@@ -7,9 +7,7 @@ export default function Layout(
   return (
     <>
       <Typography variant={"h5"}>Development</Typography>
-      <Container>
-        { children }
-      </Container>
+      { children }
     </>
   )
 }

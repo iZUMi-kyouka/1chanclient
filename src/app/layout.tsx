@@ -5,7 +5,9 @@ import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
 import Typography from "@mui/material/Typography";
 import { Roboto } from 'next/font/google';
-import {AppBar, Container} from "@mui/material";
+import {AppBar, Box, Container, Menu, MenuItem} from "@mui/material";
+import ReduxProvider from "./store";
+import Link from "next/link";
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -29,20 +31,25 @@ export default function RootLayout({
     <head>
     </head>
 
-    <body className={roboto.variable}>
-    <AppRouterCacheProvider>
-      <ThemeProvider theme={theme}>
-        <Container>
-          <AppBar>
+    <ReduxProvider>
+      <body className={roboto.variable}>
+        <AppRouterCacheProvider>
+          <ThemeProvider theme={theme}>
             <Container>
-              <Typography variant={"h4"}>1chan</Typography>
+              <AppBar>
+                  <Typography variant={"h4"}>1chan</Typography>
+              </AppBar>
+              <br/>
+              <br/>
+              <br/>
+              <Link href="/dev/redux">Redux</Link>
+              <Link href="/">Home</Link>
+              {children}
             </Container>
-          </AppBar>
-          {children}
-        </Container>
-      </ThemeProvider>
-    </AppRouterCacheProvider>
+          </ThemeProvider>
+        </AppRouterCacheProvider>
       </body>
+    </ReduxProvider>
     </html>
   );
 }
