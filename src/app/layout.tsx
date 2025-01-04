@@ -5,9 +5,18 @@ import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
 import Typography from "@mui/material/Typography";
 import { Roboto } from 'next/font/google';
-import {AppBar, Box, Container, Menu, MenuItem} from "@mui/material";
+import {alpha, AppBar, Box, Button, ButtonGroup, Container, CssBaseline, IconButton, InputAdornment, Menu, MenuItem, styled, TextField, Toolbar} from "@mui/material";
 import ReduxProvider from "./store";
 import Link from "next/link";
+import MenuIcon from '@mui/icons-material/Menu'
+import { AccountCircle, AccountCircleSharp, SearchSharp } from "@mui/icons-material";
+import FetchUserData from "@/components/userDataProvider";
+import PrimaryAppBar from "@/components/appBar";
+import ThreadCard from "@/components/threadCard";
+import Sidebar from "@/components/sidebar";
+import HandleDeviceID from "@/components/deviceIdHandler";
+
+const fetcher = (...args: [string, RequestInit?]) => fetch(...args).then(res => res.json);
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -15,6 +24,8 @@ const roboto = Roboto({
   display: 'swap',
   variable: '--font-roboto'
 });
+
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -26,30 +37,38 @@ export default function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
+
+  // const { data, error, isLoading } = useSWR('https://localhost:3000/api/v1/authcheck', fetcher);
+  // if (error || isLoading) {
+  //   // do nothing
+  // } else {
+
+  // }
+
   return (
     <html lang="en">
     <head>
     </head>
+    <CssBaseline />
 
-    <ReduxProvider>
-      <body className={roboto.variable}>
-        <AppRouterCacheProvider>
+    <body className={roboto.variable}>
+      <ReduxProvider>
+        <HandleDeviceID />
+        <FetchUserData />
+        <AppRouterCacheProvider>  
           <ThemeProvider theme={theme}>
-            <Container>
-              <AppBar>
-                  <Typography variant={"h4"}>1chan</Typography>
-              </AppBar>
-              <br/>
-              <br/>
-              <br/>
-              <Link href="/dev/redux">Redux</Link>
-              <Link href="/">Home</Link>
-              {children}
-            </Container>
+            <PrimaryAppBar/>
+            <Toolbar 
+              sx={{
+                marginBottom: '24px'
+              }}
+            />
+            {children}
           </ThemeProvider>
         </AppRouterCacheProvider>
-      </body>
-    </ReduxProvider>
+      </ReduxProvider>
+    </body>
+
     </html>
   );
 }

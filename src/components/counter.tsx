@@ -1,6 +1,6 @@
 'use client';
 
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/store";
 import { Button, TextField, Typography } from "@mui/material";
 import { decrement, increment, incrementAsync, incrementByAmount, reset } from "@/store/counter/counterSlice";
