@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { updateUser, UserAccount } from "@/store/user/userSlice";
 import { AppDispatch } from "@/store/store";
 import { Typography } from "@mui/material";
+import { updateAccessToken } from "@/store/auth/authSlice";
 
 // const fetcher = (url: string) => fetch(url, {
 //     method: "GET",
@@ -31,12 +32,13 @@ export default function FetchUserData() {
 
             const data = await response.json();
 
+            dispatch(updateAccessToken(data.account.access_token));
+
             dispatch(
                 updateUser({
                 account: {
                     id: data.account.id,
                     username: data.account.username,
-                    access_token: data.account.access_token,
                 },
                 profile: {
                     profile_photo_path: '',

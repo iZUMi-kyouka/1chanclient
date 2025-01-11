@@ -9,6 +9,9 @@ const theme = createTheme({
   },
   palette: {
     primary: purple
+  },
+  colorSchemes: {
+    dark: true
   }
 });
 

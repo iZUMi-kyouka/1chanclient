@@ -1,21 +1,26 @@
 'use client';
 
-import { AppBar, Avatar, Box, Button, ButtonBase, Chip, IconButton, Menu, MenuItem, Toolbar, Typography, useTheme } from "@mui/material";
-import { AccountCircleSharp, Create, CreateSharp, LoginSharp, MenuSharp, MoreVertSharp, NotificationsSharp, SearchSharp, SettingsSharp } from "@mui/icons-material";
+import { AppBar, Avatar, Box, Button, ButtonBase, Chip, Icon, IconButton, Menu, MenuItem, Snackbar, Toolbar, Typography, useColorScheme, useTheme } from "@mui/material";
+import { AccountCircleSharp, Create, CreateSharp, DarkModeSharp, LightModeSharp, LoginSharp, MenuSharp, MoreVertSharp, NotificationsSharp, SearchSharp, SettingsSharp } from "@mui/icons-material";
 import { Search, SearchBarIconWrapper, SearchBarInputBase } from "./searchBar";
 import { useDispatch, useSelector } from "react-redux";
-import { resetUser, selectUserAccount, selectUserDeviceID, updateAccessToken, updateDeviceID } from "@/store/user/userSlice";
+import { resetUser, selectUserAccount } from "@/store/user/userSlice";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { selectAccessToken, selectDeviceID, updateAccessToken } from "@/store/auth/authSlice";
+import { customFetch } from "@/utils/customFetch";
+import ColorSchemeSwitcher from "./colorSchemeSwitcher";
 
 export default function PrimaryAppBar() {
 	const router = useRouter();
 	const dispatch = useDispatch();
 	const theme = useTheme();
 	const user = useSelector(selectUserAccount);
-	const deviceID = useSelector(selectUserDeviceID);
+	const accessToken = useSelector(selectAccessToken);
+	const deviceID = useSelector(selectDeviceID);
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+	const [logoutSnackbarState, setLogoutSnackbarState] = useState(false);
 	const handleProfileMenuClick = (e: React.MouseEvent<HTMLElement>) => {
 		setAnchorEl(e.currentTarget);
 	};
@@ -24,16 +29,18 @@ export default function PrimaryAppBar() {
 
 	const handleLogout = async () => {
 		try {
-			const response = await fetch('http://localhost:8080/api/v1/users/logout', {
+			const response = await customFetch('http://localhost:8080/api/v1/users/logout', {
 				method: 'GET',
 				headers: {
-					'Authorization': `Bearer ${user.access_token}`
-				},
+					'Authorization': `Bearer ${accessToken}`,
+					'Device-ID': deviceID
+				},	
 				credentials: 'include'
 			})
 
-			if (response.status === 200) {
+			if (response.ok) {
 				console.log('Logout success.')
+				setLogoutSnackbarState(true);
 				dispatch(resetUser())
 			} else {
 				console.log('Logout failed.')
@@ -78,18 +85,29 @@ export default function PrimaryAppBar() {
 		</Menu>
 	);
 
-	const handleRefreshAccessToken = async () => {
-		const response = await fetch('http://localhost:8080/api/v1/users/refresh', {
-			headers: {
-				'Device-ID': deviceID || '',
-			},
-			credentials: 'include'
-		})
+	const logoutSuccessSnackbar = (
+		<Snackbar
+			open={logoutSnackbarState}
+			anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+			autoHideDuration={5000}
+			onClose={() => setLogoutSnackbarState(false)}
+			message={"Logout successful."}
+		/>
+	);
 
-		const data = await response.json();
-		dispatch(updateAccessToken(data.access_token));
-	}
+	// const handleRefreshAccessToken = async () => {
+	// 	const response = await fetch('http://localhost:8080/api/v1/users/refresh', {
+	// 		headers: {
+	// 			'Device-ID': deviceID || '',
+	// 		},
+	// 		credentials: 'include'
+	// 	})
 
+	// 	const data = await response.json();
+	// 	dispatch(updateAccessToken(data.access_token));
+	// }
+
+	
 	return (
 		<Box sx={{ flexGrow: 1}}>
 			<AppBar 
@@ -143,9 +161,10 @@ export default function PrimaryAppBar() {
 							user.username
 							? <Button
 							disableElevation
+							onClick={() => { router.push("/new") }}
 							sx={{
-								color: 'purple',
-								backgroundColor: 'white',
+								// color: 'purple',
+								// backgroundColor: 'white',
 								height: '48px',
 								alignItems: 'center',
 								marginRight: theme.spacing(2)
@@ -157,11 +176,7 @@ export default function PrimaryAppBar() {
 						</Button>
 						: <></>
 						}
-						{/* <Button
-							onClick={handleRefreshAccessToken}
-						>
-							Refresh Token
-						</Button> */}
+
 						<IconButton
 							size='large'
 							color='inherit'
@@ -174,7 +189,7 @@ export default function PrimaryAppBar() {
 						>
 							<SettingsSharp />
 						</IconButton>
-
+						<ColorSchemeSwitcher />
 							{
 								user.username 
 								? <IconButton 
@@ -184,10 +199,11 @@ export default function PrimaryAppBar() {
 									<CustomAvatar username={user.username} />
 									</IconButton>
 								: <Button
+									color="secondary"
 									sx={{
 										marginLeft: theme.spacing(2),
-										backgroundColor: 'white',
-										color: 'purple'
+										// backgroundColor: 'white',
+										// color: 'purple'
 									}}
 									startIcon={<LoginSharp 
 										color='inherit'
@@ -217,6 +233,7 @@ export default function PrimaryAppBar() {
 				</Toolbar>
 			</AppBar>
 			{profileMenu}
+			{logoutSuccessSnackbar}
 		</Box>
 	);
 }

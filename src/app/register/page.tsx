@@ -4,7 +4,6 @@ import { alpha, Button, Card, CardContent, colors, Container, FormControl, IconB
 import React, { useState } from 'react'
 import theme from '../theme';
 import Link from 'next/link';
-import useSWR from 'swr';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectUserAccount, updateUser, User } from '@/store/user/userSlice';
@@ -50,7 +49,7 @@ const page = () => {
 		setUsername(newUsername);
 	};
 
-	const handleLogin = async () => {
+	const handleRegister = async () => {
 		if (!usernameOK || !passwordOK || isLoading) {
 			return;
 		}
@@ -59,14 +58,14 @@ const page = () => {
 		setIsLoading(true);
 
 		try {
-      const response = await fetch('http://localhost:8080/api/v1/users/login', {
+      const response = await fetch('http://localhost:8080/api/v1/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-					'Device-ID': deviceID
+          'Device-ID': deviceID
         },
         body: JSON.stringify({ username, password }),
-				credentials: 'include'
+			credentials: 'include'
       });
 
       // if (!response.ok) {
@@ -75,9 +74,9 @@ const page = () => {
 
       const data = await response.json();
 
-			dispatch(
-				updateAccessToken(data.account.access_token)
-			);
+	  dispatch(
+		updateAccessToken(data.account.access_token)
+	  );
 
       dispatch(
         updateUser({
@@ -98,8 +97,8 @@ const page = () => {
           },
         })
       );
-			console.log('Updated user data!');
-			router.push('/');
+		console.log('Updated user data!');
+		router.push('/');
     } catch (err: any) {
 			console.log("error during login: ", err.message);
       setError(err.message);
@@ -133,6 +132,7 @@ const page = () => {
     event.preventDefault();
   };
 
+
   return (
     <Container
 			sx={{
@@ -142,7 +142,9 @@ const page = () => {
 				justifyContent: 'center'
 			}}
     >
-        <Typography variant='h3'>
+        <Typography
+					variant='h3'
+				>
 					1chan
 				</Typography>
 				<Card>
@@ -180,15 +182,15 @@ const page = () => {
 						<Button
 							fullWidth
 							sx={classes.button}
-							onClick={handleLogin}
+							onClick={handleRegister}
 							startIcon={<LoginSharp />}
 							disabled={!(usernameOK && passwordOK) && isLoading}
-						>{isLoading ? 'Logging in...' : 'Login'}</Button>
+						>{isLoading ? 'Registering...' : 'Register'}</Button>
 						<Container sx={{marginTop: theme.spacing(3)}}>
 
 						</Container>
 						<Typography variant='body2'>
-							Don't have an account?  <Link style={{color: 'inherit'}} href="/register">Register</Link>
+							Already have an account? <Link style={{color: 'inherit'}} href="/login">Login</Link>
 						</Typography>
 					</CardContent>
 				</Card>

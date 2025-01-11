@@ -6,7 +6,6 @@ type UUID = string;
 export interface UserAccount {
     id?: UUID,
     username?: string,
-    access_token?: string
 }
 
 interface UserProfile {
@@ -24,13 +23,11 @@ interface UserProfile {
 export interface User {
     account: UserAccount,
     profile: UserProfile,
-    deviceID: undefined | string
 }
 
 const userAccountInitialState: UserAccount = {
     id: undefined,
     username: undefined,
-    access_token: undefined,
 };
 
 const userProfileInitialState: UserProfile = {
@@ -47,8 +44,7 @@ const userProfileInitialState: UserProfile = {
 
 const initialState: User = {
     account: userAccountInitialState,
-    profile: userProfileInitialState,
-    deviceID: undefined
+    profile: userProfileInitialState
 }
 
 const userSlice = createSlice({
@@ -59,12 +55,6 @@ const userSlice = createSlice({
             state.account = action.payload.account;
             state.profile = action.payload.profile;
         },
-        updateDeviceID(state, action: PayloadAction<string>) {
-            state.deviceID =action.payload;
-        },
-        updateAccessToken(state, action: PayloadAction<string>) {
-            state.account.access_token = action.payload;
-        },
         resetUser(state) {
             state.account = initialState.account;
             state.profile = initialState.profile;
@@ -72,8 +62,7 @@ const userSlice = createSlice({
     }
 });
 
-export const { updateUser, updateDeviceID, updateAccessToken, resetUser } = userSlice.actions;
-export const selectUserDeviceID = (state: RootState) => state.user.deviceID;
+export const { updateUser, resetUser } = userSlice.actions;
 export const selectUserAccount = (state: RootState) => state.user.account;
 export const selectUserProfile = (state: RootState) => state.user.profile;
 export default userSlice.reducer;

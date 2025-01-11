@@ -1,6 +1,6 @@
 'use client';
 
-import { updateDeviceID } from '@/store/user/userSlice';
+import { updateDeviceID } from '@/store/auth/authSlice';
 import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux';
 

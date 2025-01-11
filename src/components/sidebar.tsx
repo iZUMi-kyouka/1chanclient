@@ -1,7 +1,8 @@
 'use client';
 
+import { postCategories } from '@/app/categories';
 import { selectCurrentHomePage } from '@/store/appState/appStateSlice';
-import { HomeOutlined, HomeSharp, InboxOutlined, LocalMoviesSharp, PhonelinkSharp, TravelExploreSharp, VideogameAssetSharp, WhatshotSharp } from '@mui/icons-material';
+import { HomeOutlined, HomeSharp, InboxOutlined, LocalMoviesSharp, PhonelinkSharp, TravelExploreSharp, VideogameAssetSharp, Whatshot, WhatshotSharp } from '@mui/icons-material';
 import { Toolbar, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Drawer, Box } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React from 'react'
@@ -30,76 +31,44 @@ const Sidebar = () => {
     }
   };
 
-	const sidebarItems = [
-		{
-			name: "home",
-			icon: <HomeSharp />,
-		},
-		{
-			name: "trending",
-			icon: <WhatshotSharp />
-		},
-	];
-
-	const sidebarCategories = [
-		{
-			name: "technology",
-			icon: <PhonelinkSharp />,
-		},
-		{
-			name: "games",
-			icon: <VideogameAssetSharp />
-		},
-		{
-			name: "novies",
-			icon: <LocalMoviesSharp />
-		},
-		{
-			name: "travel",
-			icon: <TravelExploreSharp />
-		}
-	];
-
-	const handleHomepageNavigation = (route: string) => {
-		if (route === 'home') {
-			router.push('/')
-		} else if (route === 'trending') {
-			router.push('/trending') 
-		} else {
-			router.push(`/top/${route}`)
-		}
-	};
-
 	const drawer = (
     <div>
       <Toolbar />
       <Divider />
       <List>
-        {sidebarItems.map(({name, icon}, index) => (
+        <ListItem key={"home"} disablePadding>
+          <ListItemButton
+            onClick={() => router.push("/")}
+          >
+            <ListItemIcon>
+              <HomeSharp />
+            </ListItemIcon>
+            <ListItemText primary={"Home"} />
+          </ListItemButton>
+        </ListItem>
+        <ListItem key={"trending"} disablePadding>
+          <ListItemButton
+            onClick={() => router.push("/")}
+          >
+            <ListItemIcon>
+              <WhatshotSharp />
+            </ListItemIcon>
+            <ListItemText primary={"Trending"} />
+          </ListItemButton>
+        </ListItem>
+      </List>
+      <Divider />
+      <List>
+        {postCategories.map(({id, name, displayName, icon}, index) => (
           <ListItem key={name} disablePadding>
             <ListItemButton
-              selected={currentHomePage === name}
-							onClick={() => handleHomepageNavigation(name)}
+              selected={currentHomePage.name === name}
+							onClick={() => router.push(`/top/${id}`)}
 						>
               <ListItemIcon>
 								{icon}
               </ListItemIcon>
-              <ListItemText primary={name[0].toUpperCase()+name.slice(1)} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-      <Divider />
-      <List>
-        {sidebarCategories.map(({name, icon}, index) => (
-          <ListItem key={name} disablePadding>
-            <ListItemButton
-              onClick={() => handleHomepageNavigation(name)}
-            >
-              <ListItemIcon>
-                {icon}
-              </ListItemIcon>
-              <ListItemText primary={name[0].toUpperCase()+name.slice(1)} />
+              <ListItemText primary={displayName} />
             </ListItemButton>
           </ListItem>
         ))}

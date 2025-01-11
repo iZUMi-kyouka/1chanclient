@@ -1,24 +1,23 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
-
-type CurrentHomePage = 'home' | 'trending' | 'technology' | 'games' | 'movies' | 'travel';
+import { HomeCategory, PostCategoryPlain } from "@/app/categories";
 
 export interface AppState {
     theme: 'dark' | 'light' | 'auto',
-    currentHomePage: CurrentHomePage,
+    currentHomePage: PostCategoryPlain,
 }
 
 const appstateInitialState: AppState = {
     theme: 'auto',
-    currentHomePage: 'home'
+    currentHomePage: HomeCategory
 }
 
 const appstateSlice = createSlice({
     name: 'appstate',
     initialState: appstateInitialState,
     reducers: {
-        updateCurrentHomePage(state, action: PayloadAction<CurrentHomePage>) {
-            state.currentHomePage = action.payload;
+        updateCurrentHomePage(state, action: PayloadAction<PostCategoryPlain>) {
+            state.currentHomePage = action.payload
         }
     }
 });
