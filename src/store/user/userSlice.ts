@@ -1,29 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
+import { LikedThreads, User, UserAccount, UserProfile } from "@/interfaces/user";
 
-type UUID = string;
 
-export interface UserAccount {
-    id?: UUID,
-    username?: string,
-}
-
-interface UserProfile {
-    profile_photo_path: string,
-    biodata: string,
-    email: string,
-    post_count: number,
-    comment_count: number,
-    preferred_lang: "en" | "id" | "ja",
-    preferred_theme: "light" | "dark" | "auto",
-    creation_date: string,
-    last_login: string
-}
-
-export interface User {
-    account: UserAccount,
-    profile: UserProfile,
-}
 
 const userAccountInitialState: UserAccount = {
     id: undefined,
@@ -44,7 +23,8 @@ const userProfileInitialState: UserProfile = {
 
 const initialState: User = {
     account: userAccountInitialState,
-    profile: userProfileInitialState
+    profile: userProfileInitialState,
+    liked_threads: {}
 }
 
 const userSlice = createSlice({
@@ -55,6 +35,18 @@ const userSlice = createSlice({
             state.account = action.payload.account;
             state.profile = action.payload.profile;
         },
+        updateLike(state, action: PayloadAction<LikedThreads>) {
+          state.liked_threads = action.payload
+        },
+        addToLike(state, action: PayloadAction<number>) {
+          state.liked_threads[action.payload] = 1;
+        },
+        removeFromLikeDislike(state, action: PayloadAction<number>) {
+          delete state.liked_threads[action.payload];
+        },
+        addToDislike(state, action: PayloadAction<number>) {
+          state.liked_threads[action.payload] = 0;
+        },
         resetUser(state) {
             state.account = initialState.account;
             state.profile = initialState.profile;
@@ -62,7 +54,8 @@ const userSlice = createSlice({
     }
 });
 
-export const { updateUser, resetUser } = userSlice.actions;
+export const { updateUser, resetUser, updateLike, addToDislike, removeFromLikeDislike, addToLike } = userSlice.actions;
 export const selectUserAccount = (state: RootState) => state.user.account;
 export const selectUserProfile = (state: RootState) => state.user.profile;
+export const selectUserLikedThreads = (state: RootState) => state.user.liked_threads;
 export default userSlice.reducer;

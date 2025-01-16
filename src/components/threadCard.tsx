@@ -1,8 +1,19 @@
-import { MoreVertSharp, ThumbDownAltSharp, ThumbDownOutlined, ThumbDownSharp, ThumbUpAltSharp, ThumbUpOutlined, ThumbUpSharp, VisibilityOffOutlined, VisibilityOutlined, VisibilitySharp } from '@mui/icons-material';
-import { alpha, Avatar, Box, Button, ButtonGroup, Card, CardActionArea, CardActions, CardContent, CardHeader, Chip, IconButton, Typography, useTheme } from '@mui/material';
-import React from 'react'
+"use client";
 
-export interface ThreadSnippet {
+import { MoreVertSharp, ThumbDown, ThumbDownAltSharp, ThumbDownOffAltSharp, ThumbDownOutlined, ThumbDownSharp, ThumbUp, ThumbUpAltSharp, ThumbUpOffAltSharp, ThumbUpOutlined, ThumbUpSharp, VisibilityOffOutlined, VisibilityOutlined, VisibilitySharp } from '@mui/icons-material';
+import { alpha, Avatar, Box, Button, ButtonGroup, Card, CardActionArea, CardActions, CardContent, CardHeader, Chip, IconButton, Typography, useTheme } from '@mui/material';
+import React, { useState } from 'react'
+import MuiMarkdown from 'mui-markdown';
+import { BASE_API_URL } from '@/app/layout';
+import { customFetch } from '@/utils/customFetch';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToDislike, addToLike, removeFromLikeDislike, selectUserLikedThreads } from '@/store/user/userSlice';
+import { store } from '@/store/store';
+import { useRouter } from 'next/navigation';
+import { Thread } from '@/interfaces/thread';
+import PaginatedResponse from '@/interfaces/paginatedResponse';
+
+export interface ThreadView {
   id: number,
   username: string,
   user_profile_path?: string,
@@ -17,134 +28,169 @@ export interface ThreadSnippet {
   view_count: number,
 }
 
-export interface Pagination {
-  current_page: number,
-  last_page: number,
-  page_size: number
-}
-
-export interface ThreadListResponse {
-  threads: ThreadSnippet[],
-  pagination: Pagination
-}
-
 const classes = {
   button: {
     borderRadius: '25px'
   }
 }
 
-const ThreadCard = ({ thread, width }: { thread: ThreadSnippet, width?: string}) => {
+const ThreadCard = ({ thread, width, disableOnClick }: { thread: ThreadView, width?: string, disableOnClick?: boolean}) => {
   const theme = useTheme();
+  const dispatch = useDispatch();
+  const likes = useSelector(selectUserLikedThreads);
+  const [likeCount, setLikeCount] = useState(thread.like_count);
+  const [dislikeCount, setDislikeCount] = useState(thread.dislike_count);
+  const router = useRouter();
 
-  const handleLikeDislike = async (likeDislike: number) => {
+  const handleLikeDislike = (likeDislike: number, remove?: boolean) => async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    var url: string;
     if (likeDislike === 1) {
-      try {
-        const request = fetch(`http://localhost:8080/api/v1/threads/like/${thread.id}`, {
-          method: 'POST',
-        });
-        
-        const response = await request;
-        if (response.ok) {
+      url = `${BASE_API_URL}/threads/like/${thread.id}`
+    } else {
+      url = `${BASE_API_URL}/threads/dislike/${thread.id}` 
+    }
 
+    try {
+      const response = await customFetch(url, {
+        method: 'PUT',
+      })
+
+      if (response.ok) {
+        console.log('response ok')
+        if (remove) {
+          if (likeDislike === 1) {
+            setLikeCount(likeCount - 1)
+          } else {
+            setDislikeCount(dislikeCount - 1)
+          }
+          dispatch(removeFromLikeDislike(thread.id));
+        } else {
+          if (likeDislike === 1) {
+            setLikeCount(likeCount + 1)
+            dispatch(addToLike(thread.id));
+          } else {
+            setDislikeCount(dislikeCount + 1);
+            dispatch(addToDislike(thread.id));
+          }
         }
-
-      } catch (err: any) {
-        console.log(`Error handling like and dislike: ${err}`)
       }
+
+    } catch (err: any) {
+      console.log(`error: ${err}`);
     }
   }
 
+  const isLiked = likes[thread.id] !== undefined && likes[thread.id] === 1;
+  const isDisliked = likes[thread.id] !== undefined && likes[thread.id] === 0;
+
   return (
-    <Card sx={{ 
-      width: width || '85ch',
-      '& .MuiCardHeader-title': {
-        fontWeight: 400,
-        fontSize: '18px'
-      },
-      '& .MuiAvatar-root': {
-        height: '45px',
-        width: '45px'
-      },
-      '& .MuiCardContent-root': {
-        padding: theme.spacing(0, 2, 1, 2)
-      },
-      '& .MuiCardActions-root': {
-        padding: theme.spacing(0, 1, 1, 1)
-      }
+    <Card 
+      sx={{ 
+        width: width || '85ch',
+        '& .MuiCardHeader-title': {
+          fontWeight: 400,
+          fontSize: '18px'
+        },
+        '& .MuiAvatar-root': {
+          height: '45px',
+          width: '45px'
+        },
+        '& .MuiCardContent-root': {
+          padding: theme.spacing(0, 2, 1, 2)
+        },
+        '& .MuiCardActions-root': {
+          padding: theme.spacing(0, 1, 1, 1)
+        }
     }}>
-      <CardHeader 
-        avatar={
-          <Avatar>
-            {thread.username[0].toUpperCase()}
-          </Avatar>
-        }
-        action={
-          <IconButton
-            color='inherit'
-          >
-            <MoreVertSharp />
-          </IconButton>
-        }
-        title={thread.title}
-        subheader={`by ${thread.username}`}
-      />
-      <CardContent>
-        <Typography variant='body1'>
-          {thread.original_post}
-        </Typography>
-      </CardContent>
-      <CardActions disableSpacing>
-        {
-          thread.likeStatus === undefined
-          ? (<>
-            <Button
-              sx={classes.button}
-              startIcon={<ThumbUpOutlined />}
-            >{thread.like_count}</Button>
-            <Button
-              sx={classes.button}
-              startIcon={<ThumbDownOutlined />}
-            >{thread.dislike_count}</Button>
-          </>)
-          : thread.likeStatus === 0
-          ? (<>
-            <Button
-              sx={classes.button}
-              startIcon={<ThumbUpOutlined />}
-            >{thread.like_count}</Button>
-            <Button
-              sx={classes.button}
-              startIcon={<ThumbDownSharp />}
-            >{thread.dislike_count}</Button>
-          </>)
-          : (<>
-            <Button
-              sx={classes.button}
-              startIcon={<ThumbUpSharp />}
-            >{thread.like_count}</Button>
-            <Button
-              sx={classes.button}
-              startIcon={<ThumbDownOutlined />}
-            >{thread.dislike_count}</Button>
-            </>)
-        }
-        <Box sx={{flexGrow: 1}} />
         <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            marginRight: 2
-          }}
+          onClick={() => { router.push(`/thread/${thread.id}`)}}
         >
-          <VisibilityOutlined 
+        <CardHeader 
+          avatar={
+            <Avatar>
+              {thread.username[0].toUpperCase()}
+            </Avatar>
+          }
+          action={
+            <IconButton
+              color='inherit'
+            >
+              <MoreVertSharp />
+            </IconButton>
+          }
+          title={thread.title}
+          subheader={`by ${thread.username}`}
+        />
+
+          <CardContent>
+            <MuiMarkdown>
+              {thread.original_post}
+            </MuiMarkdown>
+          </CardContent>
+        <CardActions disableSpacing>
+          {
+            !isLiked && !isDisliked
+            ? (<>
+              {/* <Typography>Not liked or disliked</Typography> */}
+              <Button
+                onClick={ handleLikeDislike(1)}
+                sx={classes.button}
+                startIcon={<ThumbUpOutlined />}
+              >{likeCount}</Button>
+              <Button
+                onClick={handleLikeDislike(0)}
+                sx={classes.button}
+                startIcon={<ThumbDownOutlined />}
+              ></Button>
+            </>)
+            : isDisliked
+            ? (<>
+              {/* <Typography>Disliked</Typography> */}
+              <Button
+                onClick={handleLikeDislike(1)}
+                sx={classes.button}
+                startIcon={<ThumbUpOutlined />}
+              >{likeCount}</Button>
+              <Button
+                onClick={handleLikeDislike(0, true)}
+                sx={classes.button}
+                startIcon={<ThumbDown />}
+              ></Button>
+            </>)
+            : isLiked
+            ? (<>
+              {/* <Typography>Liked</Typography> */}
+              <Button
+                onClick={handleLikeDislike(1, true)}
+                sx={classes.button}
+                startIcon={<ThumbUp />}
+              >{likeCount}</Button>
+              <Button
+                onClick={handleLikeDislike(0)}
+                sx={classes.button}
+                startIcon={<ThumbDownOutlined />}
+              ></Button>
+              </>)
+              : <></>
+          }
+          <Box sx={{flexGrow: 1}} />
+          <Box
             sx={{
-              marginRight: 1
+              display: 'flex',
+              alignItems: 'center',
+              marginRight: 2
             }}
-          />
-          {thread.view_count}
+          >
+            <VisibilityOutlined 
+              sx={{
+                marginRight: 1
+              }}
+            />
+            {thread.view_count}
+          </Box>
+        </CardActions>
         </Box>
-      </CardActions>
     </Card>
   )
 }

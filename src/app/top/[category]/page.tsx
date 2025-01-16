@@ -22,7 +22,6 @@ const page = ({ params }: { params: Promise<Params> }) => {
 
   return (
       <>
-        <Sidebar />
         <ThreadList category={categoryId} />
       </>
     );

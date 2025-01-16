@@ -48,6 +48,4 @@ export const postCategories = [
     newCategory(16, "Work & Productivity", "work_productivity", <WorkSharp />),
     newCategory(17, "Travel", "travel", <ExploreSharp />),
     newCategory(18, "Food & Drinks", "food_drinks", <RamenDiningSharp />),
-    newCategory(19, "Home", "home", <HomeSharp />),
-    newCategory(20, "Trending", "trending", <WhatshotSharp />)
 ].sort((a, b) => a.name < b.name ? -1 : 1);

@@ -18,7 +18,9 @@ export default function Home() {
   return (
     <>
       <Sidebar />
-      <ThreadList />
+      <Container sx={{ paddingLeft: '300px !important',}}>
+        <ThreadList />
+      </Container>
     </>
   );
 }

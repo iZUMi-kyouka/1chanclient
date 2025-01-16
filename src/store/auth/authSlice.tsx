@@ -1,11 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
-
-export interface Auth {
-    accessToken: string,
-    deviceID: string,
-    isRefreshing: boolean
-}
+import Auth from "@/interfaces/auth";
 
 const authStateInitialState: Auth = {
     accessToken: '',
@@ -25,11 +20,15 @@ const authSlice = createSlice({
         },
         setIsRefreshing(state, action: PayloadAction<boolean>) {
             state.isRefreshing = action.payload;
+        },
+        resetAuth(state) {
+          state.accessToken = '';
+          state.isRefreshing = false;
         }
     }
 })
 
-export const { updateAccessToken, updateDeviceID, setIsRefreshing } = authSlice.actions;
+export const { updateAccessToken, updateDeviceID, setIsRefreshing, resetAuth } = authSlice.actions;
 export const selectAccessToken = (state: RootState) => state.auth.accessToken;
 export const selectDeviceID = (state: RootState) => state.auth.deviceID;
 export const selectIsRefreshing = (state: RootState) => state.auth.isRefreshing;

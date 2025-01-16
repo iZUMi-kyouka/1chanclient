@@ -1,7 +1,7 @@
 'use client';
 
 import { postCategories } from '@/app/categories';
-import { selectCurrentHomePage } from '@/store/appState/appStateSlice';
+import { selectCurrentHomePage, updateCurrentHomePage } from '@/store/appState/appStateSlice';
 import { HomeOutlined, HomeSharp, InboxOutlined, LocalMoviesSharp, PhonelinkSharp, TravelExploreSharp, VideogameAssetSharp, Whatshot, WhatshotSharp } from '@mui/icons-material';
 import { Toolbar, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Drawer, Box } from '@mui/material';
 import { useRouter } from 'next/navigation';
@@ -31,6 +31,11 @@ const Sidebar = () => {
     }
   };
 
+  const handleChangeCategory = ({id, name, displayName}: {id: number, name: string, displayName: string}) => () => {
+    dispatch(updateCurrentHomePage({id, name, displayName}));
+    router.push(`/top/${id}`);
+  };
+
 	const drawer = (
     <div>
       <Toolbar />
@@ -38,22 +43,13 @@ const Sidebar = () => {
       <List>
         <ListItem key={"home"} disablePadding>
           <ListItemButton
-            onClick={() => router.push("/")}
+            selected={currentHomePage.name === "home"}
+            onClick={handleChangeCategory({id: 0, name: "home", displayName: "Home"})}
           >
             <ListItemIcon>
               <HomeSharp />
             </ListItemIcon>
             <ListItemText primary={"Home"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem key={"trending"} disablePadding>
-          <ListItemButton
-            onClick={() => router.push("/")}
-          >
-            <ListItemIcon>
-              <WhatshotSharp />
-            </ListItemIcon>
-            <ListItemText primary={"Trending"} />
           </ListItemButton>
         </ListItem>
       </List>
@@ -63,7 +59,7 @@ const Sidebar = () => {
           <ListItem key={name} disablePadding>
             <ListItemButton
               selected={currentHomePage.name === name}
-							onClick={() => router.push(`/top/${id}`)}
+							onClick={handleChangeCategory({id, name, displayName})}
 						>
               <ListItemIcon>
 								{icon}

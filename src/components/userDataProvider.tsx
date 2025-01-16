@@ -3,10 +3,13 @@
 import useSWR from "swr";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { updateUser, UserAccount } from "@/store/user/userSlice";
+import { updateLike, updateUser } from "@/store/user/userSlice";
+import { LikedThreads } from "@/interfaces/user";
 import { AppDispatch } from "@/store/store";
 import { Typography } from "@mui/material";
 import { updateAccessToken } from "@/store/auth/authSlice";
+import { customFetch } from "@/utils/customFetch";
+import { BASE_API_URL } from "@/app/layout";
 
 // const fetcher = (url: string) => fetch(url, {
 //     method: "GET",
@@ -22,7 +25,7 @@ export default function FetchUserData() {
   useEffect(() => {
     const fetchFunction = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/v1/users/refresh_new', {
+            let response = await fetch('http://localhost:8080/api/v1/users/refresh_new', {
                 method: 'GET',
                 headers: {
                     'Device-ID': localStorage.getItem('deviceID') || ''
@@ -53,9 +56,22 @@ export default function FetchUserData() {
                 },
                 })
             );
+
+            response = await customFetch(`${BASE_API_URL}/users/likes`, {
+              method: 'GET'
+            });
+      
+            if (response.ok) {
+              const likes = await response.json() as LikedThreads;
+              dispatch(updateLike(likes));
+            } else {
+              throw new Error('Failed to fetch liked threads.')
+            }  
         } catch (err: any) {
             console.log("error during login: ", err.message);
-        } 
+        }
+
+        
     }
 
     fetchFunction();

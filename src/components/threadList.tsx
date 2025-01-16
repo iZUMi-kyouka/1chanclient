@@ -2,7 +2,10 @@ import { CircularProgress, Container, Typography, useTheme } from '@mui/material
 import React from 'react'
 import useSWR from 'swr';
 import Sidebar from './sidebar';
-import ThreadCard, { ThreadListResponse } from './threadCard';
+import PaginatedResponse from '@/interfaces/paginatedResponse';
+import ThreadCard, { ThreadView } from './threadCard';
+
+type ThreadListResponse = PaginatedResponse<ThreadView>
 
 const fetcher = (url: string) => fetch(url).then(response => response.json())
 
@@ -26,13 +29,12 @@ const ThreadList = ({ category }: { category?: number}) => {
             alignItems: 'center',
             justifyContent: 'center',
             paddingTop: theme.spacing(1),
-            paddingLeft: '300px !important',
             gap: theme.spacing(1),
             paddingBottom: theme.spacing(8),
           }}>
             {
-              data && data.threads 
-              ? data.threads.map(thread => (
+              data && data.response 
+              ? data.response.map(thread => (
                 <ThreadCard key={thread.id} thread={thread} />
               )) 
               : <div><Typography>No threads are found.</Typography></div>

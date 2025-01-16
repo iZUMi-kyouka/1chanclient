@@ -1,7 +1,8 @@
 import { useSelector } from "react-redux";
 import { store } from "../store/store";
-import { updateAccessToken, setIsRefreshing, selectAccessToken } from "@/store/auth/authSlice";
+import { updateAccessToken, setIsRefreshing, selectAccessToken, resetAuth } from "@/store/auth/authSlice";
 import { RequestOptions } from "https";
+import { resetUser } from "@/store/user/userSlice";
 
 let refreshAccessTokenPromise: Promise<string> | null = null;
 
@@ -34,6 +35,9 @@ export const customFetch = async (url: string, options?: RequestInit): Promise<R
                         }
 										).then(async (refreshResponse) => {
 											if (!refreshResponse.ok) {
+                        store.dispatch(resetUser());
+                        store.dispatch(resetAuth());
+                        alert("Your session has expired. Please login again.");
 												throw new Error("Failed to refresh token.");
 											}
 

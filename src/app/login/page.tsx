@@ -1,14 +1,16 @@
 'use client';
 import { LoginSharp, MarginTwoTone, VisibilityOffSharp, VisibilitySharp } from '@mui/icons-material';
-import { alpha, Button, Card, CardContent, colors, Container, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material'
+import { alpha, Button, Card, CardContent, colors, Container, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography, useTheme } from '@mui/material'
 import React, { useState } from 'react'
 import theme from '../theme';
 import Link from 'next/link';
 import useSWR from 'swr';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectUserAccount, updateUser, User } from '@/store/user/userSlice';
+import { LikedThreads, selectUserAccount, updateLike, updateUser, User } from '@/store/user/userSlice';
 import { selectDeviceID, updateAccessToken } from '@/store/auth/authSlice';
+import { BASE_API_URL } from '../layout';
+import { customFetch } from '@/utils/customFetch';
 
 const classes = {
 	field: {
@@ -25,6 +27,7 @@ const classes = {
 const page = () => {
 	const user = useSelector(selectUserAccount);
 	const deviceID = useSelector(selectDeviceID);
+  const theme = useTheme();
 	const router = useRouter();
 	const dispatch = useDispatch();
 
@@ -36,6 +39,7 @@ const page = () => {
 	const [passwordHidden, setPasswordHidden] = useState(true);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<null | string>(null);
+  const [errorMsg, setErrorMsg] = useState(false);
 
 
 	const handleUsernameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +63,7 @@ const page = () => {
 		setIsLoading(true);
 
 		try {
-      const response = await fetch('http://localhost:8080/api/v1/users/login', {
+      let response = await fetch('http://localhost:8080/api/v1/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -69,9 +73,9 @@ const page = () => {
 				credentials: 'include'
       });
 
-      // if (!response.ok) {
-      //   throw new Error('Failed to login. Please check your credentials.');
-      // }
+      if (!response.ok) {
+        throw new Error('Failed to login. Please check your credentials.');
+      }
 
       const data = await response.json();
 
@@ -98,11 +102,30 @@ const page = () => {
           },
         })
       );
+
+      // Get liked threads
+      try {
+        response = await customFetch(`${BASE_API_URL}/users/likes`, {
+          method: 'GET'
+        });
+  
+        if (response.ok) {
+          const likes = await response.json() as LikedThreads;
+          dispatch(updateLike(likes));
+        } else {
+          throw new Error('Failed to fetch liked threads.')
+        }  
+      } catch (err: any) {
+        console.log(`error: ${err}`)
+      }
+
+      setErrorMsg(false);
 			console.log('Updated user data!');
 			router.push('/');
     } catch (err: any) {
 			console.log("error during login: ", err.message);
       setError(err.message);
+      setErrorMsg(true);
     } finally {
       setIsLoading(false);
     }
@@ -176,6 +199,11 @@ const page = () => {
 								}
 								label="Password"
 							/>
+              {
+                errorMsg
+                ? <Typography variant='body2' color='error' sx={{marginTop: theme.spacing(1)}}>Invalid username or password.</Typography>
+                : <div style={{display: 'block', marginTop: theme.spacing(1)}}><Typography variant='body2'>&#8203;</Typography></div>
+              }
 						</FormControl>
 						<Button
 							fullWidth

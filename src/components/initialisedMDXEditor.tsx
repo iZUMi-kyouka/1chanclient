@@ -44,9 +44,10 @@ const handleImageUpload = async (image: File) => {
 
 // Only import this to the next file
 export default function InitializedMDXEditor({
+  disableImage,
   editorRef,
   ...props
-}: { editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
+}: { disableImage?: boolean, editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
   return (
     <MDXEditor
       plugins={[
@@ -66,8 +67,8 @@ export default function InitializedMDXEditor({
                 <UndoRedo />
                 <BoldItalicUnderlineToggles />
                 <CreateLink />
-                <ListsToggle />
-                <InsertImage />
+                <ListsToggle options={['bullet', 'number']}/>
+                { disableImage ? <></> : <InsertImage />}
               </>
             )
           }),
