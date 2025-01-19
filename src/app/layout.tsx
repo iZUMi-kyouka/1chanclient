@@ -1,14 +1,17 @@
+'use client';
+
 import type { Metadata } from "next";
-import { ReactNode } from "react";
+import { ReactNode, Suspense } from "react";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
 import { Roboto } from 'next/font/google';
-import {CssBaseline, Toolbar} from "@mui/material";
+import {CircularProgress, CssBaseline, Paper, Toolbar} from "@mui/material";
 import ReduxProvider from "./store";
 import FetchUserData from "@/components/userDataProvider";
 import PrimaryAppBar from "@/components/appBar";
 import HandleDeviceID from "@/components/deviceIdHandler";
+import CopyPasteSnackbar from "@/components/copiedToClipboardSnakbar";
 
 const fetcher = (...args: [string, RequestInit?]) => fetch(...args).then(res => res.json);
 
@@ -46,12 +49,11 @@ export default function RootLayout({
         <AppRouterCacheProvider>  
           <ThemeProvider theme={theme}>
             <PrimaryAppBar/>
-            <Toolbar 
-              sx={{
-                marginBottom: '24px'
-              }}
-            />
-            {children}
+            <Toolbar />
+            <Paper elevation={0} sx={{minHeight: 'calc(100vh - 64px)', borderRadius: '0px'}}>
+              {children}
+            <CopyPasteSnackbar />
+            </Paper>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </ReduxProvider>

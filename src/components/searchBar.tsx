@@ -2,6 +2,7 @@
 
 import { SearchSharp } from "@mui/icons-material";
 import { alpha, InputBase, styled } from "@mui/material";
+import { forwardRef } from "react";
 
 export const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -32,7 +33,7 @@ export const SearchBarIconWrapper = styled('div')(({ theme }) => ({
     justifyContent: 'center'
 }));
 
-export const SearchBarInputBase = styled(InputBase)(({ theme }) => ({
+export const SearchBarInputBase = styled(forwardRef<HTMLInputElement, React.ComponentProps<typeof InputBase>>((props, ref) => <InputBase {...props} inputRef={ref} />))(({ theme }) => ({
     color: 'inherit',
     '& .MuiInputBase-input': {
         height: '48px',
@@ -41,9 +42,9 @@ export const SearchBarInputBase = styled(InputBase)(({ theme }) => ({
         transition: theme.transitions.create('width'),
         width: '100%',
         [theme.breakpoints.up('sm')]: {
-            width: '15ch',
+            width: '25ch',
             '&:focus': {
-                width: '30ch'
+                width: '40ch'
             }
         }
     }

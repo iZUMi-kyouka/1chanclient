@@ -1,4 +1,8 @@
-export type LikedThreads = {[thread_id: number]: number | undefined}
+export type LikedThreads = {[thread_id: number]: number}
+export type LikedComments = {[comment_id: number]: number}
+export type WrittenThreads = {[thread_id: number]: number}
+export type WrittenComments = {[comment_id: number]: number}
+
 export type UUID = string;
 
 export interface UserAccount {
@@ -21,5 +25,13 @@ export interface UserProfile {
 export interface User {
   account: UserAccount,
   profile: UserProfile,
-  liked_threads: LikedThreads
+  liked_threads: LikedThreads,
+  liked_comments: LikedComments,
+  threads: WrittenThreads,
+  comments: WrittenComments
+}
+
+export interface UserLikes {
+  threads: LikedThreads,
+  comments: LikedComments
 }

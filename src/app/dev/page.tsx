@@ -6,6 +6,7 @@ import CommentCardEdit from "@/components/commentCardEdit";
 import { ForwardRefEditor } from "@/components/forwardRefEditor";
 import { Box, Button, Card, CardActionArea, CardActions, Container } from "@mui/material";
 import Typography from "@mui/material/Typography";
+import ThreadListFilterDropdown from "@/components/threadListFilterDropdown";
 
 const testComment: Comment = {
   id: 0,
@@ -34,6 +35,7 @@ export default function Page() {
       >
         <CommentCard comment={testComment} />
         <CommentCardEdit/>
+        <ThreadListFilterDropdown />
       </Container>
     </>
   );

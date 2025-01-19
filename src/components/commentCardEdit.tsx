@@ -1,9 +1,11 @@
 import { MoreVertSharp } from '@mui/icons-material';
 import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, Container, IconButton, Typography, useTheme } from '@mui/material';
-import React from 'react'
+import React, { useRef } from 'react'
 import { ForwardRefEditor } from './forwardRefEditor';
 import { useSelector } from 'react-redux';
 import { selectUserAccount } from '@/store/user/userSlice';
+import '@mdxeditor/editor/style.css';
+import { MDXEditorMethods } from '@mdxeditor/editor';
 
 export interface Comment {
   id: number,
@@ -15,20 +17,21 @@ export interface Comment {
   dislike_count: number
 }
 
-const CommentCardEdit = ({ onSubmit, onCancel }: { onSubmit?: () => void, onCancel?: () => void}) => {
+const CommentCardEdit = ({ width, onSubmit, onCancel }: { width?: string, onSubmit?: (markdown: string) => void, onCancel?: () => void}) => {
   const theme = useTheme();
   const userAccount = useSelector(selectUserAccount);
+  const ref = useRef<MDXEditorMethods>(null);
 
   const handleSubmit = () => {
     if (onSubmit) {
-      onSubmit();
+      onSubmit(ref.current ? ref.current.getMarkdown() : '');
     }
   };
 
   return (
     <Card
       sx={{
-        width: '60ch'
+        width: width || '85ch'
       }}
     >   
         <CardHeader
@@ -55,7 +58,7 @@ const CommentCardEdit = ({ onSubmit, onCancel }: { onSubmit?: () => void, onCanc
           }}
         >
           <Container sx={{padding: '0 !important', margin: '0 !important'}}>
-            <ForwardRefEditor disableImage={true} markdown=''/>
+            <ForwardRefEditor ref={ref} markdown=''/>
           </Container>
         </CardContent>
         <CardActions>

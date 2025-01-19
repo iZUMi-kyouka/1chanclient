@@ -12,7 +12,8 @@ const layout = ({ children }: { children: ReactNode}) => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        gap: theme.spacing(2)
+        gap: theme.spacing(2),
+        paddingTop: theme.spacing(2)
         // justifyContent: 'center',
         // alignItems: 'center',
       }}

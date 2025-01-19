@@ -6,6 +6,7 @@ import {
   listsPlugin,
   linkPlugin,
   linkDialogPlugin,
+  tablePlugin,
   quotePlugin,
   thematicBreakPlugin,
   markdownShortcutPlugin,
@@ -19,10 +20,16 @@ import {
   InsertImage,
   CreateLink,
   ListsToggle,
+  codeBlockPlugin,
+  InsertCodeBlock,
+  sandpackPlugin,
+  codeMirrorPlugin,
+  SandpackConfig,
+  InsertTable
 } from '@mdxeditor/editor'
 import { BASE_API_URL, BASE_URL } from '@/app/layout';
 import { customFetch } from '@/utils/customFetch';
-import { InsertEmoticon, InsertLink } from '@mui/icons-material';
+import { DarkMode, InsertEmoticon, InsertLink } from '@mui/icons-material';
 
 const handleImageUpload = async (image: File) => {
   const formData = new FormData();
@@ -42,23 +49,46 @@ const handleImageUpload = async (image: File) => {
   }
 }
 
+const simpleSandpackConfig: SandpackConfig = {
+  defaultPreset: 'react',
+  presets: [
+    {
+      label: 'React',
+      name: 'react',
+      meta: 'live react',
+      sandpackTemplate: 'react',
+      sandpackTheme: 'light',
+      snippetFileName: '/App.js',
+      snippetLanguage: 'jsx',
+      initialSnippetContent: ''
+    },
+  ]
+}
+
+
 // Only import this to the next file
 export default function InitializedMDXEditor({
+  darkMode,
   disableImage,
   editorRef,
   ...props
-}: { disableImage?: boolean, editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
+}: { darkMode?: boolean, disableImage?: boolean, editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
   return (
     <MDXEditor
+      className={`${darkMode ? 'dark-theme dark-editor' : ''}`}
       plugins={[
         // Example Plugin Usage
         headingsPlugin(),
         listsPlugin(),
         quotePlugin(),
         linkPlugin(),
+        tablePlugin(),
         linkDialogPlugin(),
         thematicBreakPlugin(),
         markdownShortcutPlugin(),
+        codeBlockPlugin({ defaultCodeBlockLanguage: 'js'}),
+        sandpackPlugin({ sandpackConfig: simpleSandpackConfig }),
+        codeMirrorPlugin({ codeBlockLanguages: {  html: 'HTML', css: 'CSS', js: 'JavaScript', ts: 'TypeScript', jsx: 'JSX', tsx: 'TSX', rust: 'Rust', c: 'C', cpp: 'C++', python: 'Python' } }),
         toolbarPlugin({
             toolbarClassName: 'mdxeditorToolbar',
             toolbarContents: () => (
@@ -68,6 +98,8 @@ export default function InitializedMDXEditor({
                 <BoldItalicUnderlineToggles />
                 <CreateLink />
                 <ListsToggle options={['bullet', 'number']}/>
+                <InsertTable />
+                <InsertCodeBlock />
                 { disableImage ? <></> : <InsertImage />}
               </>
             )

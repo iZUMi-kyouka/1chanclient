@@ -3,46 +3,39 @@ import React from 'react'
 import useSWR from 'swr';
 import Sidebar from './sidebar';
 import PaginatedResponse from '@/interfaces/paginatedResponse';
-import ThreadCard, { ThreadView } from './threadCard';
+import ThreadCard from './threadCard';
+import { Thread } from '@/interfaces/thread';
 
-type ThreadListResponse = PaginatedResponse<ThreadView>
+export type ThreadListResponse = PaginatedResponse<Thread>
 
 const fetcher = (url: string) => fetch(url).then(response => response.json())
 
-const ThreadList = ({ category }: { category?: number}) => {
+const ThreadList = ({ threads }: { threads: ThreadListResponse}) => {
     const theme = useTheme();
-    const { data, error, isLoading} = useSWR<ThreadListResponse>(`http://localhost:8080/api/v1/threads/list${category ? `?tag=${category}` : ""}`, fetcher);
-    if (isLoading) {
-      return <CircularProgress />
-    }
   
-    if (error) {
-      throw new Error(`Failed to fetch threads: ${error}`);
-    }
-  
-    if (data) {
-      return (
-        <>
-          <Container sx={{  
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            paddingTop: theme.spacing(1),
-            gap: theme.spacing(1),
-            paddingBottom: theme.spacing(8),
-          }}>
-            {
-              data && data.response 
-              ? data.response.map(thread => (
-                <ThreadCard key={thread.id} thread={thread} />
-              )) 
-              : <div><Typography>No threads are found.</Typography></div>
-            }
-          </Container>
-        </>
-      )
-    }
+    return (
+      <>
+        <Container sx={{  
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: theme.spacing(1),
+          paddingLeft: '0 !important',
+          paddingRight: '0 !important',
+          paddingTop: '0 !important',
+          paddingBottom: theme.spacing(4),
+        }}>
+          {
+            threads.response  
+            ? threads.response.map(thread => (
+              <ThreadCard key={thread.id} thread={thread} />
+            )) 
+            : <div><Typography>No threads are found.</Typography></div>
+          }
+        </Container>
+      </>
+    )
 }
 
 export default ThreadList;

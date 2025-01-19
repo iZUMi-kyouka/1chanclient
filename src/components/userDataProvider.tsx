@@ -3,8 +3,8 @@
 import useSWR from "swr";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { updateLike, updateUser } from "@/store/user/userSlice";
-import { LikedThreads } from "@/interfaces/user";
+import { updateCommentLike, updateThreadLike, updateUser } from "@/store/user/userSlice";
+import { LikedThreads, UserLikes } from "@/interfaces/user";
 import { AppDispatch } from "@/store/store";
 import { Typography } from "@mui/material";
 import { updateAccessToken } from "@/store/auth/authSlice";
@@ -62,8 +62,9 @@ export default function FetchUserData() {
             });
       
             if (response.ok) {
-              const likes = await response.json() as LikedThreads;
-              dispatch(updateLike(likes));
+              const likes = await response.json() as UserLikes;
+              dispatch(updateThreadLike(likes.threads));
+              dispatch(updateCommentLike(likes.comments));
             } else {
               throw new Error('Failed to fetch liked threads.')
             }  

@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../store";
-import { LikedThreads, User, UserAccount, UserProfile } from "@/interfaces/user";
-
+import { LikedComments, LikedThreads, User, UserAccount, UserProfile, WrittenComments, WrittenThreads } from "@/interfaces/user";
 
 
 const userAccountInitialState: UserAccount = {
@@ -24,7 +23,10 @@ const userProfileInitialState: UserProfile = {
 const initialState: User = {
     account: userAccountInitialState,
     profile: userProfileInitialState,
-    liked_threads: {}
+    liked_threads: {},
+    liked_comments: {},
+    comments: {},
+    threads: {}
 }
 
 const userSlice = createSlice({
@@ -35,27 +37,50 @@ const userSlice = createSlice({
             state.account = action.payload.account;
             state.profile = action.payload.profile;
         },
-        updateLike(state, action: PayloadAction<LikedThreads>) {
-          state.liked_threads = action.payload
+        updateWrittenThreads(state, action: PayloadAction<WrittenThreads>) {
+          state.threads = action.payload
         },
-        addToLike(state, action: PayloadAction<number>) {
+        updateWrittenComments(state, action: PayloadAction<WrittenComments>) {
+          state.comments = action.payload
+        },
+        updateThreadLike(state, action: PayloadAction<LikedThreads>) {
+          state.liked_threads = action.payload;
+        },
+        updateCommentLike(state, action: PayloadAction<LikedComments>) {
+          state.liked_comments = action.payload;
+        },
+        addToThreadLike(state, action: PayloadAction<number>) {
           state.liked_threads[action.payload] = 1;
         },
-        removeFromLikeDislike(state, action: PayloadAction<number>) {
+        addToCommentLike(state, action: PayloadAction<number>) {
+          state.liked_comments[action.payload] = 1;
+        },
+        removeFromThreadLikeDislike(state, action: PayloadAction<number>) {
           delete state.liked_threads[action.payload];
         },
-        addToDislike(state, action: PayloadAction<number>) {
+        removeFromCommentLikeDislike(state, action: PayloadAction<number>) {
+          delete state.liked_comments[action.payload];
+        },
+        addToCommentDislike(state, action: PayloadAction<number>) {
+          state.liked_comments[action.payload] = 0;
+        },
+        addToThreadDislike(state, action: PayloadAction<number>) {
           state.liked_threads[action.payload] = 0;
         },
         resetUser(state) {
             state.account = initialState.account;
             state.profile = initialState.profile;
+            state.liked_threads = initialState.liked_threads;
+            state.liked_comments = initialState.liked_comments;
         }
     }
 });
 
-export const { updateUser, resetUser, updateLike, addToDislike, removeFromLikeDislike, addToLike } = userSlice.actions;
+export const { updateUser, resetUser, updateWrittenComments, updateWrittenThreads, updateThreadLike, addToThreadDislike, removeFromThreadLikeDislike, addToThreadLike, addToCommentDislike, addToCommentLike, removeFromCommentLikeDislike, updateCommentLike } = userSlice.actions;
 export const selectUserAccount = (state: RootState) => state.user.account;
 export const selectUserProfile = (state: RootState) => state.user.profile;
 export const selectUserLikedThreads = (state: RootState) => state.user.liked_threads;
+export const selectUserLikedComments = (state: RootState) => state.user.liked_comments;
+export const selectUserWrittenThreads = (state: RootState) => state.user.threads;
+export const selectUserWrittenComments = (state: RootState) => state.user.comments;
 export default userSlice.reducer;

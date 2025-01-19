@@ -3,12 +3,14 @@ import { store } from "../store/store";
 import { updateAccessToken, setIsRefreshing, selectAccessToken, resetAuth } from "@/store/auth/authSlice";
 import { RequestOptions } from "https";
 import { resetUser } from "@/store/user/userSlice";
+import { ResetTvOutlined } from "@mui/icons-material";
 
 let refreshAccessTokenPromise: Promise<string> | null = null;
 
 export const generalFetch = (options?: RequestInit) => (url: string) => fetch(url, options).then(response => response.json());
 
-export const customFetch = async (url: string, options?: RequestInit): Promise<Response> => {
+export async function customFetch<T>(url: string, options?: RequestInit): Promise<Response> {
+    // Do not use dispatch hook.
 		const state = store.getState();
 		const isRefreshing = state.auth.isRefreshing;
 
@@ -20,7 +22,9 @@ export const customFetch = async (url: string, options?: RequestInit): Promise<R
 						'Authorization': `Bearer ${store.getState().auth.accessToken}`
 					},
 				});
+
 				if (response.status === 401) {
+
 						// No token refresh request in progress, send request
 						if (!isRefreshing) {
 								store.dispatch(setIsRefreshing(true));
@@ -31,7 +35,12 @@ export const customFetch = async (url: string, options?: RequestInit): Promise<R
 												{
                           ...options,
                           method: 'GET',
-                          credentials: 'include'
+                          credentials: 'include',
+                          headers: {
+                            ...options?.headers,
+                            'Device-ID': store.getState().auth.deviceID
+                          },
+                          body: null
                         }
 										).then(async (refreshResponse) => {
 											if (!refreshResponse.ok) {
@@ -47,8 +56,8 @@ export const customFetch = async (url: string, options?: RequestInit): Promise<R
 											return data.access_token;
 										});
 
-
 										await refreshAccessTokenPromise;
+                    
 								} catch (err: any) {
 										store.dispatch(setIsRefreshing(false));
 										refreshAccessTokenPromise = null;

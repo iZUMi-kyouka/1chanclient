@@ -7,10 +7,11 @@ import Link from 'next/link';
 import useSWR from 'swr';
 import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
-import { LikedThreads, selectUserAccount, updateLike, updateUser, User } from '@/store/user/userSlice';
+import { selectUserAccount, updateThreadLike, updateUser, updateWrittenComments, updateWrittenThreads } from '@/store/user/userSlice';
 import { selectDeviceID, updateAccessToken } from '@/store/auth/authSlice';
 import { BASE_API_URL } from '../layout';
 import { customFetch } from '@/utils/customFetch';
+import { LikedThreads, WrittenComments, WrittenThreads } from '@/interfaces/user';
 
 const classes = {
 	field: {
@@ -111,10 +112,33 @@ const page = () => {
   
         if (response.ok) {
           const likes = await response.json() as LikedThreads;
-          dispatch(updateLike(likes));
+          dispatch(updateThreadLike(likes));
         } else {
           throw new Error('Failed to fetch liked threads.')
         }  
+
+        response = await customFetch(`${BASE_API_URL}/users/threads`, {
+          method: 'GET'
+        });
+  
+        if (response.ok) {
+          const threads = await response.json() as WrittenThreads;
+          dispatch(updateWrittenThreads(threads));
+        } else {
+          throw new Error('Failed to fetch written threads.')
+        }
+
+        response = await customFetch(`${BASE_API_URL}/users/comments`, {
+          method: 'GET'
+        });
+
+        if (response.ok) {
+          const comments = await response.json() as WrittenComments;
+          dispatch(updateWrittenComments(comments));
+        } else {
+          throw new Error('Failed to fetch written threads.')
+        }  
+
       } catch (err: any) {
         console.log(`error: ${err}`)
       }
@@ -162,10 +186,11 @@ const page = () => {
 				display: 'flex',
 				flexDirection: 'column',
 				alignItems: 'center',
-				justifyContent: 'center'
+				justifyContent: 'center',
+        paddingTop: theme.spacing(2)
 			}}
     >
-        <Typography variant='h3'>
+        <Typography variant='h3' sx={{marginBottom: theme.spacing(2)}}>
 					1chan
 				</Typography>
 				<Card>

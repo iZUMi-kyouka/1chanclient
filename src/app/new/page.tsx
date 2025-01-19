@@ -1,12 +1,14 @@
 'use client';
 
 import { ForwardRefEditor } from '@/components/forwardRefEditor'
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, FormControl, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent, TextField, Typography, useTheme } from '@mui/material'
-import React, { ChangeEvent, useState } from 'react'
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Chip, CircularProgress, Container, FormControl, IconButton, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent, Stack, TextField, Tooltip, Typography, useTheme } from '@mui/material'
+import React, { ChangeEvent, useRef, useState } from 'react'
 import useSWR from 'swr';
 import { BASE_API_URL } from '../layout';
 import { customFetch, generalFetch } from '@/utils/customFetch';
 import { useRouter } from 'next/navigation';
+import { MDXEditorMethods } from '@mdxeditor/editor';
+import { RestartAltSharp, RestoreSharp, SendSharp } from '@mui/icons-material';
 
 export interface Tag {
   id: number,
@@ -30,36 +32,70 @@ const TagsPicker = ({ selectedTags, setTags }: { selectedTags: Tag[], setTags: R
     return (
       <FormControl>
         <InputLabel id="tags-selector-chip-label">Tags</InputLabel>
-        <Select
-          fullWidth
-          labelId="tags-selector-chip-label"
-          id="tags-selector-chip"
-          multiple
-          value={selectedTags.map(tag => tag.id)}
-          onChange={handleEditTag}
-          input={<OutlinedInput id="select-multiple-tags" label="Tags" fullWidth/>}
-          renderValue={(selected) => (
-            <Box sx={{
-              display: 'flex',
-              gap: theme.spacing(1)
-            }}>
-              {
-                selectedTags.map(tag => (
-                  <Chip key={tag.id} label={tag.tag} />
-                ))
-              }
-            </Box>
-          )}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: theme.spacing(1)
+          }}
         >
-          {data.tags.map((tag) => (
-            <MenuItem
-              key={tag.id}
-              value={tag.id}
+          <Select
+            MenuProps={{
+              keepMounted: true,
+              PaperProps: {
+                style: {
+                  maxHeight: '320px',
+                  marginTop: theme.spacing(1)
+                }
+              }
+            }}
+            fullWidth
+            labelId="tags-selector-chip-label"
+            id="tags-selector-chip"
+            multiple
+            value={selectedTags.map(tag => tag.id)}
+            onChange={handleEditTag}
+            input={<OutlinedInput id="select-multiple-tags" label="Tags" fullWidth/>}
+            renderValue={(selected) => (
+              <Box sx={{
+                display: 'flex',
+                gap: theme.spacing(1),
+                flexWrap: 'wrap',
+              }}>
+                {
+                  selectedTags.map(tag => (
+                    <Chip key={tag.id} label={tag.tag} />
+                  ))
+                }
+              </Box>
+            )}
+          >
+            {data.tags.map((tag) => (
+              <MenuItem
+                key={tag.id}
+                value={tag.id}
+              >
+                {tag.tag}
+              </MenuItem>
+            ))}
+          </Select>
+          <Tooltip
+            title="Reset tags"
+          >
+            <IconButton
+              sx={{
+                width: theme.spacing(6),
+                height: theme.spacing(6)
+              }}
+              onClick={() => setTags([])}
             >
-              {tag.tag}
-            </MenuItem>
-          ))}
-        </Select>
+              <RestartAltSharp />
+            </IconButton>
+          </Tooltip>
+
+        </Box>
+     
     </FormControl>
     );
   }
@@ -67,32 +103,41 @@ const TagsPicker = ({ selectedTags, setTags }: { selectedTags: Tag[], setTags: R
 
 const page = () => {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-  const [title, setTitle] = useState('');
+  const ref = useRef<MDXEditorMethods>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
   const theme = useTheme();
-  const [post, setPost] = useState("");
-  const handleEditorUpdate = (e: string) => {
-    setPost(e);
-  }
   const router = useRouter();
 
   const handlePost = async () => {
-    try {
-      const request = customFetch(`${BASE_API_URL}/threads/new`, {
-        method: 'POST',
-        body: JSON.stringify({
-          title: title,
-          original_post: post,
-          tags: selectedTags
-        })
-      });
+    if (ref.current) {
+      try {
+        if (titleRef.current && titleRef.current.value === '') {
+          alert('Title must not be empty.');
+          return
+        } else if (ref.current.getMarkdown() === '') {
+          alert('Post must not be empty.');
+          return
+        }
 
-      const response = await request;
-      if (response.ok) {
-        alert("Thread successfully created.")
-        router.push("/");
+        const request = customFetch(`${BASE_API_URL}/threads/new`, {
+          method: 'POST',
+          body: JSON.stringify({
+            title: titleRef.current ? titleRef.current.value : '',
+            original_post: ref.current.getMarkdown(),
+            tags: selectedTags
+          })
+        });
+  
+        const response = await request;
+        if (response.ok) {
+          alert("Thread successfully created.")
+          router.push("/");
+        } else {
+          throw new Error("failed to post")
+        }
+      } catch (err: any) {
+          console.log(err);
       }
-    } catch (err: any) {
-
     }
   };
 
@@ -112,10 +157,7 @@ const page = () => {
           <TextField
             fullWidth
             label='Title'
-            onChange={(e) => {
-              const newTitle = e.target.value;
-              setTitle(newTitle);
-            }}
+            inputRef={titleRef}
           />
           <TagsPicker selectedTags={selectedTags} setTags={setSelectedTags}/>
         </CardContent>
@@ -130,12 +172,15 @@ const page = () => {
         >
           <Typography variant='h5'>Post Content</Typography>
           <ForwardRefEditor
-            onChange={handleEditorUpdate}
             markdown=''
+            ref={ref}
           />          
         </CardContent>
       </Card>
-      <Button onClick={handlePost}>
+      <Button 
+        startIcon={<SendSharp />}
+        variant='contained' 
+        onClick={handlePost}>
         Post
       </Button>
     </>

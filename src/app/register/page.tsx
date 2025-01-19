@@ -68,15 +68,17 @@ const page = () => {
 			credentials: 'include'
       });
 
-      // if (!response.ok) {
-      //   throw new Error('Failed to login. Please check your credentials.');
-      // }
-
+      if (!response.ok) {
+        if (response.status === 409) {
+          throw new Error("Username already exists.")
+        } else {
+          throw new Error('Failed to register. Please try again soon.');
+        }
+      }
+      
       const data = await response.json();
 
-	  dispatch(
-		updateAccessToken(data.account.access_token)
-	  );
+	    dispatch(updateAccessToken(data.account.access_token));
 
       dispatch(
         updateUser({
@@ -139,11 +141,15 @@ const page = () => {
 				display: 'flex',
 				flexDirection: 'column',
 				alignItems: 'center',
-				justifyContent: 'center'
+				justifyContent: 'center',
+        paddingTop: theme.spacing(2)
 			}}
     >
         <Typography
 					variant='h3'
+          sx={{
+            marginBottom: theme.spacing(2)
+          }}
 				>
 					1chan
 				</Typography>
@@ -179,6 +185,11 @@ const page = () => {
 								label="Password"
 							/>
 						</FormControl>
+              {
+                error
+                ? <Typography variant='body2' color='error' sx={{marginTop: theme.spacing(1)}}>{error}</Typography>
+                : <div style={{display: 'block', marginTop: theme.spacing(1)}}><Typography variant='body2'>&#8203;</Typography></div>
+              }
 						<Button
 							fullWidth
 							sx={classes.button}

@@ -1,49 +1,52 @@
 "use client";
 
-import { MoreVertSharp, ThumbDown, ThumbDownAltSharp, ThumbDownOffAltSharp, ThumbDownOutlined, ThumbDownSharp, ThumbUp, ThumbUpAltSharp, ThumbUpOffAltSharp, ThumbUpOutlined, ThumbUpSharp, VisibilityOffOutlined, VisibilityOutlined, VisibilitySharp } from '@mui/icons-material';
-import { alpha, Avatar, Box, Button, ButtonGroup, Card, CardActionArea, CardActions, CardContent, CardHeader, Chip, IconButton, Typography, useTheme } from '@mui/material';
+import { AdsClick, AdsClickSharp, BorderRight, CommentSharp, MoreVertSharp, ShareSharp, ThumbDown, ThumbDownAltSharp, ThumbDownOffAltSharp, ThumbDownOutlined, ThumbDownSharp, ThumbUp, ThumbUpAltSharp, ThumbUpOffAltSharp, ThumbUpOutlined, ThumbUpSharp, VisibilityOffOutlined, VisibilityOutlined, VisibilitySharp } from '@mui/icons-material';
+import { alpha, Avatar, Box, Button, ButtonGroup, Card, CardActionArea, CardActions, CardContent, CardHeader, Chip, IconButton, Menu, MenuItem, Tooltip, Typography, useTheme } from '@mui/material';
 import React, { useState } from 'react'
-import MuiMarkdown from 'mui-markdown';
+import MuiMarkdown, { getOverrides } from 'mui-markdown';
 import { BASE_API_URL } from '@/app/layout';
 import { customFetch } from '@/utils/customFetch';
 import { useDispatch, useSelector } from 'react-redux';
-import { addToDislike, addToLike, removeFromLikeDislike, selectUserLikedThreads } from '@/store/user/userSlice';
+import { addToThreadDislike, addToThreadLike, removeFromThreadLikeDislike, selectUserLikedThreads } from '@/store/user/userSlice';
 import { store } from '@/store/store';
 import { useRouter } from 'next/navigation';
 import { Thread } from '@/interfaces/thread';
 import PaginatedResponse from '@/interfaces/paginatedResponse';
-
-export interface ThreadView {
-  id: number,
-  username: string,
-  user_profile_path?: string,
-  title: string,
-  original_post: string,
-  creation_date: Date,
-  updated_date?: Date,
-  last_comment_date?: Date,
-  like_count: number,
-  dislike_count: number,
-  likeStatus?: number,
-  view_count: number,
-}
+import { format } from 'date-fns/format';
+import LikeDislikeButton from './likeDislikeButton';
+import { openCopyPasteSnackbar } from '@/store/appState/appStateSlice';
+import beautifyNumber from '@/utils/beautifyNumber';
 
 const classes = {
-  button: {
-    borderRadius: '25px'
+  buttonLike: {
+    borderRadius: '25px 0 0 25px',
+    borderRight: '0px !important'
+  },
+  buttonDislike: {
+    borderRadius: '0px 25px 25px 0px',
   }
 }
 
-const ThreadCard = ({ thread, width, disableOnClick }: { thread: ThreadView, width?: string, disableOnClick?: boolean}) => {
+const ThreadCard = ({ thread, width, disableOnClick }: { thread: Thread, width?: string, disableOnClick?: boolean}) => {
   const theme = useTheme();
   const dispatch = useDispatch();
   const likes = useSelector(selectUserLikedThreads);
   const [likeCount, setLikeCount] = useState(thread.like_count);
   const [dislikeCount, setDislikeCount] = useState(thread.dislike_count);
   const router = useRouter();
+  const [reportAnchorEl, setReportAnchorEl] = useState<null | HTMLElement>(null);
 
-  const handleLikeDislike = (likeDislike: number, remove?: boolean) => async (e: React.MouseEvent) => {
+  const copyToClipboard = async (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
+    await navigator.clipboard.writeText(`${BASE_API_URL}/thread/${thread.id}`);
+    dispatch(openCopyPasteSnackbar());
+  };
+
+  const isLiked = likes[thread.id] !== undefined && likes[thread.id] === 1;
+  const isDisliked = likes[thread.id] !== undefined && likes[thread.id] === 0;
+
+  const handleLikeDislike = (likeDislike: number, remove?: boolean) => async (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     var url: string;
     if (likeDislike === 1) {
       url = `${BASE_API_URL}/threads/like/${thread.id}`
@@ -64,14 +67,16 @@ const ThreadCard = ({ thread, width, disableOnClick }: { thread: ThreadView, wid
           } else {
             setDislikeCount(dislikeCount - 1)
           }
-          dispatch(removeFromLikeDislike(thread.id));
+          dispatch(removeFromThreadLikeDislike(thread.id));
         } else {
           if (likeDislike === 1) {
-            setLikeCount(likeCount + 1)
-            dispatch(addToLike(thread.id));
+            setLikeCount(likeCount + 1);
+            if (isDisliked) { setDislikeCount(dislikeCount - 1)}
+            dispatch(addToThreadLike(thread.id));
           } else {
             setDislikeCount(dislikeCount + 1);
-            dispatch(addToDislike(thread.id));
+            if (isLiked) { setLikeCount(likeCount - 1)}
+            dispatch(addToThreadDislike(thread.id));
           }
         }
       }
@@ -81,11 +86,9 @@ const ThreadCard = ({ thread, width, disableOnClick }: { thread: ThreadView, wid
     }
   }
 
-  const isLiked = likes[thread.id] !== undefined && likes[thread.id] === 1;
-  const isDisliked = likes[thread.id] !== undefined && likes[thread.id] === 0;
-
   return (
     <Card 
+      elevation={1}
       sx={{ 
         width: width || '85ch',
         '& .MuiCardHeader-title': {
@@ -104,91 +107,145 @@ const ThreadCard = ({ thread, width, disableOnClick }: { thread: ThreadView, wid
         }
     }}>
         <Box
-          onClick={() => { router.push(`/thread/${thread.id}`)}}
+          sx={{
+            transition: 'background-color 150ms ease-out',
+            '&:hover': {
+              // backgroundColor: theme.palette.grey[100],
+              cursor: disableOnClick ? 'default' : 'pointer'
+            }
+          }}
+          onClick={() => { if (!disableOnClick) {router.push(`/thread/${thread.id}`)}}}
         >
+        <Menu
+          id={`report-${thread.id}`}
+          open={reportAnchorEl !== null}
+          anchorEl={reportAnchorEl}
+          onClose={(e: React.MouseEvent<HTMLElement>) => {e.stopPropagation(); setReportAnchorEl(null)}}
+        >
+          <MenuItem
+            onClick={(e: React.MouseEvent<HTMLElement>) => {
+              e.stopPropagation();
+            }}
+          >Report</MenuItem>
+        </Menu>
         <CardHeader 
           avatar={
-            <Avatar>
-              {thread.username[0].toUpperCase()}
-            </Avatar>
+            <IconButton
+              onClick={(e: React.MouseEvent<HTMLElement>) => {
+                e.stopPropagation();
+                router.push(`/profile/${thread.username}`);
+              }}
+              sx={{
+                padding: '0px !important'
+              }}
+            >
+              <Avatar>
+                {thread.username[0].toUpperCase()}
+              </Avatar>
+            </IconButton>
+
           }
           action={
             <IconButton
+              onClick={(e: React.MouseEvent<HTMLElement>) => {
+                e.stopPropagation();
+                setReportAnchorEl(e.currentTarget)}}
               color='inherit'
             >
               <MoreVertSharp />
             </IconButton>
           }
           title={thread.title}
-          subheader={`by ${thread.username}`}
+          subheader={`by ${thread.username} | ${format(new Date(thread.creation_date), 'MMM d, y')}`}
         />
 
           <CardContent>
-            <MuiMarkdown>
+            <MuiMarkdown
+              overrides={{
+                ...getOverrides({}),
+                img: {
+                  props: {
+                    style: {
+                      width: '100%',
+                      height: 'auto',
+                      objectFit: 'cover'
+                    }
+                  }
+                }
+              }}
+            >
               {thread.original_post}
             </MuiMarkdown>
           </CardContent>
-        <CardActions disableSpacing>
+        <CardActions>
           {
             !isLiked && !isDisliked
-            ? (<>
-              {/* <Typography>Not liked or disliked</Typography> */}
-              <Button
-                onClick={ handleLikeDislike(1)}
-                sx={classes.button}
-                startIcon={<ThumbUpOutlined />}
-              >{likeCount}</Button>
-              <Button
-                onClick={handleLikeDislike(0)}
-                sx={classes.button}
-                startIcon={<ThumbDownOutlined />}
-              ></Button>
-            </>)
+            ? <LikeDislikeButton
+                likeCount={likeCount}
+                dislikeCount={dislikeCount}
+                status='undefined' 
+                onLikeClick={handleLikeDislike(1)} 
+                onDislikeClick={handleLikeDislike(0)}
+              />
             : isDisliked
-            ? (<>
-              {/* <Typography>Disliked</Typography> */}
-              <Button
-                onClick={handleLikeDislike(1)}
-                sx={classes.button}
-                startIcon={<ThumbUpOutlined />}
-              >{likeCount}</Button>
-              <Button
-                onClick={handleLikeDislike(0, true)}
-                sx={classes.button}
-                startIcon={<ThumbDown />}
-              ></Button>
-            </>)
+            ? <LikeDislikeButton 
+              status='disliked'
+              likeCount={likeCount}
+              dislikeCount={dislikeCount}
+              onLikeClick={handleLikeDislike(1)} 
+              onDislikeClick={handleLikeDislike(0, true)}
+              />
             : isLiked
-            ? (<>
-              {/* <Typography>Liked</Typography> */}
-              <Button
-                onClick={handleLikeDislike(1, true)}
-                sx={classes.button}
-                startIcon={<ThumbUp />}
-              >{likeCount}</Button>
-              <Button
-                onClick={handleLikeDislike(0)}
-                sx={classes.button}
-                startIcon={<ThumbDownOutlined />}
-              ></Button>
-              </>)
+            ? <LikeDislikeButton 
+                status='liked'
+                likeCount={likeCount}
+                dislikeCount={dislikeCount}
+                onLikeClick={handleLikeDislike(1, true)} 
+                onDislikeClick={handleLikeDislike(0)}
+              />
               : <></>
           }
+          <Tooltip
+            title="Copy link to clipboard"
+          >
+            <IconButton
+              onClick={copyToClipboard}
+              aria-label='Copy link to clipboard.'
+            >
+              <ShareSharp sx={{color: theme.palette.primary.main}}/>
+            </IconButton>
+          </Tooltip>
+
           <Box sx={{flexGrow: 1}} />
-          <Box
+          {/* <Box
             sx={{
               display: 'flex',
               alignItems: 'center',
               marginRight: 2
             }}
-          >
-            <VisibilityOutlined 
-              sx={{
-                marginRight: 1
-              }}
+          > */}
+            <Chip
+              icon={
+                <AdsClickSharp 
+                  sx={{ 
+                    marginRight: 1, 
+                    color: theme.palette.primary.main
+                }}/>}
+              label={beautifyNumber(thread.view_count)}
             />
-            {thread.view_count}
-          </Box>
+            <Chip 
+              sx={{
+                paddingLeft: theme.spacing(0.5)
+              }}
+              icon={<CommentSharp
+                sx={{
+                  color: theme.palette.primary.main,
+                  fontSize: '22px !important'
+                }}
+              />}
+              label={beautifyNumber(thread.comment_count)}
+            />
+          {/* </Box> */}
         </CardActions>
         </Box>
     </Card>

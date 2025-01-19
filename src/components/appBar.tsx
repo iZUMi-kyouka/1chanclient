@@ -5,10 +5,10 @@ import { AccountCircleSharp, Create, CreateSharp, DarkModeSharp, LightModeSharp,
 import { Search, SearchBarIconWrapper, SearchBarInputBase } from "./searchBar";
 import { useDispatch, useSelector } from "react-redux";
 import { resetUser, selectUserAccount } from "@/store/user/userSlice";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { selectAccessToken, selectDeviceID, updateAccessToken } from "@/store/auth/authSlice";
+import { resetAuth, selectAccessToken, selectDeviceID, updateAccessToken } from "@/store/auth/authSlice";
 import { customFetch } from "@/utils/customFetch";
 import ColorSchemeSwitcher from "./colorSchemeSwitcher";
 
@@ -24,8 +24,26 @@ export default function PrimaryAppBar() {
 	const handleProfileMenuClick = (e: React.MouseEvent<HTMLElement>) => {
 		setAnchorEl(e.currentTarget);
 	};
+  const searchBarRef = useRef<HTMLInputElement | null>(null);
 	const handleMenuClose = () => setAnchorEl(null);
 	const isMenuOpen = Boolean(anchorEl);
+
+  useEffect(() => {
+    const searchShortcutHandler = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === 'k') {
+        if (searchBarRef !== null) {
+          event.preventDefault();
+          searchBarRef.current?.focus();
+        }
+      }
+    };
+  
+    window.addEventListener('keydown', searchShortcutHandler);
+
+    return () => {
+      window.removeEventListener('keydown', searchShortcutHandler);
+    }
+  }, [searchBarRef]);
 
 	const handleLogout = async () => {
 		try {
@@ -42,6 +60,7 @@ export default function PrimaryAppBar() {
 				console.log('Logout success.')
 				setLogoutSnackbarState(true);
 				dispatch(resetUser())
+        dispatch(resetAuth())
 			} else {
 				console.log('Logout failed.')
 			}
@@ -77,7 +96,10 @@ export default function PrimaryAppBar() {
 				user.username
 				? <div>
 					<MenuItem onClick={handleLogout}>Logout</MenuItem>
-					<MenuItem>Profile</MenuItem>
+					<MenuItem onClick={() => {
+            router.push(`/profile/${user.username}`);
+            setAnchorEl(null);
+            }}>Profile</MenuItem>
 				</div>
 
 				: <MenuItem>Login</MenuItem>
@@ -150,7 +172,9 @@ export default function PrimaryAppBar() {
 							<SearchSharp />
 						</SearchBarIconWrapper>
 						<SearchBarInputBase 
-							placeholder="Search..."
+              ref={searchBarRef}
+              id="app-main-search"
+							placeholder="Search... (Ctrl + K)"
 							inputProps={{ 'aria-label': 'search'}}
 						/>
 					</Search>
@@ -163,8 +187,11 @@ export default function PrimaryAppBar() {
 							disableElevation
 							onClick={() => { router.push("/new") }}
 							sx={{
-								// color: 'purple',
-								// backgroundColor: 'white',
+								backgroundColor: 'white',
+                color: theme.palette.primary.main,
+                '&:hover': {
+                  backgroundColor: theme.palette.grey[300]
+                },
 								height: '48px',
 								alignItems: 'center',
 								marginRight: theme.spacing(2)
@@ -199,11 +226,13 @@ export default function PrimaryAppBar() {
 									<CustomAvatar username={user.username} />
 									</IconButton>
 								: <Button
+                  disableElevation
 									color="secondary"
 									sx={{
 										marginLeft: theme.spacing(2),
-										// backgroundColor: 'white',
-										// color: 'purple'
+										backgroundColor: 'white',
+										color: theme.palette.primary.main,
+                    height: '48px'
 									}}
 									startIcon={<LoginSharp 
 										color='inherit'
