@@ -41,12 +41,14 @@ const ThreadListFilterDropdown = () => {
       Filters
     </Button>
     <Dialog
+      fullWidth
+      maxWidth='xs'
       open={isOpen}
       onClose={handleClose}
     >
       <DialogTitle>Filters</DialogTitle>
       <DialogContent>
-        <Box display='flex' gap={theme.spacing(4)}>
+        <Box display='flex' gap={theme.spacing(4)} justifyContent={'center'}>
           <Box display='flex' flexDirection='column' gap={theme.spacing(1)}>
             <Typography>SORT BY</Typography>
             <Divider></Divider>

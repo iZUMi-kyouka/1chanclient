@@ -45,18 +45,28 @@ const ThreadOpenView = ({ threadViewResponse }: { threadViewResponse: ThreadView
         alignItems: 'center',
         justifyContent: 'flex-start',
         gap: theme.spacing(1),
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(2),
         // padding: '0 !important',
-        paddingBottom: theme.spacing(1),
+        [theme.breakpoints.down('lg')]: {
+          padding: 0,
+          paddingBottom: theme.spacing(2)
+        },
         height: '100%',
+        width: '100%',
         overflowY: 'auto'
       }}
     >
-      <Box>
+      <Box display='flex' justifyContent='center' sx={{padding: '0 !important', width: '85ch', [theme.breakpoints.down('lg')]: {
+          width: '100%'
+        }}}>
         <ThreadCard disableOnClick={true} thread={threadViewResponse.thread}/>
       </Box>
 
       <Container
-        sx={{padding: '0 !important', width: '85ch', flexGrow: 1}}
+        sx={{padding: '0 !important', width: '85ch', [theme.breakpoints.down('lg')]: {
+          width: '100%'
+        }}}
       >
         { commentOpen
           ? <CommentCardEdit onCancel={() => { setCommentOpen(false)}} onSubmit={handleCommentSubmit} />
@@ -92,7 +102,7 @@ const ThreadOpenView = ({ threadViewResponse }: { threadViewResponse: ThreadView
       </Container>
       {
         threadViewResponse.comments.response
-        ? (<Box display='flex' flexDirection='column' gap={theme.spacing(1)}>{
+        ? (<Box display='flex' flexDirection='column' alignItems={'center'} gap={theme.spacing(1)} width={'100%'}>{
           threadViewResponse.comments.response.map(comment => {
           return (
             <CommentCard key={comment.id} comment={comment}/>

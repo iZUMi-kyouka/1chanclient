@@ -90,17 +90,7 @@ const page = () => {
             id: data.account.id,
             username: data.account.username,
           },
-          profile: {
-            profile_photo_path: '',
-            biodata: '',
-            email: '',
-            post_count: 0,
-            comment_count: 0,
-            preferred_lang: 'id',
-            preferred_theme: 'auto',
-            creation_date: '',
-            last_login: '',
-          },
+          profile: data.profile
         })
       );
 

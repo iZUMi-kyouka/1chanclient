@@ -1,12 +1,13 @@
 'use client';
 
 import type { Metadata } from "next";
+import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
 import { ReactNode, Suspense } from "react";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme";
 import { Roboto } from 'next/font/google';
-import {CircularProgress, CssBaseline, Paper, Toolbar} from "@mui/material";
+import {Box, CircularProgress, CssBaseline, Paper, Toolbar} from "@mui/material";
 import ReduxProvider from "./store";
 import FetchUserData from "@/components/userDataProvider";
 import PrimaryAppBar from "@/components/appBar";
@@ -43,15 +44,18 @@ export default function RootLayout({
     <CssBaseline />
 
     <body className={roboto.variable}>
+      {/* <InitColorSchemeScript attribute="class" /> */}
       <ReduxProvider>
         <HandleDeviceID />
         <FetchUserData />
         <AppRouterCacheProvider>  
           <ThemeProvider theme={theme}>
             <PrimaryAppBar/>
-            <Toolbar />
+            <Toolbar sx={{ height: '64px' }}/>
             <Paper elevation={0} sx={{minHeight: 'calc(100vh - 64px)', borderRadius: '0px'}}>
+              {/* <Box display='flex' flexGrow={1}> */}
               {children}
+              {/* </Box> */}
             <CopyPasteSnackbar />
             </Paper>
           </ThemeProvider>

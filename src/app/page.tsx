@@ -1,17 +1,13 @@
 'use client';
 
 import Sidebar from "@/components/sidebar";
-import ThreadCard from "@/components/threadCard";
 import ThreadList, { ThreadListResponse } from "@/components/threadList";
-import FetchUserData from "@/components/userDataProvider";
-import { Box, CircularProgress, useTheme } from "@mui/material";
-import { Container } from "@mui/material";
-import Typography from "@mui/material/Typography";
-import { useState } from "react";
-import { BASE_API_URL } from "./layout";
-import { generalFetch } from "@/utils/customFetch";
-import useSWR from "swr";
 import WrappedLoading from "@/components/wrappedLoading";
+import { generalFetch } from "@/utils/customFetch";
+import { Box, Container, useTheme } from "@mui/material";
+import { useState } from "react";
+import useSWR from "swr";
+import { BASE_API_URL } from "./layout";
 
 type CurrentHomePage = 'home' | 'trending';
 

@@ -38,11 +38,13 @@ const handleImageUpload = async (image: File) => {
     const response = await fetch(`${BASE_API_URL}/upload/image`, {
       method: 'POST',
       body: formData
-    })
+    });
   
     if (response.ok) {
-      const imageURL = (await response.json()).url
-      return imageURL
+      const imageURL = (await response.json()).url;
+      return imageURL;
+    } else if (response.status === 400) {
+      throw new Error("uploaded image is invalid.");
     }
   } catch (err: any) {
     throw new Error(`Failed to upload image: ${err}`)

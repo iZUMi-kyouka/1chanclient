@@ -1,5 +1,6 @@
 'use client';
 
+import FullPageSpinner from '@/components/fullPageLoading';
 import Sidebar from '@/components/sidebar'
 import ThreadList, { ThreadListResponse } from '@/components/threadList';
 import ThreadListFilterDropdown from '@/components/threadListFilterDropdown';
@@ -26,14 +27,14 @@ const page = ({ params }: { params: Promise<Params> }) => {
     categoryId = undefined
   }
 
-  const { data, error, isLoading} = useSWR<ThreadListResponse>
+  const { data, error, isLoading } = useSWR<ThreadListResponse>
     (`http://localhost:8080/api/v1/threads/list?${categoryId ? `tag=${categoryId}` : ""}${sortParam ? `&sort_by=${sortParam}` : ''}${sortDir ? `&order=${sortDir}` : '' }`, generalFetch());
   return (  
     <>
       {
       (() => {
         if (isLoading) {
-          return <WrappedLoading />
+          return <FullPageSpinner />
         }
 
         if (error) {

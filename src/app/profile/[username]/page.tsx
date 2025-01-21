@@ -2,14 +2,18 @@
 
 import { BASE_API_URL } from '@/app/layout';
 import BareContainer from '@/components/bareContainer';
+import FullPageSpinner from '@/components/fullPageLoading';
+import UserAvatar from '@/components/userAvatar';
+import VisuallyHiddenInput from '@/components/visuallyHiddenInput';
 import { UserProfile } from '@/interfaces/user';
-import { selectUserAccount } from '@/store/user/userSlice'
+import { selectUserAccount, selectUserProfile, updateProfilePicture } from '@/store/user/userSlice'
 import { customFetch } from '@/utils/customFetch';
+import { makeProfilePictureURL } from '@/utils/makeUrl';
 import { EditSharp, KeySharp, PasswordSharp } from '@mui/icons-material';
-import { Avatar, Badge, Button, Card, CardActions, CardContent, CardHeader, CircularProgress, Container, FormControl, MenuItem, Select, Stack, styled, TextField, Typography, useTheme } from '@mui/material'
+import { Avatar, Badge, Button, Card, CardActions, CardContent, CardHeader, CircularProgress, Container, FormControl, InputLabel, MenuItem, Select, Stack, styled, TextField, Typography, useMediaQuery, useTheme } from '@mui/material'
 import { Params } from 'next/dist/server/request/params'
-import React, { use, useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import React, { use, useEffect, useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import useSWR from 'swr';
 
 const url = `${BASE_API_URL}/users/profile`;
@@ -17,12 +21,97 @@ const url = `${BASE_API_URL}/users/profile`;
 const Profile = ({ params }: { params: Promise<Params>}) => {
   const username = use(params).username;
   const user = useSelector(selectUserAccount);
+  const userProfile = useSelector(selectUserProfile);
   const theme = useTheme();
+  const dispatch = useDispatch();
+
+  const isDesktopWidth = useMediaQuery('(min-width: 600px)');
+  
+  const oldPasswordRef = useRef<HTMLInputElement | null>(null);
+  const newPasswordRef = useRef<HTMLInputElement | null>(null);
+  const biodataRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
+
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
   const { data, error, isLoading } = useSWR<UserProfile>(url, (url: string) => customFetch(url).then(response => response.json()));
   const isOwner = username === user.username;
+
+  const handleUploadProfilePicture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e?.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    // Limit size to 2MB
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Image file should not exceed 2MB.')
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('profile_picture', file);
+
+    try {
+      const response = await customFetch(`${BASE_API_URL}/users/profile/picture`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        const newProfilePictureURL = (await response.json()).url;
+        if (newProfilePictureURL) {
+          dispatch(updateProfilePicture(newProfilePictureURL));
+          alert('Profile picture updated')
+        }
+      } else {
+        throw new Error('failed to update profile picture');
+      }
+    } catch (err: any) {
+      console.log(err);
+    }
+  };
+
+  const handleUpdateProfile = async () => {
+    try {
+      const response = await customFetch(`${BASE_API_URL}/users/profile`, {
+        method: 'POST',
+        body: JSON.stringify({
+          biodata: biodataRef.current?.value,
+          email: emailRef.current?.value,
+        })
+      });
+
+      if (response.ok) {
+        alert('Profile updated successfully!')
+      } else {
+        throw new Error('failed to updated profile')
+      }
+
+    } catch (err: any) {
+      alert(`error: ${err}`);
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    const response = await customFetch(`${BASE_API_URL}/users/update_password`, {
+      method: 'POST',
+      body: JSON.stringify({
+        old_password: oldPasswordRef.current?.value,
+        new_password
+        : newPasswordRef.current?.value
+      })
+    });
+
+    if (response.ok) {
+      alert('Password successfully updated!');
+    } else if (response.status === 403) {
+      alert('Current password is incorrect.')
+    } else {
+      alert('Unexpected error occurred. Failed to update password.')
+    }
+  };
 
   useEffect(() => {
     if (data) {
@@ -32,7 +121,7 @@ const Profile = ({ params }: { params: Promise<Params>}) => {
   }, [data]);
 
   if (isLoading) {
-    return <CircularProgress />
+    return <FullPageSpinner />
   }
 
   if (error) {
@@ -44,6 +133,7 @@ const Profile = ({ params }: { params: Promise<Params>}) => {
       <Container
         sx={{
           paddingTop: theme.spacing(2),
+          paddingBottom: theme.spacing(2),
           display: 'flex',
           flexDirection: 'column',
           gap: theme.spacing(2)
@@ -64,51 +154,96 @@ const Profile = ({ params }: { params: Promise<Params>}) => {
               padding: theme.spacing(3)
             }}
           >
-            <Stack direction='row' gap={theme.spacing(2)}>
-            <Container sx={{flexShrink: 1, width: 'auto'}}>
-              {
-                isOwner ?
-                <Badge
-                overlap='circular'
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                badgeContent={
-                  
-                  <Avatar
-                    sx={{bgcolor: theme.palette.grey[700]}}
-                  >
-                    <EditSharp />
-                  </Avatar>}
-              >
-                <Avatar
-                  sx={{width: '160px', height: '160px'}}
-                >
-                </Avatar>
-              </Badge> :                 
-              <Avatar
-                sx={{width: '160px', height: '160px'}}
-              >
-              </Avatar>
-              }
-              
-            </Container>
-            <Stack direction='column' gap={theme.spacing(2)} sx={{width: '100%'}}>
-              <TextField
-                id="outlined-multiline-static"
-                label="Biodata"
-                multiline
-                fullWidth
-                rows={4}
-                defaultValue={profile?.biodata}
-                variant='outlined'
-                disabled={!isEditing}
-              />
-              <TextField 
-                label="Email"
-                defaultValue={profile?.email}
-                disabled={!isEditing}
-              />
-            </Stack>
-            </Stack>
+            {
+              isDesktopWidth ?
+              <Stack direction='row' gap={theme.spacing(2)}>
+              <Container sx={{flexShrink: 1, width: 'auto'}}>
+                {
+                  isOwner ?
+                  <InputLabel htmlFor="upload-profile-picture" sx={{'& :hover': { cursor: 'pointer'}}}>
+                    <Badge
+                    overlap='circular'
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    badgeContent={ <Avatar sx={{bgcolor: theme.palette.grey[700]}}><EditSharp /></Avatar> }
+                    >
+                      <UserAvatar
+                        currentUser={true}
+                        sx={{width: '160px', height: '160px'}} 
+                        fontSize={'6rem'}
+                      />
+                    </Badge>
+                    <VisuallyHiddenInput onChange={handleUploadProfilePicture} type='file' id="upload-profile-picture" />
+                  </InputLabel>
+                :                 
+                <UserAvatar fontSize='6rem' username={username as string | undefined} sx={{width: '160px', height: '160px'}} />
+                }
+                <Typography sx={{marginTop: theme.spacing(2)}} textAlign={'center'} variant='h6'>{username}</Typography>
+              </Container>
+              <Stack direction='column' gap={theme.spacing(2)} sx={{width: '100%'}}>
+                <TextField
+                  id="outlined-multiline-static"
+                  label="Biodata"
+                  multiline
+                  fullWidth
+                  rows={4}
+                  defaultValue={profile?.biodata}
+                  inputRef={biodataRef}
+                  variant='outlined'
+                  disabled={!isEditing}
+                />
+                <TextField 
+                  inputRef={emailRef}
+                  label="Email"
+                  defaultValue={profile?.email}
+                  disabled={!isEditing}
+                />
+              </Stack>
+              </Stack> :
+               <Stack direction='column' gap={theme.spacing(2)}>
+               <Container sx={{flexShrink: 1, width: 'auto'}}>
+                 {
+                   isOwner ?
+                   <InputLabel htmlFor="upload-profile-picture" sx={{'& :hover': { cursor: 'pointer'}}}>
+                     <Badge
+                     overlap='circular'
+                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                     badgeContent={ <Avatar sx={{bgcolor: theme.palette.grey[700]}}><EditSharp /></Avatar> }
+                     >
+                       <UserAvatar
+                         currentUser={true}
+                         sx={{width: '160px', height: '160px'}} 
+                         fontSize={'6rem'}
+                       />
+                     </Badge>
+                     <VisuallyHiddenInput onChange={handleUploadProfilePicture} type='file' id="upload-profile-picture" />
+                   </InputLabel>
+                 :                 
+                 <UserAvatar fontSize='6rem' username={username as string | undefined} sx={{width: '160px', height: '160px'}} />
+                 }
+                 <Typography sx={{marginTop: theme.spacing(2)}} textAlign={'center'} variant='h6'>{username}</Typography>
+               </Container>
+               <Stack direction='column' gap={theme.spacing(2)} sx={{width: '100%'}}>
+                 <TextField
+                   id="outlined-multiline-static"
+                   label="Biodata"
+                   multiline
+                   fullWidth
+                   rows={4}
+                   defaultValue={profile?.biodata}
+                   inputRef={biodataRef}
+                   variant='outlined'
+                   disabled={!isEditing}
+                 />
+                 <TextField 
+                   inputRef={emailRef}
+                   label="Email"
+                   defaultValue={profile?.email}
+                   disabled={!isEditing}
+                 />
+               </Stack>
+               </Stack> 
+            }
+
           </CardContent>
           {
             isOwner ?
@@ -117,7 +252,7 @@ const Profile = ({ params }: { params: Promise<Params>}) => {
               isEditing
               ? <>
                 <Button onClick={() => setIsEditing(false)}>Cancel</Button>
-                <Button>Update Profile</Button>
+                <Button onClick={handleUpdateProfile}>Update Profile</Button>
               </>
               : <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
             }
@@ -136,22 +271,31 @@ const Profile = ({ params }: { params: Promise<Params>}) => {
           />
           <CardContent>
             <Stack direction='column' gap={theme.spacing(1)} sx={{width: '100%'}}>
-              <TextField 
+              <TextField
+                inputRef={oldPasswordRef}
                 type="password"
                 label="Current Password"
               />
-              <TextField 
+              <TextField
+                inputRef={newPasswordRef}
                 type="password"
                 label="New Password"
               />
-              <BareContainer>
-                <Button
-                  variant='contained'
-                  startIcon={<KeySharp />}
-                >Update Password</Button>
-              </BareContainer>
             </Stack>
           </CardContent>
+          <CardActions
+            sx={{
+              paddingLeft: theme.spacing(2),
+              paddingRight: theme.spacing(2),
+              paddingBottom: theme.spacing(2),
+            }}
+          >
+            <Button
+              onClick={handleUpdatePassword}
+              variant='contained'
+              startIcon={<KeySharp />}
+            >Update Password</Button>
+          </CardActions>
           </Card>
           : <></>
         }

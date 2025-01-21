@@ -1,33 +1,42 @@
 'use client';
 
-import { AppBar, Avatar, Box, Button, ButtonBase, Chip, Icon, IconButton, Menu, MenuItem, Snackbar, Toolbar, Typography, useColorScheme, useTheme } from "@mui/material";
+import { AppBar, Avatar, Box, Button, ButtonBase, Chip, Icon, IconButton, Menu, MenuItem, Snackbar, Toolbar, Typography, useColorScheme, useMediaQuery, useTheme } from "@mui/material";
 import { AccountCircleSharp, Create, CreateSharp, DarkModeSharp, LightModeSharp, LoginSharp, MenuSharp, MoreVertSharp, NotificationsSharp, SearchSharp, SettingsSharp } from "@mui/icons-material";
 import { Search, SearchBarIconWrapper, SearchBarInputBase } from "./searchBar";
 import { useDispatch, useSelector } from "react-redux";
-import { resetUser, selectUserAccount } from "@/store/user/userSlice";
+import { resetUser, selectUserAccount, selectUserProfile } from "@/store/user/userSlice";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { resetAuth, selectAccessToken, selectDeviceID, updateAccessToken } from "@/store/auth/authSlice";
 import { customFetch } from "@/utils/customFetch";
 import ColorSchemeSwitcher from "./colorSchemeSwitcher";
+import { makeProfilePictureURL } from "@/utils/makeUrl";
+import UserAvatar from "./userAvatar";
+import { selectMobileSidebarOpen, setMobileSidebarOpen } from "@/store/appState/appStateSlice";
 
 export default function PrimaryAppBar() {
 	const router = useRouter();
 	const dispatch = useDispatch();
 	const theme = useTheme();
-	const user = useSelector(selectUserAccount);
+	const {colorScheme, setColorScheme} = useColorScheme();
+  const isDarkMode = colorScheme === 'dark';
+
+  const user = useSelector(selectUserAccount);
+  const userProfile = useSelector(selectUserProfile);
 	const accessToken = useSelector(selectAccessToken);
 	const deviceID = useSelector(selectDeviceID);
-	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const mobileSidebarOpen = useSelector(selectMobileSidebarOpen);
+	
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const [logoutSnackbarState, setLogoutSnackbarState] = useState(false);
-	const handleProfileMenuClick = (e: React.MouseEvent<HTMLElement>) => {
-		setAnchorEl(e.currentTarget);
-	};
-  const searchBarRef = useRef<HTMLInputElement | null>(null);
-	const handleMenuClose = () => setAnchorEl(null);
-	const isMenuOpen = Boolean(anchorEl);
 
+  const isDesktopWidth = useMediaQuery('(min-width: 900px)')
+	
+  const searchBarRef = useRef<HTMLInputElement | null>(null);
+  
+  const isMenuOpen = Boolean(anchorEl);
+  
   useEffect(() => {
     const searchShortcutHandler = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.key === 'k') {
@@ -37,13 +46,18 @@ export default function PrimaryAppBar() {
         }
       }
     };
-  
+    
     window.addEventListener('keydown', searchShortcutHandler);
-
+    
     return () => {
       window.removeEventListener('keydown', searchShortcutHandler);
     }
   }, [searchBarRef]);
+
+  const handleProfileMenuClick = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(e.currentTarget);
+  };
+  const handleMenuClose = () => setAnchorEl(null);
 
 	const handleLogout = async () => {
 		try {
@@ -70,11 +84,11 @@ export default function PrimaryAppBar() {
 			router.push('/');
 			setAnchorEl(null);
 		}
-	}
+	};
 
-	const CustomAvatar = ({ username }: { username: string | undefined}) => (
-		<Avatar>{username ? username[0].toUpperCase() : null}</Avatar>
-	);
+  const handleSearch = (q: string) => {
+    router.push(`/search/${q}`);
+  };
 
 	const profileMenu = (
 		<Menu
@@ -146,6 +160,7 @@ export default function PrimaryAppBar() {
 						color='inherit'
 						aria-label='open drawer'
 						sx={{ mr: 1 }}
+            onClick={() => { dispatch(setMobileSidebarOpen(!mobileSidebarOpen) )}}
 					>
 						<MenuSharp />
 					</IconButton>
@@ -174,21 +189,29 @@ export default function PrimaryAppBar() {
 						<SearchBarInputBase 
               ref={searchBarRef}
               id="app-main-search"
-							placeholder="Search... (Ctrl + K)"
+							placeholder={`${ isDesktopWidth ? "Search 1chan... (Ctrl + K)" : "Search..."}`}
 							inputProps={{ 'aria-label': 'search'}}
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  if (searchBarRef.current?.value) {
+                    handleSearch(searchBarRef.current.value);
+                  }
+                }
+              }}
 						/>
 					</Search>
 
 					{/* DESKTOP layout */}
-					<Box sx={{ display: { xs: 'none', sm: 'flex'}, alignItems: 'center'}}>
+					<Box sx={{ display: { xs: 'none', sm: 'none', md: 'flex'}, alignItems: 'center'}}>
 						{
 							user.username
 							? <Button
 							disableElevation
 							onClick={() => { router.push("/new") }}
 							sx={{
-								backgroundColor: 'white',
-                color: theme.palette.primary.main,
+                backgroundColor:  `${ isDarkMode ? 'default' : 'white'}` ,
+                color: `${ isDarkMode ? 'default' : theme.palette.primary.main}`,
                 '&:hover': {
                   backgroundColor: theme.palette.grey[300]
                 },
@@ -217,38 +240,39 @@ export default function PrimaryAppBar() {
 							<SettingsSharp />
 						</IconButton>
 						<ColorSchemeSwitcher />
-							{
-								user.username 
-								? <IconButton 
-										onClick={handleProfileMenuClick}
-										size='large' 
-										color='inherit'>
-									<CustomAvatar username={user.username} />
-									</IconButton>
-								: <Button
-                  disableElevation
-									color="secondary"
-									sx={{
-										marginLeft: theme.spacing(2),
-										backgroundColor: 'white',
-										color: theme.palette.primary.main,
-                    height: '48px'
-									}}
-									startIcon={<LoginSharp 
-										color='inherit'
-									/>}
-									href="/login" 
-									LinkComponent={Link} 
-									variant="contained"
-								>Login</Button>
-							}
+							
 					</Box>
-
+          <Box>
+            {
+              user.username 
+              ? <IconButton 
+                  onClick={handleProfileMenuClick}
+                  size='large' 
+                  color='inherit'>
+                <UserAvatar currentUser={true} />
+                </IconButton>
+              : <Button
+                disableElevation
+                color='secondary'
+                sx={{
+                  marginLeft: theme.spacing(2),
+                  backgroundColor:  `${ isDarkMode ? 'default' : 'white'}` ,
+                  color: `${ isDarkMode ? 'default' : theme.palette.primary.main}`,
+                  height: '48px'
+                }}
+                startIcon={<LoginSharp 
+                  color='inherit'
+                />}
+                href="/login" 
+                LinkComponent={Link} 
+                variant='contained'
+              >Login</Button>
+            }
+          </Box>
 					{/* MOBILE layout */}
-					<Box 
+					{/* <Box 
 						sx={{ 
-							display: { xs: 'flex', sm: 'none'},
-							ml: 1
+							display: { xs: 'flex', sm: 'flex'},
 						}}
 					>
 						<IconButton
@@ -258,7 +282,7 @@ export default function PrimaryAppBar() {
 						>
 							<MoreVertSharp />
 						</IconButton>
-					</Box>
+					</Box> */}
 				</Toolbar>
 			</AppBar>
 			{profileMenu}

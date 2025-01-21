@@ -9,7 +9,7 @@ const userAccountInitialState: UserAccount = {
 };
 
 const userProfileInitialState: UserProfile = {
-    profile_photo_path: '',
+    profile_picture_path: '',
     biodata: '',
     email: '',
     post_count: -1,
@@ -36,6 +36,9 @@ const userSlice = createSlice({
         updateUser(state, action: PayloadAction<{account: UserAccount, profile: UserProfile}>) {
             state.account = action.payload.account;
             state.profile = action.payload.profile;
+        },
+        updateProfilePicture(state, action: PayloadAction<string>) {
+          state.profile.profile_picture_path = action.payload;
         },
         updateWrittenThreads(state, action: PayloadAction<WrittenThreads>) {
           state.threads = action.payload
@@ -76,7 +79,7 @@ const userSlice = createSlice({
     }
 });
 
-export const { updateUser, resetUser, updateWrittenComments, updateWrittenThreads, updateThreadLike, addToThreadDislike, removeFromThreadLikeDislike, addToThreadLike, addToCommentDislike, addToCommentLike, removeFromCommentLikeDislike, updateCommentLike } = userSlice.actions;
+export const { updateProfilePicture, updateUser, resetUser, updateWrittenComments, updateWrittenThreads, updateThreadLike, addToThreadDislike, removeFromThreadLikeDislike, addToThreadLike, addToCommentDislike, addToCommentLike, removeFromCommentLikeDislike, updateCommentLike } = userSlice.actions;
 export const selectUserAccount = (state: RootState) => state.user.account;
 export const selectUserProfile = (state: RootState) => state.user.profile;
 export const selectUserLikedThreads = (state: RootState) => state.user.liked_threads;

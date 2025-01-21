@@ -1,15 +1,29 @@
-import { useSelector } from "react-redux";
+import { BASE_API_URL } from "@/app/layout";
+import { UserLikes, WrittenComments, WrittenThreads } from "@/interfaces/user";
+import { resetAuth, setIsRefreshing, updateAccessToken } from "@/store/auth/authSlice";
+import { resetUser, updateCommentLike, updateThreadLike, updateWrittenComments, updateWrittenThreads } from "@/store/user/userSlice";
 import { store } from "../store/store";
-import { updateAccessToken, setIsRefreshing, selectAccessToken, resetAuth } from "@/store/auth/authSlice";
-import { RequestOptions } from "https";
-import { resetUser } from "@/store/user/userSlice";
-import { ResetTvOutlined } from "@mui/icons-material";
 
+/**
+ * Stores the current access token refresh operation, if any, as a flag 
+ * to prevent multiple access token refresh
+ */
 let refreshAccessTokenPromise: Promise<string> | null = null;
 
+/**
+ * A fetcher function to be used with useSWR for requests that do not require authorisation.
+ * @param {RequestInit?} options
+ * @returns {Promise<Void>}
+ */
 export const generalFetch = (options?: RequestInit) => (url: string) => fetch(url, options).then(response => response.json());
 
-export async function customFetch<T>(url: string, options?: RequestInit): Promise<Response> {
+/**
+ * customFetch
+ * @param {string} url 
+ * @param {RequestInit?} options 
+ * @returns 
+ */
+export async function customFetch(url: string, options?: RequestInit): Promise<Response> {
     // Do not use dispatch hook.
 		const state = store.getState();
 		const isRefreshing = state.auth.isRefreshing;
@@ -57,6 +71,40 @@ export async function customFetch<T>(url: string, options?: RequestInit): Promis
 										});
 
 										await refreshAccessTokenPromise;
+
+                    let response = await customFetch(`${BASE_API_URL}/users/likes`, {
+                      method: 'GET'
+                    });
+              
+                    if (response.ok) {
+                      const likes = await response.json() as UserLikes;
+                      store.dispatch(updateThreadLike(likes.threads));
+                      store.dispatch(updateCommentLike(likes.comments));
+                    } else {
+                      throw new Error('Failed to fetch liked threads.')
+                    }
+                  
+                    response = await customFetch(`${BASE_API_URL}/users/threads`, {
+                      method: 'GET'
+                    });
+              
+                    if (response.ok) {
+                      const threads = await response.json() as WrittenThreads;
+                      store.dispatch(updateWrittenThreads(threads));
+                    } else {
+                      throw new Error('Failed to fetch written threads.')
+                    }
+            
+                    response = await customFetch(`${BASE_API_URL}/users/comments`, {
+                      method: 'GET'
+                    });
+            
+                    if (response.ok) {
+                      const comments = await response.json() as WrittenComments;
+                      store.dispatch(updateWrittenComments(comments));
+                    } else {
+                      throw new Error('Failed to fetch written threads.')
+                    }  
                     
 								} catch (err: any) {
 										store.dispatch(setIsRefreshing(false));

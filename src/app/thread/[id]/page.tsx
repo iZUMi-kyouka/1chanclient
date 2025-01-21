@@ -2,7 +2,8 @@
 
 import { BASE_API_URL } from '@/app/layout'
 import theme from '@/app/theme';
-import ThreadOpenView from '@/components/thradOpenView';
+import FullPageSpinner from '@/components/fullPageLoading';
+import ThreadOpenView from '@/components/threadOpenView';
 import PaginatedResponse from '@/interfaces/paginatedResponse';
 import { ThreadViewResponse } from '@/interfaces/thread';
 import { customFetch, generalFetch } from '@/utils/customFetch'
@@ -17,7 +18,7 @@ const page = ({ params }: { params: Promise<Params>}) => {
   const theme = useTheme();
   
   if (isLoading) {
-    return <CircularProgress />;
+    return <FullPageSpinner />;
   }
 
   if (error) {
@@ -26,14 +27,7 @@ const page = ({ params }: { params: Promise<Params>}) => {
 
   if (data) {
     return (
-      <Container
-        sx={{
-          height: 'calc(100vh - 96px) !important',
-          marginTop: theme.spacing(2)
-        }}
-      >
         <ThreadOpenView threadViewResponse={data}/>
-      </Container>
     )
   }
 

@@ -13,7 +13,8 @@ const layout = ({ children }: { children: ReactNode}) => {
         display: 'flex',
         flexDirection: 'column',
         gap: theme.spacing(2),
-        paddingTop: theme.spacing(2)
+        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(2)
         // justifyContent: 'center',
         // alignItems: 'center',
       }}

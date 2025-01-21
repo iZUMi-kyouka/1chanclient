@@ -3,8 +3,8 @@
 import useSWR from "swr";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { updateCommentLike, updateThreadLike, updateUser } from "@/store/user/userSlice";
-import { LikedThreads, UserLikes } from "@/interfaces/user";
+import { updateCommentLike, updateThreadLike, updateUser, updateWrittenComments, updateWrittenThreads } from "@/store/user/userSlice";
+import { LikedThreads, UserLikes, WrittenComments, WrittenThreads } from "@/interfaces/user";
 import { AppDispatch } from "@/store/store";
 import { Typography } from "@mui/material";
 import { updateAccessToken } from "@/store/auth/authSlice";
@@ -43,17 +43,7 @@ export default function FetchUserData() {
                     id: data.account.id,
                     username: data.account.username,
                 },
-                profile: {
-                    profile_photo_path: '',
-                    biodata: '',
-                    email: '',
-                    post_count: 0,
-                    comment_count: 0,
-                    preferred_lang: 'id',
-                    preferred_theme: 'auto',
-                    creation_date: '',
-                    last_login: '',
-                },
+                profile: data.profile
                 })
             );
 
@@ -67,7 +57,30 @@ export default function FetchUserData() {
               dispatch(updateCommentLike(likes.comments));
             } else {
               throw new Error('Failed to fetch liked threads.')
+            }
+
+            response = await customFetch(`${BASE_API_URL}/users/threads`, {
+              method: 'GET'
+            });
+      
+            if (response.ok) {
+              const threads = await response.json() as WrittenThreads;
+              dispatch(updateWrittenThreads(threads));
+            } else {
+              throw new Error('Failed to fetch written threads.')
+            }
+    
+            response = await customFetch(`${BASE_API_URL}/users/comments`, {
+              method: 'GET'
+            });
+    
+            if (response.ok) {
+              const comments = await response.json() as WrittenComments;
+              dispatch(updateWrittenComments(comments));
+            } else {
+              throw new Error('Failed to fetch written threads.')
             }  
+            
         } catch (err: any) {
             console.log("error during login: ", err.message);
         }

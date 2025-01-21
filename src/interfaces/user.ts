@@ -11,7 +11,7 @@ export interface UserAccount {
 }
 
 export interface UserProfile {
-  profile_photo_path: string,
+  profile_picture_path: string,
   biodata: string,
   email: string,
   post_count: number,

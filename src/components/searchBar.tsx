@@ -42,7 +42,7 @@ export const SearchBarInputBase = styled(forwardRef<HTMLInputElement, React.Comp
         transition: theme.transitions.create('width'),
         width: '100%',
         [theme.breakpoints.up('sm')]: {
-            width: '25ch',
+            width: '30ch',
             '&:focus': {
                 width: '40ch'
             }

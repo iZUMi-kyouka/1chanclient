@@ -2,31 +2,70 @@
 
 import Comment from '@/interfaces/comment';
 import { MoreVertSharp } from '@mui/icons-material';
-import { Avatar, Badge, Box, Card, CardActions, CardContent, CardHeader, Container, IconButton, Menu, MenuItem, styled, Typography, useTheme } from '@mui/material';
+import { Avatar, Badge, Box, Button, Card, CardActions, CardContent, CardHeader, Container, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Menu, MenuItem, styled, TextField, Typography, useTheme } from '@mui/material';
 import MuiMarkdown, { getOverrides } from 'mui-markdown';
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { format } from 'date-fns'
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import LikeDislikeButton from './likeDislikeButton';
 import { useDispatch, useSelector } from 'react-redux';
-import { addToCommentDislike, addToCommentLike, removeFromCommentLikeDislike, selectUserLikedComments } from '@/store/user/userSlice';
-import { BASE_API_URL } from '@/app/layout';
+import { addToCommentDislike, addToCommentLike, removeFromCommentLikeDislike, selectUserLikedComments, selectUserWrittenComments } from '@/store/user/userSlice';
+import { BASE_API_URL, BASE_URL } from '@/app/layout';
 import { customFetch } from '@/utils/customFetch';
+import UserAvatar from './userAvatar';
+import BareContainer from './bareContainer';
 
 
 const CommentCard = ({ width, comment }: { width?: string, comment: Comment}) => {
   const theme = useTheme();
-  const creation_date = new Date(comment.creation_date);
+  const dispatch = useDispatch();
   const router = useRouter();
   const likes = useSelector(selectUserLikedComments)
+  const writtenComments = useSelector(selectUserWrittenComments);
+  
+  const isOwnedByCurrentUser = writtenComments[comment.id] === 0 ? true : false;
+  const updatedDate = comment.updated_date ? format(comment.updated_date, 'MMM d, y') : '';
+  
   const isLiked = likes[comment.id] === 1;
   const isDisliked = likes[comment.id] === 0;
+  
   const [likeCount, setLikeCount] = useState(comment.like_count);
   const [dislikeCount, setDislikeCount] = useState(comment.dislike_count);
   const [reportAnchorEl, setReportAnchorEl] = useState<null | HTMLElement>(null);
-  const dispatch = useDispatch();
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
   
+  const reportRef = useRef<HTMLInputElement | null>(null);
+  
+  const creation_date = new Date(comment.creation_date);
+
+  const handleEditComment = () => {
+    router.push(`/edit/comment/${comment.id}`);
+  }
+
+  const handleReport = async () => {
+    try {
+      const response = await customFetch(`${BASE_API_URL}/comments/report/${comment.id}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          report_reason: reportRef.current?.value || null,
+        })
+      });
+
+      if (response.ok) {
+        const reportID = (await response.json()).report_id;
+        alert(`Thread ${comment.id} successfully reported. Your report ID is ${reportID}`);
+        setReportDialogOpen(false);
+        setReportAnchorEl(null);
+      } else {
+        throw new Error("unexpected error occurred.")
+      }
+
+    } catch (err: any) {
+      alert(`Failed to report thread: ${err}`)
+    }
+  };
+
   const handleLikeClick = () => {
     if (!isDisliked && !isLiked) {
       handleLikeDislike(1);
@@ -87,10 +126,18 @@ const CommentCard = ({ width, comment }: { width?: string, comment: Comment}) =>
       }
     };
 
+  const handleDialogClose = () => {
+    setReportDialogOpen(false);
+    setReportAnchorEl(null);
+  };
+
   return (
     <Card
       sx={{
         width: width || '85ch',
+        [theme.breakpoints.down('lg')]: {
+          width: '100%'
+        },
       }}
     >   
         <CardHeader
@@ -106,11 +153,11 @@ const CommentCard = ({ width, comment }: { width?: string, comment: Comment}) =>
                 router.push(`/profile/${comment.username}`);
               }}
             >
-              <Avatar
+              <UserAvatar
+                username={comment.username}
+                filename={comment.user_profile_path}
                 sx={{width: '32px', height: '32px', fontSize: theme.typography.pxToRem(15)}}
-              >
-                {comment.username[0].toUpperCase()}
-              </Avatar>
+              />
             </IconButton>
           }
           action={
@@ -121,7 +168,7 @@ const CommentCard = ({ width, comment }: { width?: string, comment: Comment}) =>
               <MoreVertSharp sx={{ fontSize: theme.typography.pxToRem(20)}}/>
             </IconButton>
           }
-          subheader={<Typography variant='body2'>@{comment.username} | {format(creation_date, "MMM d, y")}</Typography>}
+          subheader={<Typography variant='body2'>@{comment.username} | {format(creation_date, "MMM d, y")} {updatedDate ? ` (edited)` : null}</Typography>}
           sx={{
             padding: theme.spacing(1.5),
             paddingBottom: '0 !important'
@@ -145,8 +192,13 @@ const CommentCard = ({ width, comment }: { width?: string, comment: Comment}) =>
           <MenuItem
             onClick={(e: React.MouseEvent<HTMLElement>) => {
               e.stopPropagation();
+              setReportDialogOpen(true);
             }}
           >Report</MenuItem>
+          { isOwnedByCurrentUser
+            ? <MenuItem onClick={handleEditComment}>Edit</MenuItem>
+            : null
+          }
         </Menu>
           <Container sx={{padding: '0 !important', margin: '0 !important'}}>
           <MuiMarkdown
@@ -176,6 +228,34 @@ const CommentCard = ({ width, comment }: { width?: string, comment: Comment}) =>
             onDislikeClick={handleDislikeClick}
           />
         </CardActions>
+
+        {/* Report dialog */}
+        <Dialog open={reportDialogOpen} onClose={handleDialogClose}>
+          <DialogTitle>Report Comment</DialogTitle>
+          <DialogContent>
+            <Box sx={{display: 'flex', flexDirection: 'column', gap: theme.spacing(2)}}>
+            <BareContainer>
+              <Typography>{`ID: ${comment.id}`}</Typography>
+              <Typography>{`Commenter: ${comment.username}`}</Typography>
+            </BareContainer>
+              <TextField
+                sx={{
+                  width: '30ch',
+                  [theme.breakpoints.up('sm')]: { width: '50ch'},
+                }}
+                rows={6}
+                multiline
+                label='Reason'
+                placeholder="Tell us more what's wrong about this comment..."
+                inputRef={reportRef}
+              />
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDialogClose}>Cancel</Button>
+            <Button onClick={handleReport}>Report</Button>
+          </DialogActions>
+        </Dialog>
     </Card>
   )
 }

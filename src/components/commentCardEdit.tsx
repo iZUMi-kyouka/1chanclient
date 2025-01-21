@@ -1,11 +1,12 @@
 import { MoreVertSharp } from '@mui/icons-material';
 import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, Container, IconButton, Typography, useTheme } from '@mui/material';
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { ForwardRefEditor } from './forwardRefEditor';
 import { useSelector } from 'react-redux';
 import { selectUserAccount } from '@/store/user/userSlice';
 import '@mdxeditor/editor/style.css';
 import { MDXEditorMethods } from '@mdxeditor/editor';
+import UserAvatar from './userAvatar';
 
 export interface Comment {
   id: number,
@@ -30,17 +31,16 @@ const CommentCardEdit = ({ width, onSubmit, onCancel }: { width?: string, onSubm
 
   return (
     <Card
-      sx={{
-        width: width || '85ch'
-      }}
+    sx={{
+      width: width || '85ch',
+      [theme.breakpoints.down('lg')]: {
+        width: '100%'
+      },
+    }}
     >   
         <CardHeader
           avatar={
-            <Avatar
-              sx={{width: '32px', height: '32px', fontSize: theme.typography.pxToRem(15)}}
-            >
-              {userAccount.username === undefined ? '' : (userAccount.username as string)[0].toUpperCase()}
-            </Avatar>
+            <UserAvatar currentUser={true}/>
           }
           subheader={<Typography>@{userAccount.username}</Typography>}
           sx={{
