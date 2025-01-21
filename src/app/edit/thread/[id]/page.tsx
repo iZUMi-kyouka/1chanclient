@@ -1,18 +1,18 @@
 'use client';
 
 import { BASE_API_URL } from '@/app/layout';
-import { ForwardRefEditor } from '@/components/forwardRefEditor'
+import { ForwardRefEditor } from '@/components/input/forwardRefEditor';
+import FullPageSpinner from '@/components/loading/fullPageLoading';
 import { ThreadViewResponse } from '@/interfaces/thread';
 import { customFetch, generalFetch } from '@/utils/customFetch';
-import { Button, Card, CardActions, CardContent, CircularProgress, Container, TextField, Typography, useTheme } from '@mui/material'
-import { Params } from 'next/dist/server/request/params';
-import React, { use, useRef } from 'react'
-import useSWR from 'swr';
-import '@mdxeditor/editor/style.css'
-import { EditSharp } from '@mui/icons-material';
-import { useRouter } from 'next/navigation';
 import { MDXEditorMethods } from '@mdxeditor/editor';
-import FullPageSpinner from '@/components/fullPageLoading';
+import '@mdxeditor/editor/style.css';
+import { EditSharp } from '@mui/icons-material';
+import { Button, Card, CardActions, CardContent, Container, TextField, Typography, useTheme } from '@mui/material';
+import { Params } from 'next/dist/server/request/params';
+import { useRouter } from 'next/navigation';
+import { use, useRef } from 'react';
+import useSWR from 'swr';
 
 const Edit = ({ params }: { params: Promise<Params>}) => {
   const threadID = use(params).id;

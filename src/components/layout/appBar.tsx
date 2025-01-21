@@ -38,9 +38,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import ColorSchemeSwitcher from './colorSchemeSwitcher';
-import { Search, SearchBarIconWrapper, SearchBarInputBase } from './searchBar';
-import UserAvatar from './userAvatar';
+import ColorSchemeSwitcher from '../button/colorSchemeSwitcherButton';
+import { Search, SearchBarIconWrapper, SearchBarInputBase } from '../input/searchBar';
+import UserAvatar from '../user/userAvatar';
 
 export default function PrimaryAppBar() {
   const router = useRouter();

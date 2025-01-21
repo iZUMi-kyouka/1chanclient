@@ -1,17 +1,17 @@
 'use client';
 
-import { BASE_API_URL } from '@/app/layout'
-import FullPageSpinner from '@/components/fullPageLoading';
-import ThreadList from '@/components/threadList'
-import ThreadListFilterDropdown from '@/components/threadListFilterDropdown';
-import PaginatedResponse from '@/interfaces/paginatedResponse'
-import { Thread, ThreadViewResponse } from '@/interfaces/thread'
-import { generalFetch } from '@/utils/customFetch'
-import { Box, CircularProgress, Container, Typography, useTheme } from '@mui/material'
-import { Params } from 'next/dist/server/request/params'
+import { BASE_API_URL } from '@/app/layout';
+import FullPageSpinner from '@/components/loading/fullPageLoading';
+import ThreadList from '@/components/thread/threadList';
+import ThreadListFilterDropdown from '@/components/thread/threadListFilterDialog';
+import PaginatedResponse from '@/interfaces/paginatedResponse';
+import { Thread } from '@/interfaces/thread';
+import { generalFetch } from '@/utils/customFetch';
+import { Box, Container, Typography, useTheme } from '@mui/material';
+import { Params } from 'next/dist/server/request/params';
 import { useSearchParams } from 'next/navigation';
-import React, { use } from 'react'
-import useSWR from 'swr'
+import { use } from 'react';
+import useSWR from 'swr';
 
 const page = ({ params }: { params: Promise<Params>}) => {
   const query = use(params).query as string

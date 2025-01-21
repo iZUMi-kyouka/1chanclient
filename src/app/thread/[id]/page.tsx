@@ -1,16 +1,14 @@
 "use client";
 
-import { BASE_API_URL } from '@/app/layout'
-import theme from '@/app/theme';
-import FullPageSpinner from '@/components/fullPageLoading';
+import { BASE_API_URL } from '@/app/layout';
+import FullPageSpinner from '@/components/loading/fullPageLoading';
 import ThreadOpenView from '@/components/threadOpenView';
-import PaginatedResponse from '@/interfaces/paginatedResponse';
 import { ThreadViewResponse } from '@/interfaces/thread';
-import { customFetch, generalFetch } from '@/utils/customFetch'
-import { CircularProgress, Container, useTheme } from '@mui/material'
-import { Params } from 'next/dist/server/request/params'
-import React, { Suspense, use } from 'react'
-import useSWR from 'swr'
+import { generalFetch } from '@/utils/customFetch';
+import { useTheme } from '@mui/material';
+import { Params } from 'next/dist/server/request/params';
+import { use } from 'react';
+import useSWR from 'swr';
 
 const page = ({ params }: { params: Promise<Params>}) => {
   const threadID = use(params).id;

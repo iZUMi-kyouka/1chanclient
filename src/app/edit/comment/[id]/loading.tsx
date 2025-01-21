@@ -1,7 +1,4 @@
-import FullPageSpinner from '@/components/fullPageLoading'
-import WrappedLoading from '@/components/wrappedLoading'
-import { CircularProgress } from '@mui/material'
-import React from 'react'
+import FullPageSpinner from '@/components/loading/fullPageLoading'
 
 const loading = () => {
   return (

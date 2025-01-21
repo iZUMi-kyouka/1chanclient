@@ -1,15 +1,12 @@
 'use client';
 
-import FullPageSpinner from '@/components/fullPageLoading';
-import Sidebar from '@/components/sidebar'
-import ThreadList, { ThreadListResponse } from '@/components/threadList';
-import ThreadListFilterDropdown from '@/components/threadListFilterDropdown';
-import WrappedLoading from '@/components/wrappedLoading';
+import FullPageSpinner from '@/components/loading/fullPageLoading';
+import ThreadList, { ThreadListResponse } from '@/components/thread/threadList';
+import ThreadListFilterDropdown from '@/components/thread/threadListFilterDialog';
 import { generalFetch } from '@/utils/customFetch';
-import { Box, CircularProgress, Container, Typography, useTheme } from '@mui/material'
+import { Box, Container, useTheme } from '@mui/material';
 import { Params } from 'next/dist/server/request/params';
-import { useSearchParams, usePathname } from 'next/navigation';
-import React from 'react';
+import { useSearchParams } from 'next/navigation';
 import { use } from 'react';
 import useSWR from 'swr';
 

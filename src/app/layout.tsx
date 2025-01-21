@@ -1,18 +1,16 @@
 'use client';
 
-import type { Metadata } from "next";
-import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
-import { ReactNode, Suspense } from "react";
+import HandleDeviceID from "@/components/deviceIdHandler";
+import PrimaryAppBar from "@/components/layout/appBar";
+import CopyPasteSnackbar from "@/components/snackbar/copiedToClipboardSnakbar";
+import FetchUserData from "@/components/user/userDataProvider";
+import { CssBaseline, Paper, Toolbar } from "@mui/material";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import { ThemeProvider } from "@mui/material/styles";
-import theme from "./theme";
 import { Roboto } from 'next/font/google';
-import {Box, CircularProgress, CssBaseline, Paper, Toolbar} from "@mui/material";
+import { ReactNode } from "react";
 import ReduxProvider from "./store";
-import FetchUserData from "@/components/userDataProvider";
-import PrimaryAppBar from "@/components/appBar";
-import HandleDeviceID from "@/components/deviceIdHandler";
-import CopyPasteSnackbar from "@/components/copiedToClipboardSnakbar";
+import theme from "./theme";
 
 const fetcher = (...args: [string, RequestInit?]) => fetch(...args).then(res => res.json);
 

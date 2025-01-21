@@ -15,9 +15,9 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import CommentCard from './commentCard';
-import CommentCardEdit from './commentCardEdit';
-import ThreadCard from './threadCard';
+import CommentCard from './comment/commentCard';
+import CommentCardEdit from './comment/commentCardEdit';
+import ThreadCard from './thread/threadCard';
 
 const ThreadOpenView = ({
   threadViewResponse,

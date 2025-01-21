@@ -1,10 +1,7 @@
-import { CircularProgress, Container, Typography, useTheme } from '@mui/material';
-import React from 'react'
-import useSWR from 'swr';
-import Sidebar from './sidebar';
 import PaginatedResponse from '@/interfaces/paginatedResponse';
-import ThreadCard from './threadCard';
 import { Thread } from '@/interfaces/thread';
+import { Container, Typography, useTheme } from '@mui/material';
+import ThreadCard from './threadCard';
 
 export type ThreadListResponse = PaginatedResponse<Thread>
 

@@ -12,9 +12,9 @@ import {
 } from '@mui/material';
 import { useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { ForwardRefEditor } from './forwardRefEditor';
-import StandardCard from './StandardCard';
-import UserAvatar from './userAvatar';
+import { ForwardRefEditor } from '../input/forwardRefEditor';
+import StandardCard from '../StandardCard';
+import UserAvatar from '../user/userAvatar';
 
 export interface Comment {
   id: number;

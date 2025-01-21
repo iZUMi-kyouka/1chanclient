@@ -1,19 +1,17 @@
 'use client';
 
 import { BASE_API_URL } from '@/app/layout';
-import BareContainer from '@/components/bareContainer';
-import FullPageSpinner from '@/components/fullPageLoading';
-import UserAvatar from '@/components/userAvatar';
+import FullPageSpinner from '@/components/loading/fullPageLoading';
+import UserAvatar from '@/components/user/userAvatar';
 import VisuallyHiddenInput from '@/components/visuallyHiddenInput';
 import { UserProfile } from '@/interfaces/user';
-import { selectUserAccount, selectUserProfile, updateProfilePicture } from '@/store/user/userSlice'
+import { selectUserAccount, selectUserProfile, updateProfilePicture } from '@/store/user/userSlice';
 import { customFetch } from '@/utils/customFetch';
-import { makeProfilePictureURL } from '@/utils/makeUrl';
-import { EditSharp, KeySharp, PasswordSharp } from '@mui/icons-material';
-import { Avatar, Badge, Button, Card, CardActions, CardContent, CardHeader, CircularProgress, Container, FormControl, InputLabel, MenuItem, Select, Stack, styled, TextField, Typography, useMediaQuery, useTheme } from '@mui/material'
-import { Params } from 'next/dist/server/request/params'
-import React, { use, useEffect, useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { EditSharp, KeySharp } from '@mui/icons-material';
+import { Avatar, Badge, Button, Card, CardActions, CardContent, CardHeader, Container, InputLabel, Stack, TextField, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Params } from 'next/dist/server/request/params';
+import React, { use, useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import useSWR from 'swr';
 
 const url = `${BASE_API_URL}/users/profile`;

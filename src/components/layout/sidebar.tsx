@@ -33,7 +33,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import ColorSchemeSwitcher from './colorSchemeSwitcher';
+import ColorSchemeSwitcher from '../button/colorSchemeSwitcherButton';
 
 const drawerWidth = 250;
 

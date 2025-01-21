@@ -35,10 +35,10 @@ import MuiMarkdown, { getOverrides } from 'mui-markdown';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import BareContainer from './bareContainer';
-import LikeDislikeButton from './likeDislikeButton';
-import StandardCard from './StandardCard';
-import UserAvatar from './userAvatar';
+import LikeDislikeButton from '../button/likeDislikeButton';
+import StandardCard from '../StandardCard';
+import UserAvatar from '../user/userAvatar';
+import BareContainer from '../wrapper/bareContainer';
 
 const CommentCard = ({
   width,

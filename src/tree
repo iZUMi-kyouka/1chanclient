@@ -1,0 +1,113 @@
+.
+├── app
+│   ├── categories.tsx
+│   ├── dev
+│   │   ├── grids
+│   │   │   └── page.tsx
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── redux
+│   │   │   └── page.tsx
+│   │   ├── textfields
+│   │   │   └── page.tsx
+│   │   └── theme
+│   │       └── page.tsx
+│   ├── edit
+│   │   ├── comment
+│   │   │   └── [id]
+│   │   │       ├── loading.tsx
+│   │   │       └── page.tsx
+│   │   └── thread
+│   │       └── [id]
+│   │           ├── loading.tsx
+│   │           └── page.tsx
+│   ├── global-error.tsx
+│   ├── globals.css
+│   ├── icon.png
+│   ├── layout.tsx
+│   ├── loading.tsx
+│   ├── login
+│   │   ├── loading.tsx
+│   │   └── page.tsx
+│   ├── metadata.ts
+│   ├── new
+│   │   ├── layout.tsx
+│   │   ├── loading.tsx
+│   │   └── page.tsx
+│   ├── page.tsx
+│   ├── profile
+│   │   └── [username]
+│   │       ├── loading.tsx
+│   │       └── page.tsx
+│   ├── register
+│   │   ├── loading.tsx
+│   │   └── page.tsx
+│   ├── search
+│   │   └── [query]
+│   │       ├── layout.tsx
+│   │       ├── loading.tsx
+│   │       └── page.tsx
+│   ├── store.tsx
+│   ├── theme.tsx
+│   ├── thread
+│   │   └── [id]
+│   │       ├── layout.tsx
+│   │       ├── loading.tsx
+│   │       └── page.tsx
+│   └── top
+│       └── [category]
+│           ├── layout.tsx
+│           ├── loading.tsx
+│           └── page.tsx
+├── components
+│   ├── bareContainer.tsx
+│   ├── centeredFlexBox.tsx
+│   ├── colorSchemeSwitcher.tsx
+│   ├── commentCardEdit.tsx
+│   ├── commentCard.tsx
+│   ├── commentCountChip.tsx
+│   ├── copiedToClipboardSnakbar.tsx
+│   ├── deviceIdHandler.tsx
+│   ├── forwardRefEditor.tsx
+│   ├── fullPageLoading.tsx
+│   ├── initialisedMDXEditor.tsx
+│   ├── likeDislikeButton.tsx
+│   ├── main
+│   │   └── appBar.tsx
+│   ├── searchBar.tsx
+│   ├── shareButton.tsx
+│   ├── sidebar.tsx
+│   ├── StandardCard.tsx
+│   ├── threadCard.tsx
+│   ├── threadCardWithComentInput.tsx
+│   ├── threadListFilterDropdown.tsx
+│   ├── threadList.tsx
+│   ├── threadOpenView.tsx
+│   ├── userAvatar.tsx
+│   ├── userDataProvider.tsx
+│   ├── viewCountChip.tsx
+│   ├── visuallyHiddenInput.tsx
+│   └── wrappedLoading.tsx
+├── interfaces
+│   ├── auth.ts
+│   ├── comment.ts
+│   ├── paginatedResponse.ts
+│   ├── pagination.ts
+│   ├── thread.ts
+│   └── user.ts
+├── store
+│   ├── appState
+│   │   └── appStateSlice.tsx
+│   ├── auth
+│   │   └── authSlice.tsx
+│   ├── store.ts
+│   └── user
+│       └── userSlice.ts
+├── tree
+└── utils
+    ├── beautifyNumber.ts
+    ├── customFetch.tsx
+    ├── makeUrl.ts
+    └── onClickHandlers.ts
+
+31 directories, 80 files

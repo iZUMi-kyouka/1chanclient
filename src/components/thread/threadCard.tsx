@@ -38,13 +38,13 @@ import MuiMarkdown, { getOverrides } from 'mui-markdown';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import BareContainer from './bareContainer';
-import CommentCountChip from './commentCountChip';
-import LikeDislikeButton from './likeDislikeButton';
-import ShareButton from './shareButton';
-import StandardCard from './StandardCard';
-import UserAvatar from './userAvatar';
-import ViewCountChip from './viewCountChip';
+import LikeDislikeButton from '../button/likeDislikeButton';
+import ShareButton from '../button/shareButton';
+import CommentCountChip from '../chip/commentCountChip';
+import ViewCountChip from '../chip/viewCountChip';
+import StandardCard from '../StandardCard';
+import UserAvatar from '../user/userAvatar';
+import BareContainer from '../wrapper/bareContainer';
 
 const ThreadCard = ({
   thread,

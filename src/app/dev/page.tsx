@@ -1,12 +1,12 @@
 'use client';
 
+import CommentCard from "@/components/comment/commentCard";
+import CommentCardEdit from "@/components/comment/commentCardEdit";
+import { ForwardRefEditor } from "@/components/input/forwardRefEditor";
+import ThreadListFilterDropdown from "@/components/thread/threadListFilterDialog";
 import Comment from "@/interfaces/comment";
-import CommentCard from "@/components/commentCard";
-import CommentCardEdit from "@/components/commentCardEdit";
-import { ForwardRefEditor } from "@/components/forwardRefEditor";
-import { Box, Button, Card, CardActionArea, CardActions, Container } from "@mui/material";
+import { Container } from "@mui/material";
 import Typography from "@mui/material/Typography";
-import ThreadListFilterDropdown from "@/components/threadListFilterDropdown";
 
 const testComment: Comment = {
   id: 0,

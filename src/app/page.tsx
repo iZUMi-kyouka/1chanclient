@@ -1,8 +1,8 @@
 'use client';
 
-import Sidebar from "@/components/sidebar";
-import ThreadList, { ThreadListResponse } from "@/components/threadList";
-import WrappedLoading from "@/components/wrappedLoading";
+import Sidebar from "@/components/layout/sidebar";
+import WrappedLoading from "@/components/loading/wrappedLoading";
+import ThreadList, { ThreadListResponse } from "@/components/thread/threadList";
 import { generalFetch } from "@/utils/customFetch";
 import { Box, Container, useTheme } from "@mui/material";
 import { useState } from "react";

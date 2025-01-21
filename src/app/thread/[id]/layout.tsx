@@ -1,9 +1,9 @@
 'use client';
 
 
-import Sidebar from '@/components/sidebar'
-import { Box, Container, useTheme } from '@mui/material'
-import React, { ReactNode } from 'react'
+import Sidebar from '@/components/layout/sidebar';
+import { Box, Container, useTheme } from '@mui/material';
+import { ReactNode } from 'react';
 
 const layout = ({ children }: { children: ReactNode}) => {
   const theme = useTheme();
