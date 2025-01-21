@@ -11,128 +11,131 @@ import { store } from "../store/store";
 let refreshAccessTokenPromise: Promise<string> | null = null;
 
 /**
- * A fetcher function to be used with useSWR for requests that do not require authorisation.
+ * A fetcher function to be used with useSWR for requests that do not require authentication.
  * @param {RequestInit?} options
  * @returns {Promise<Void>}
  */
 export const generalFetch = (options?: RequestInit) => (url: string) => fetch(url, options).then(response => response.json());
 
 /**
- * customFetch
- * @param {string} url 
+ * A fetcher function for requests that require authentication. This function automatically
+ * sets the "Authorization" header and perform access token refresh if it is expired, before
+ * retrying the request that failed due to expired access token.
+ * @param {string} url
  * @param {RequestInit?} options 
- * @returns 
+ * @returns {Promise<Response>}
  */
 export async function customFetch(url: string, options?: RequestInit): Promise<Response> {
-    // Do not use dispatch hook.
-		const state = store.getState();
-		const isRefreshing = state.auth.isRefreshing;
+  // Dispatch hook cannot be used since this is not a function component body
+  const state = store.getState();
+  const isRefreshing = state.auth.isRefreshing;
 
-		const fetchWithIntercept = async () => {
-				const response = await fetch(url, {
-					...options,
-					headers: {
-						...options?.headers,
-						'Authorization': `Bearer ${store.getState().auth.accessToken}`
-					},
-				});
+  const fetchWithIntercept = async () => {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...options?.headers,
+        'Authorization': `Bearer ${store.getState().auth.accessToken}`
+      },
+    });
 
-				if (response.status === 401) {
+    // Access token has expired
+    if (response.status === 401) {
 
-						// No token refresh request in progress, send request
-						if (!isRefreshing) {
-								store.dispatch(setIsRefreshing(true));
+      // No access token refresh request in progress, send request 
+      if (!isRefreshing) {
+        store.dispatch(setIsRefreshing(true));
 
-								try {
-										refreshAccessTokenPromise = fetch(
-												"http://localhost:8080/api/v1/users/refresh",
-												{
-                          ...options,
-                          method: 'GET',
-                          credentials: 'include',
-                          headers: {
-                            ...options?.headers,
-                            'Device-ID': store.getState().auth.deviceID
-                          },
-                          body: null
-                        }
-										).then(async (refreshResponse) => {
-											if (!refreshResponse.ok) {
-                        store.dispatch(resetUser());
-                        store.dispatch(resetAuth());
-                        alert("Your session has expired. Please login again.");
-												throw new Error("Failed to refresh token.");
-											}
+        try {
+          // Set the global access token refresh promise
+          refreshAccessTokenPromise = fetch(
+            "http://localhost:8080/api/v1/users/refresh",
+            {
+              ...options,
+              method: 'GET',
+              credentials: 'include', // include the refresh token
+              headers: {
+                ...options?.headers,
+                'Device-ID': store.getState().auth.deviceID
+              },
+            }
+          ).then(async (refreshResponse) => {
+            if (!refreshResponse.ok) {
+              // Token refresh failed. Reset all user and auth state, and prompt user to relogin.
+              store.dispatch(resetUser());
+              store.dispatch(resetAuth());
+              alert("Your session has expired. Please login again.");
+              throw new Error("refresh token expired");
+            }
 
-											const data: { access_token: string } = await refreshResponse.json();
-											store.dispatch(updateAccessToken(data.access_token));
-											console.log(`Obtained new access token: ${data.access_token}`);
-											return data.access_token;
-										});
+            const data: { access_token: string } = await refreshResponse.json();
+            store.dispatch(updateAccessToken(data.access_token));
+            console.log(`Obtained new access token: ${data.access_token}`);
+            return data.access_token;
+          });
+          
+          await refreshAccessTokenPromise;
 
-										await refreshAccessTokenPromise;
+          // Refresh user metadata (likes, dislikes, owned threads and comments)
+          let response = await customFetch(`${BASE_API_URL}/users/likes`, {
+            method: 'GET'
+          });
 
-                    let response = await customFetch(`${BASE_API_URL}/users/likes`, {
-                      method: 'GET'
-                    });
-              
-                    if (response.ok) {
-                      const likes = await response.json() as UserLikes;
-                      store.dispatch(updateThreadLike(likes.threads));
-                      store.dispatch(updateCommentLike(likes.comments));
-                    } else {
-                      throw new Error('Failed to fetch liked threads.')
-                    }
-                  
-                    response = await customFetch(`${BASE_API_URL}/users/threads`, {
-                      method: 'GET'
-                    });
-              
-                    if (response.ok) {
-                      const threads = await response.json() as WrittenThreads;
-                      store.dispatch(updateWrittenThreads(threads));
-                    } else {
-                      throw new Error('Failed to fetch written threads.')
-                    }
-            
-                    response = await customFetch(`${BASE_API_URL}/users/comments`, {
-                      method: 'GET'
-                    });
-            
-                    if (response.ok) {
-                      const comments = await response.json() as WrittenComments;
-                      store.dispatch(updateWrittenComments(comments));
-                    } else {
-                      throw new Error('Failed to fetch written threads.')
-                    }  
-                    
-								} catch (err: any) {
-										store.dispatch(setIsRefreshing(false));
-										refreshAccessTokenPromise = null;
-										console.log(`Token refresh failed: ${err}`);
-								} finally {
-										store.dispatch(setIsRefreshing(false));
-										refreshAccessTokenPromise = null;
-								}
-						} else if (refreshAccessTokenPromise) {
-								await refreshAccessTokenPromise;
-						}
+          if (response.ok) {
+            const likes = await response.json() as UserLikes;
+            store.dispatch(updateThreadLike(likes.threads));
+            store.dispatch(updateCommentLike(likes.comments));
+          } else {
+            throw new Error('failed to fetch liked threads')
+          }
 
-						// Retry the request that failed with 401
-						console.log(`Retrying auth-protected route using new access token: ${store.getState().auth.accessToken}`);
-						const newAccessToken = store.getState().auth.accessToken;
-            store.dispatch(setIsRefreshing(false));
-						return fetch(url, {
-							...options,
-							headers: {
-								...options?.headers,
-								'Authorization': `Bearer ${newAccessToken}`,
-							},
-						});
-				}
+          response = await customFetch(`${BASE_API_URL}/users/threads`, {
+            method: 'GET'
+          });
 
-				return response;
-		}
+          if (response.ok) {
+            const threads = await response.json() as WrittenThreads;
+            store.dispatch(updateWrittenThreads(threads));
+          } else {
+            throw new Error('failed to fetch written threads.')
+          }
 
-		return fetchWithIntercept();
+          response = await customFetch(`${BASE_API_URL}/users/comments`, {
+            method: 'GET'
+          });
+          if (response.ok) {
+            const comments = await response.json() as WrittenComments;
+            store.dispatch(updateWrittenComments(comments));
+          } else {
+            throw new Error('failed to fetch written comments.')
+          }
+        } catch (err) {
+          console.log(`an error occurred in making auth-required request: ${err}`);
+        } finally {
+          // Reset flag variables
+          store.dispatch(setIsRefreshing(false));
+          refreshAccessTokenPromise = null;
+        }
+      }
+
+      // An access token refresh is already in progerss. Await the new access token.
+      await refreshAccessTokenPromise;
+
+      // Retry the request that failed with 401
+      console.log(`retrying auth-protected route using new access token: ${store.getState().auth.accessToken}`);
+      const newAccessToken = store.getState().auth.accessToken;
+      return fetch(url, {
+        ...options,
+        headers: {
+          ...options?.headers,
+          'Authorization': `Bearer ${newAccessToken}`,
+        },
+      });
+    }
+
+    // If request is success, return the response immediately
+    return response;
+  }
+
+  return fetchWithIntercept();
 }

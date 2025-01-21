@@ -1,8 +1,15 @@
-import { closeCopyPasteSnackbar, selectOpenCopyPasteSnackbar } from '@/store/appState/appStateSlice';
+import {
+  closeCopyPasteSnackbar,
+  selectOpenCopyPasteSnackbar,
+} from '@/store/appState/appStateSlice';
 import { Snackbar } from '@mui/material';
-import React from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 
+/**
+ * A global snakcbar to inform user that some text has been successfully
+ * copied to the clipboard.
+ * @returns
+ */
 const CopyPasteSnackbar = () => {
   const snackBarOpen = useSelector(selectOpenCopyPasteSnackbar);
   const dispatch = useDispatch();
@@ -12,10 +19,10 @@ const CopyPasteSnackbar = () => {
       open={snackBarOpen}
       autoHideDuration={5000}
       onClose={() => dispatch(closeCopyPasteSnackbar())}
-      message={"Link copied to clipboard!"}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'right'}}
+      message={'Link copied to clipboard!'}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
     />
-  )
-}
+  );
+};
 
 export default CopyPasteSnackbar;

@@ -1,35 +1,33 @@
 'use client'
 // InitializedMDXEditor.tsx
-import type { ForwardedRef } from 'react'
+import { BASE_API_URL } from '@/app/layout';
 import {
+  BoldItalicUnderlineToggles,
+  codeBlockPlugin,
+  codeMirrorPlugin,
+  CreateLink,
   headingsPlugin,
-  listsPlugin,
-  linkPlugin,
+  imagePlugin,
+  InsertCodeBlock,
+  InsertImage,
+  InsertTable,
   linkDialogPlugin,
-  tablePlugin,
-  quotePlugin,
-  thematicBreakPlugin,
+  linkPlugin,
+  listsPlugin,
+  ListsToggle,
   markdownShortcutPlugin,
   MDXEditor,
   type MDXEditorMethods,
   type MDXEditorProps,
-  toolbarPlugin,
-  BoldItalicUnderlineToggles,
-  UndoRedo,
-  imagePlugin,
-  InsertImage,
-  CreateLink,
-  ListsToggle,
-  codeBlockPlugin,
-  InsertCodeBlock,
-  sandpackPlugin,
-  codeMirrorPlugin,
+  quotePlugin,
   SandpackConfig,
-  InsertTable
-} from '@mdxeditor/editor'
-import { BASE_API_URL, BASE_URL } from '@/app/layout';
-import { customFetch } from '@/utils/customFetch';
-import { DarkMode, InsertEmoticon, InsertLink } from '@mui/icons-material';
+  sandpackPlugin,
+  tablePlugin,
+  thematicBreakPlugin,
+  toolbarPlugin,
+  UndoRedo
+} from '@mdxeditor/editor';
+import type { ForwardedRef } from 'react';
 
 const handleImageUpload = async (image: File) => {
   const formData = new FormData();
@@ -46,7 +44,7 @@ const handleImageUpload = async (image: File) => {
     } else if (response.status === 400) {
       throw new Error("uploaded image is invalid.");
     }
-  } catch (err: any) {
+  } catch (err) {
     throw new Error(`Failed to upload image: ${err}`)
   }
 }

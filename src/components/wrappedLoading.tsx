@@ -1,6 +1,9 @@
-import { Container, CircularProgress } from '@mui/material'
-import React from 'react'
+import { CircularProgress, Container } from '@mui/material'
 
+/**
+ * A loading screen wrapped in a flexbox that takes up all available space and centralise the spinner
+ * @returns {ReactNode}
+ */
 const WrappedLoading = () => {
   return (
     <Container

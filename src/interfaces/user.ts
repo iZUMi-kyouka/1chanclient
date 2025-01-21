@@ -30,7 +30,7 @@ export interface User {
   threads: WrittenThreads,
   comments: WrittenComments
 }
-
+ 
 export interface UserLikes {
   threads: LikedThreads,
   comments: LikedComments
