@@ -3,6 +3,7 @@
 import { ForwardRefEditor } from '@/components/input/forwardRefEditor';
 import IconPadding from '@/components/wrapper/IconPadding';
 import RowFlexBox from '@/components/wrapper/rowFlexContainer';
+import { addToWrittenThreads } from '@/store/user/userSlice';
 import { customFetch, generalFetch } from '@/utils/customFetch';
 import { checkInvalidCustomTag } from '@/utils/inputValidator';
 import { MDXEditorMethods } from '@mdxeditor/editor';
@@ -28,6 +29,7 @@ import {
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import useSWR from 'swr';
 import { postCategories, postCategoriesDict } from '../categories';
 import { BASE_API_URL } from '../layout';
@@ -52,8 +54,9 @@ const TagsPicker = ({
 
   const handleEditTag = (event: SelectChangeEvent<number[]>) => {
     const newTags = event.target.value as number[];
-    const newSelectedTags = (data as { tags: Tag[] }).tags
-      .filter((tag) => newTags.includes(tag.id));
+    const newSelectedTags = (data as { tags: Tag[] }).tags.filter((tag) =>
+      newTags.includes(tag.id)
+    );
     setTags(newSelectedTags);
     // console.log(`Tag changed: ${newTags}`);
   };
@@ -104,27 +107,32 @@ const TagsPicker = ({
                   display: 'flex',
                   gap: theme.spacing(1),
                   flexWrap: 'wrap',
-                  alignItems: 'center'
+                  alignItems: 'center',
                 }}
               >
-                {selectedTags.map((tag, idx) => (
-                  <Chip sx={{pl: theme.spacing(1)}} icon={postCategoriesDict[tag.id].icon} key={tag.id} label={tag.tag} />
+                {selectedTags.map((tag) => (
+                  <Chip
+                    sx={{ pl: theme.spacing(1) }}
+                    icon={postCategoriesDict[tag.id].icon}
+                    key={tag.id}
+                    label={tag.tag}
+                  />
                 ))}
               </Box>
             )}
           >
-            {
-              data.tags ?
-                data.tags.map((tag, idx) => (
-                  <MenuItem key={tag.id} value={tag.id}>
-                    <RowFlexBox>
-                      {postCategories[idx].icon}
-                      {tag.tag}
-                    </RowFlexBox>
-                  </MenuItem>
-                )) :
-                <MenuItem disabled>Tags are currently unavailable.</MenuItem>
-          }
+            {data.tags ? (
+              data.tags.map((tag, idx) => (
+                <MenuItem key={tag.id} value={tag.id}>
+                  <RowFlexBox>
+                    {postCategories[idx].icon}
+                    {tag.tag}
+                  </RowFlexBox>
+                </MenuItem>
+              ))
+            ) : (
+              <MenuItem disabled>Tags are currently unavailable.</MenuItem>
+            )}
           </Select>
           <Tooltip title="Reset tags">
             <IconButton onClick={() => setTags([])}>
@@ -142,7 +150,8 @@ const Page = () => {
   const ref = useRef<MDXEditorMethods>(null);
   const titleRef = useRef<HTMLInputElement>(null);
   const customTagsRef = useRef<HTMLInputElement>(null);
-
+  
+  const dispatch = useDispatch();
   const theme = useTheme();
   const router = useRouter();
 
@@ -150,10 +159,10 @@ const Page = () => {
     if (ref.current) {
       try {
         if (titleRef.current && titleRef.current.value === '') {
-          alert('Title must not be empty.');
+          alert('Posting a thread with empty title is not allowed.');
           return;
         } else if (ref.current.getMarkdown() === '') {
-          alert('Post must not be empty.');
+          alert('Posting an empty content is not allowed.');
           return;
         }
 
@@ -167,7 +176,7 @@ const Page = () => {
         for (let i = 0; i < customTags.length; i++) {
           if (checkInvalidCustomTag(customTags[i])) {
             alert(
-              'Custom tag contains symbols other than "_". Custom tags can contain anything except symbols other than "_". Multiple words are joined with "_".'
+              'Custom tag contains special characters other than "_". Special characters except "_" are not allowed in custom tags. Multiple words are joined with "_".'
             );
             return;
           }
@@ -185,8 +194,9 @@ const Page = () => {
 
         const response = await request;
         if (response.ok) {
+          dispatch(addToWrittenThreads((await response.json()).id));
           alert('Thread successfully created.');
-          router.push('/');
+          router.back();
         } else if (response.status === 400) {
           throw new Error('post object is invalid. check for any warning');
         } else {
@@ -201,6 +211,7 @@ const Page = () => {
   return (
     <>
       <Typography variant="h4">New Post</Typography>
+      <title>{`1chan | New Post`}</title>
       <br />
       <Card>
         <CardContent

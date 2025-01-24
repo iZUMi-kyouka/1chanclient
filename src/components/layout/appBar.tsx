@@ -54,6 +54,7 @@ export default function PrimaryAppBar() {
   const mobileSidebarOpen = useSelector(selectMobileSidebarOpen);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  // const [notificationAnchorEl, setNotificationAnchorEl] = useState<null | HTMLElement>();
   const [logoutSnackbarState, setLogoutSnackbarState] = useState(false);
 
   const isDesktopWidth = useMediaQuery('(min-width: 900px)');
@@ -62,6 +63,21 @@ export default function PrimaryAppBar() {
 
   const isDarkMode = colorScheme === 'dark';
   const isMenuOpen = Boolean(anchorEl);
+
+  // TODO: Finish notification implementation
+  // const getNotification = async () => {
+  //   try {
+  //     const response = await fetch(`${BASE_API_URL}/notifications`);
+  //     if (response.ok) {
+  //       return await response.json();
+  //     } else {
+  //       throw new Error(`${response.status}`)
+  //     }
+  //   } catch (err: unknown) {
+  //     alert(`Failed to fetch notifications. ${err}. Please try again later.`);
+  //     return;
+  //   }
+  // };
 
   useEffect(() => {
     const searchShortcutHandler = (event: KeyboardEvent) => {

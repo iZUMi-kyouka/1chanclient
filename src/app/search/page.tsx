@@ -60,6 +60,7 @@ const Page = () => {
 
   useEffect(() => {
     setSize(size + 1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
 
   if (error) {
@@ -82,6 +83,7 @@ const Page = () => {
         gap={theme.spacing(2)}
         paddingTop={theme.spacing(2)}
       >
+        <title>{`1chan | Search Result`}</title>
         <Typography variant="h5">{`${searchQuery ? `Search result for "${searchQuery}"` : 'Search Result'}`}</Typography>
         <RowFlexBox>
           {customTags
@@ -92,9 +94,7 @@ const Page = () => {
         </RowFlexBox>
         <RowFlexBox>
           {tags
-            ? splitTags(tags).map((t, idx) => (
-                <TagChip key={idx} tagID={t} />
-              ))
+            ? splitTags(tags).map((t, idx) => <TagChip key={idx} tagID={t} />)
             : null}
         </RowFlexBox>
         <Container sx={{ margin: '0 !important', padding: '0 !important' }}>

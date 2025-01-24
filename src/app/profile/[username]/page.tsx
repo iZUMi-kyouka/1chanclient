@@ -189,6 +189,7 @@ const Profile = ({ params }: { params: Promise<Params> }) => {
           gap: theme.spacing(2),
         }}
       >
+        <title>{`1chan | ${isOwner ? "My Profile" : `${username}'s Profile`}`}</title>
         {isOwner ? (
           <Typography variant="h4">My Account</Typography>
         ) : (

@@ -32,6 +32,11 @@ const ThreadOpenView = ({
   const dispatch  = useDispatch();
 
   const handleCommentSubmit = async (markdown: string) => {
+    if (markdown === '') {
+      alert('Posting empty comment is not allowed.')
+      return;
+    }
+
     try {
       const response = await customFetch(
         `${BASE_API_URL}/comments/new/${threadViewResponse.thread.id}`,

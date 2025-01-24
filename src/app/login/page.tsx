@@ -173,6 +173,7 @@ const Page = () => {
         paddingTop: theme.spacing(2)
 			}}
     >
+        <title>{`1chan | Login`}</title>
         <Typography variant='h3' sx={{marginBottom: theme.spacing(2)}}>
 					1chan
 				</Typography>

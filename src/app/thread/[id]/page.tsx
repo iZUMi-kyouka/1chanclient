@@ -22,6 +22,7 @@ const Page = ({ params }: { params: Promise<Params>}) => {
   if (error) {
     return (
       <ColFlexBox>
+        <title>{`1chan | Thread`}</title>
         <Typography>This thread is missing or has been deleted.</Typography>
         <Typography>Please refresh the page.</Typography>
       </ColFlexBox>
@@ -30,8 +31,11 @@ const Page = ({ params }: { params: Promise<Params>}) => {
 
   if (data) {
     return (
-        <ThreadOpenView threadViewResponse={data}/>
-    )
+      <>
+        <title>{`1chan | Thread: ${data.thread.title}`}</title>
+        <ThreadOpenView threadViewResponse={data} />
+      </>
+    );
   }
 
 }

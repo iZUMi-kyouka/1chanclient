@@ -1,5 +1,5 @@
-import theme from '@/app/theme';
-import Comment from '@/interfaces/comment';
+import { Thread } from '@/interfaces/thread';
+import noPropagate from '@/utils/onClickHandlers';
 import {
   Box,
   Button,
@@ -9,27 +9,30 @@ import {
   DialogTitle,
   TextField,
   Typography,
+  useTheme,
 } from '@mui/material';
-import React, { forwardRef, RefObject } from 'react';
+import { forwardRef, RefObject } from 'react';
 import BareContainer from '../wrapper/bareContainer';
 
-export const CommentReportDialog = forwardRef<
+export const ThreadReportDialog = forwardRef<
   HTMLDivElement,
   React.ComponentProps<typeof Dialog> & {
-    comment: Comment;
+    thread: Thread;
     reportRef: RefObject<HTMLInputElement | null>;
-    handleReport: () => void;
+    handleReport: (e: React.MouseEvent<HTMLElement>) => void;
   }
->(({ comment, handleReport, reportRef, ...props }, _ref) => {
-  const handleClose = () => {
+>(({ thread, handleReport, reportRef, ...props }, _ref) => {
+  const handleClose = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
     if (props.onClose) {
       props.onClose({}, 'backdropClick');
     }
   };
+  const theme = useTheme();
 
   return (
     <Dialog {...props} ref={_ref}>
-      <DialogTitle>Report Comment</DialogTitle>
+      <DialogTitle>Report Thread</DialogTitle>
       <DialogContent>
         <Box
           sx={{
@@ -39,18 +42,19 @@ export const CommentReportDialog = forwardRef<
           }}
         >
           <BareContainer>
-            <Typography>{`ID: ${comment.id}`}</Typography>
-            <Typography>{`Commenter: ${comment.username}`}</Typography>
+            <Typography>{`ID: ${thread.id}`}</Typography>
+            <Typography>{`Title: ${thread.title}`}</Typography>
+            <Typography>{`Original Poster: ${thread.username}`}</Typography>
           </BareContainer>
           <TextField
             sx={{
               width: '30ch',
               [theme.breakpoints.up('sm')]: { width: '50ch' },
             }}
-            rows={6}
+            rows={4}
             multiline
             label="Reason"
-            placeholder="Tell us more what's wrong about this comment..."
+            placeholder="Tell us more what's wrong about this thread..."
             inputRef={reportRef}
           />
         </Box>
@@ -63,37 +67,40 @@ export const CommentReportDialog = forwardRef<
   );
 });
 
-CommentReportDialog.displayName = 'CommentReportDialog';
+ThreadReportDialog.displayName = 'ThreadReportDialog';
 
-export const CommentDeleteDialog = forwardRef<
+export const ThreadDeleteDialog = forwardRef<
   HTMLDivElement,
   React.ComponentProps<typeof Dialog> & {
-    comment: Comment;
-    handleDeleteComment: (e: React.MouseEvent<HTMLElement>) => void;
+    thread: Thread;
+    handleDeleteThread: (e: React.MouseEvent<HTMLElement>) => void;
   }
->(({ comment, handleDeleteComment, ...props }, _ref) => {
-  const handleClose = () => {
+>(({ thread, handleDeleteThread, ...props }, _ref) => {
+
+  const handleClose = noPropagate(() => {
     if (props.onClose) {
       props.onClose({}, 'backdropClick');
     }
-  };
+  });
+  
   return (
     <Dialog {...props} ref={_ref}>
-      <DialogTitle>{`Delete comment?`}</DialogTitle>
+      <DialogTitle>{`Delete thread?`}</DialogTitle>
       <DialogContent>
-        <Typography>{`ID: ${comment.id}`}</Typography>
+        <Typography>{`Title: ${thread.title}`}</Typography>
+        <Typography>{`ID: ${thread.id}`}</Typography>
         <Typography>&nbsp;</Typography>
-        <Typography>{`Are you sure you want to delete this commment?`}</Typography>
+        <Typography>{`Are you sure you want to delete this thread?`}</Typography>
         <Typography color="warning">
           This action is <b>irreversible</b>.
         </Typography>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleDeleteComment}>Delete</Button>
+        <Button onClick={handleDeleteThread}>Delete</Button>
       </DialogActions>
     </Dialog>
   );
 });
 
-CommentDeleteDialog.displayName = 'CommentDeleteDialog';
+ThreadDeleteDialog.displayName = 'CommentDeleteDialog';

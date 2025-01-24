@@ -83,6 +83,7 @@ const Edit = ({ params }: { params: Promise<Params> }) => {
           paddingBottom: theme.spacing(2),
         }}
       >
+        <title>{`1chan | Edit Comment (ID: ${commentID})`}</title>
         <Typography variant="h4">Edit Comment</Typography>
         <br />
         <Card>

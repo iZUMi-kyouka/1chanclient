@@ -2,10 +2,11 @@ import { CircularProgress, Container } from '@mui/material';
 import { forwardRef } from 'react';
 
 /**
- * A loading screen wrapped in a flexbox that takes up all available space and centralise the spinner
+ * Shows a spinner that is wrapped in a container. The container will try to fill up all available horizontal space
+ * while centering the spinner for a better visual.
  * @returns {ReactNode}
  */
-const WrappedLoading = forwardRef<HTMLElement, React.ComponentProps<typeof CircularProgress>>((props, ref) => {
+const WrappedLoading = forwardRef<HTMLDivElement, React.ComponentProps<typeof CircularProgress>>((props, ref) => {
   return (
     <Container
       ref={ref}

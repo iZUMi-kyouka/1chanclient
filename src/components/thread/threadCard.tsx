@@ -16,21 +16,14 @@ import { splitCustomTags, splitTags } from '@/utils/tagsSplitter';
 import { MoreVertSharp } from '@mui/icons-material';
 import {
   Box,
-  Button,
   CardActions,
   CardContent,
   CardHeader,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   IconButton,
   Menu,
   MenuItem,
   Stack,
-  TextField,
   Tooltip,
-  Typography,
   useTheme,
 } from '@mui/material';
 import { format } from 'date-fns/format';
@@ -47,8 +40,8 @@ import TagChip from '../chip/tagChip';
 import ViewCountChip from '../chip/viewCountChip';
 import StandardCard from '../StandardCard';
 import UserAvatar from '../user/userAvatar';
-import BareContainer from '../wrapper/bareContainer';
 import RowFlexBox from '../wrapper/rowFlexContainer';
+import { ThreadDeleteDialog, ThreadReportDialog } from './threadDialogs';
 import { ThreadListResponse } from './threadList';
 
 const ThreadCard = ({
@@ -127,7 +120,7 @@ const ThreadCard = ({
   const handleDeleteDialogOpen = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
     setDeleteDialogOpen(true);
-  }
+  };
 
   const handleDeleteDialogClose = () => {
     setDeleteDialogOpen(false);
@@ -135,6 +128,11 @@ const ThreadCard = ({
 
   const handleReport = async () => {
     try {
+      if (reportRef.current && reportRef.current.value === '') {
+        alert('Reporting a thread with empty reason is not allowed.');
+        return;
+      }
+
       const response = await customFetch(
         `${BASE_API_URL}/threads/report/${thread.id}`,
         {
@@ -427,56 +425,19 @@ const ThreadCard = ({
           </Tooltip>
         </CardActions>
 
-        {/* Delete confirmation dialog */}
-        <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
-          <DialogTitle>{`Delete thread?`}</DialogTitle>
-          <DialogContent>
-            <Typography>{`Title: ${thread.title}`}</Typography>
-            <Typography>{`ID: ${thread.id}`}</Typography>
-            <Typography>&nbsp;</Typography>
-            <Typography>{`Are you sure you want to delete this thread?`}</Typography>
-            <Typography color='warning'>This action is <b>irreversible</b>.</Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDeleteDialogClose}>Cancel</Button>
-            <Button onClick={handleDeleteThread}>Delete</Button>
-          </DialogActions>
-        </Dialog>
-
-        {/* Report dialog */}
-        <Dialog open={reportDialogOpen} onClose={handleDialogClose}>
-          <DialogTitle>Report Thread</DialogTitle>
-          <DialogContent>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: theme.spacing(2),
-              }}
-            >
-              <BareContainer>
-                <Typography>{`ID: ${thread.id}`}</Typography>
-                <Typography>{`Title: ${thread.title}`}</Typography>
-                <Typography>{`Original Poster: ${thread.username}`}</Typography>
-              </BareContainer>
-              <TextField
-                sx={{
-                  width: '30ch',
-                  [theme.breakpoints.up('sm')]: { width: '50ch' },
-                }}
-                rows={4}
-                multiline
-                label="Reason"
-                placeholder="Tell us more what's wrong about this thread..."
-                inputRef={reportRef}
-              />
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDialogClose}>Cancel</Button>
-            <Button onClick={handleReport}>Report</Button>
-          </DialogActions>
-        </Dialog>
+        <ThreadDeleteDialog
+          thread={thread}
+          onClose={handleDeleteDialogClose}
+          open={deleteDialogOpen}
+          handleDeleteThread={handleDeleteThread}
+        />
+        <ThreadReportDialog
+          thread={thread}
+          open={reportDialogOpen}
+          reportRef={reportRef}
+          onClose={handleDialogClose}
+          handleReport={handleReport}
+        />
       </Box>
     </StandardCard>
   );

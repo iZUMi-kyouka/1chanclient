@@ -2,8 +2,8 @@
 
 import RefreshButton from '@/components/button/refreshButton';
 import Sidebar from '@/components/layout/sidebar';
+import FullPageSpinner from '@/components/loading/fullPageLoading';
 import InfiniteScrollLoading from '@/components/loading/infiniteScrollLoading';
-import WrappedLoading from '@/components/loading/wrappedLoading';
 import ThreadList from '@/components/thread/threadList';
 import ThreadListFilterDropdown from '@/components/thread/threadListFilterDialog';
 import RowFlexBox from '@/components/wrapper/rowFlexContainer';
@@ -71,7 +71,7 @@ export default function Home() {
         >
           {(() => {
             if (isLoading) {
-              return <WrappedLoading />;
+              return <FullPageSpinner />;
             }
 
             if (error) {

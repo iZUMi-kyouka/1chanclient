@@ -82,7 +82,13 @@ const Page = ({ params }: { params: Promise<Params> }) => {
           data.forEach(threadViewResponse => threads.push(threadViewResponse));
 
           return (
-            <Box display="flex" flexDirection="column" gap={theme.spacing(2)} flexGrow={1}>
+            <Box
+              display="flex"
+              flexDirection="column"
+              gap={theme.spacing(2)}
+              flexGrow={1}
+            >
+              <title>{`1chan | Threads in ${postCategoriesDict[categoryId].displayName}`}</title>
               <Container
                 sx={{ margin: '0 !important', padding: '0 !important' }}
               >
@@ -90,7 +96,7 @@ const Page = ({ params }: { params: Promise<Params> }) => {
                   sx={{
                     pt: theme.spacing(2),
                     pb: theme.spacing(2),
-                    gap: theme.spacing(3)
+                    gap: theme.spacing(3),
                   }}
                 >
                   <Box
@@ -109,7 +115,7 @@ const Page = ({ params }: { params: Promise<Params> }) => {
                 </RowFlexBox>
                 {threads.length > 0 && threads[0].response ? (
                   <Box display={'flex'} gap={theme.spacing(1)}>
-                    <ThreadListFilterDropdown disableRelevance={true}/>
+                    <ThreadListFilterDropdown disableRelevance={true} />
                     <RefreshButton onClick={() => mutate(undefined)} />
                   </Box>
                 ) : (

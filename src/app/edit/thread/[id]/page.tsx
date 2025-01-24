@@ -73,6 +73,7 @@ const Edit = ({ params }: { params: Promise<Params>}) => {
           paddingBottom: theme.spacing(2)
         }}
       >
+        <title>{`1chan | Edit Thread: ${data.thread.title}`}</title>
         <Typography variant='h4'>Edit Post</Typography>
         <br />
         <Card>

@@ -14,20 +14,15 @@ import { customFetch } from '@/utils/customFetch';
 import { MoreVertSharp } from '@mui/icons-material';
 import {
   Box,
-  Button,
   CardActions,
   CardContent,
   CardHeader,
   Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   IconButton,
   Menu,
   MenuItem,
   Typography,
-  useTheme
+  useTheme,
 } from '@mui/material';
 import { format } from 'date-fns';
 import MuiMarkdown, { getOverrides } from 'mui-markdown';
@@ -37,7 +32,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import LikeDislikeButton from '../button/likeDislikeButton';
 import StandardCard from '../StandardCard';
 import UserAvatar from '../user/userAvatar';
-import CommentReportDialog from './commentDialogs';
+import { CommentDeleteDialog, CommentReportDialog } from './commentDialogs';
 
 const CommentCard = ({
   width,
@@ -88,13 +83,18 @@ const CommentCard = ({
   };
 
   const handleReport = async () => {
+    if (reportRef.current && reportRef.current.value === '') {
+      alert('Reporting a comment with no reason is not allowed.');
+      return;
+    }
+
     try {
       const response = await customFetch(
         `${BASE_API_URL}/comments/report/${comment.id}`,
         {
           method: 'POST',
           body: JSON.stringify({
-            report_reason: reportRef.current?.value || null,
+            report_reason: reportRef.current?.value,
           }),
         }
       );
@@ -146,9 +146,7 @@ const CommentCard = ({
       );
 
       if (response.ok) {
-        alert(
-          `Comment with ID of ${comment.id}) successfully deleted.`
-        );
+        alert(`Comment with ID of ${comment.id}) successfully deleted.`);
         closeCommentDeleteDialog();
       } else {
         throw new Error('unexpected error occurred.');
@@ -315,25 +313,19 @@ const CommentCard = ({
         />
       </CardActions>
 
-      {/* Delete confirmation dialog */}
-      <Dialog open={commentDeleteDialogOpen} onClose={closeCommentDeleteDialog}>
-        <DialogTitle>{`Delete comment?`}</DialogTitle>
-        <DialogContent>
-          <Typography>{`ID: ${comment.id}`}</Typography>
-          <Typography>&nbsp;</Typography>
-          <Typography>{`Are you sure you want to delete this commment?`}</Typography>
-          <Typography color="warning">
-            This action is <b>irreversible</b>.
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeCommentDeleteDialog}>Cancel</Button>
-          <Button onClick={handleDeleteComment}>Delete</Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Report dialog */}
-      <CommentReportDialog open={reportDialogOpen} comment={comment} handleReport={handleReport} onClose={handleDialogClose}/>
+      <CommentDeleteDialog
+        comment={comment}
+        handleDeleteComment={handleDeleteComment}
+        open={commentDeleteDialogOpen}
+        onClose={closeCommentDeleteDialog}
+      />
+      <CommentReportDialog
+        open={reportDialogOpen}
+        comment={comment}
+        handleReport={handleReport}
+        onClose={handleDialogClose}
+        reportRef={reportRef}
+      />
     </StandardCard>
   );
 };
