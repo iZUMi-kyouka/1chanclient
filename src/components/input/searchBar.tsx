@@ -15,9 +15,8 @@ export const Search = styled('div')(({ theme }) => ({
   },
   marginRight: theme.spacing(1),
   marginLeft: theme.spacing(3),
-  width: '100%',
-  [theme.breakpoints.up('sm')]: {
-    width: 'auto',
+  [theme.breakpoints.down(450)]: {
+    marginLeft: 0,
   },
 }));
 
@@ -41,10 +40,10 @@ export const SearchBarInputBase = styled(
   '& .MuiInputBase-input': {
     height: '48px',
     padding: 0,
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    paddingLeft: theme.spacing(2),
     transition: theme.transitions.create('width'),
     width: '100%',
-    [theme.breakpoints.up('sm')]: {
+    [theme.breakpoints.up('md')]: {
       width: '30ch',
       '&:focus': {
         width: '40ch',

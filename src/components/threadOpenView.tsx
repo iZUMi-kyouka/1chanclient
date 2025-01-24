@@ -1,6 +1,7 @@
 import { BASE_API_URL } from '@/app/layout';
 import { ThreadViewResponse } from '@/interfaces/thread';
 import { selectAccessToken } from '@/store/auth/authSlice';
+import { addToWrittenComments } from '@/store/user/userSlice';
 import { customFetch } from '@/utils/customFetch';
 import { AddCommentSharp } from '@mui/icons-material';
 import {
@@ -14,10 +15,11 @@ import {
   useTheme,
 } from '@mui/material';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import CommentCard from './comment/commentCard';
 import CommentCardEdit from './comment/commentCardEdit';
 import ThreadCard from './thread/threadCard';
+import ColFlexBox from './wrapper/colFlexContainer';
 
 const ThreadOpenView = ({
   threadViewResponse,
@@ -27,6 +29,7 @@ const ThreadOpenView = ({
   const theme = useTheme();
   const accessToken = useSelector(selectAccessToken);
   const [commentOpen, setCommentOpen] = useState(false);
+  const dispatch  = useDispatch();
 
   const handleCommentSubmit = async (markdown: string) => {
     try {
@@ -41,6 +44,7 @@ const ThreadOpenView = ({
       );
 
       if (response.status === 201) {
+        dispatch(addToWrittenComments((await response.json()).id));
         alert('Comment posted successfully.');
         setCommentOpen(false);
       } else {
@@ -50,6 +54,15 @@ const ThreadOpenView = ({
       alert(`error: ${err}`);
     }
   };
+
+  if (!threadViewResponse.thread) {
+    return (
+      <ColFlexBox>
+        <Typography>This thread is missing or has been deleted.</Typography>
+        <Typography>Please refresh the page.</Typography>
+      </ColFlexBox>
+    );
+  }
 
   return (
     <Container
@@ -76,19 +89,24 @@ const ThreadOpenView = ({
         justifyContent="center"
         sx={{
           padding: '0 !important',
-          width: '85ch',
+          width: '925px',
           [theme.breakpoints.down('lg')]: {
             width: '100%',
           },
         }}
       >
-        <ThreadCard disableOnClick={true} thread={threadViewResponse.thread} />
+        <ThreadCard
+          showCustomTags={true}
+          showTags={true}
+          disableOnClick={true}
+          thread={threadViewResponse.thread}
+        />
       </Box>
 
       <Container
         sx={{
           padding: '0 !important',
-          width: '85ch',
+          width: '925px',
           [theme.breakpoints.down('lg')]: {
             width: '100%',
           },
@@ -135,7 +153,7 @@ const ThreadOpenView = ({
           <Chip label="Comments"></Chip>
         </Divider>
       </Container>
-      {threadViewResponse.comments.response ? (
+      {threadViewResponse.comments && threadViewResponse.comments.response ? (
         <Box
           display="flex"
           flexDirection="column"

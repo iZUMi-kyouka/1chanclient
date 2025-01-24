@@ -1,5 +1,5 @@
-import PaginatedResponse from "./paginatedResponse"
 import Comment from "./comment"
+import PaginatedResponse from "./paginatedResponse"
 
 export interface Thread {
   id: number,
@@ -15,6 +15,8 @@ export interface Thread {
   comment_count: number,
   likeStatus?: number,
   view_count: number,
+  tags?: string,
+  custom_tags?: string,
 }
 
 export interface ThreadViewResponse {

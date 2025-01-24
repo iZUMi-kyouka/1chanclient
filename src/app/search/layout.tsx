@@ -4,7 +4,7 @@ import Sidebar from '@/components/layout/sidebar';
 import { Box, Container, useTheme } from '@mui/material';
 import { ReactNode } from 'react';
 
-const layout = ({children}: {children: ReactNode}) => {
+const Layout = ({children}: {children: ReactNode}) => {
   const theme = useTheme();
 
   return (
@@ -17,4 +17,4 @@ const layout = ({children}: {children: ReactNode}) => {
   )
 }
 
-export default layout
+export default Layout;

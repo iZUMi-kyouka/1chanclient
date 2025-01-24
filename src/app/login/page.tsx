@@ -1,17 +1,15 @@
 'use client';
-import { LoginSharp, MarginTwoTone, VisibilityOffSharp, VisibilitySharp } from '@mui/icons-material';
-import { alpha, Button, Card, CardContent, colors, Container, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography, useTheme } from '@mui/material'
-import React, { useState } from 'react'
-import theme from '../theme';
-import Link from 'next/link';
-import useSWR from 'swr';
-import { useRouter } from 'next/navigation';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectUserAccount, updateThreadLike, updateUser, updateWrittenComments, updateWrittenThreads } from '@/store/user/userSlice';
-import { selectDeviceID, updateAccessToken } from '@/store/auth/authSlice';
-import { BASE_API_URL } from '../layout';
-import { customFetch } from '@/utils/customFetch';
 import { LikedThreads, WrittenComments, WrittenThreads } from '@/interfaces/user';
+import { selectDeviceID, updateAccessToken } from '@/store/auth/authSlice';
+import { selectUserAccount, updateThreadLike, updateUser, updateWrittenComments, updateWrittenThreads } from '@/store/user/userSlice';
+import { customFetch } from '@/utils/customFetch';
+import { LoginSharp, VisibilityOffSharp, VisibilitySharp } from '@mui/icons-material';
+import { Button, Card, CardContent, CircularProgress, Container, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography, useTheme } from '@mui/material';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { BASE_API_URL } from '../layout';
 
 const classes = {
 	field: {
@@ -25,7 +23,7 @@ const classes = {
 	}
 }
 
-const page = () => {
+const Page = () => {
 	const user = useSelector(selectUserAccount);
 	const deviceID = useSelector(selectDeviceID);
   const theme = useTheme();
@@ -37,11 +35,8 @@ const page = () => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [usernameOK, setUsernameOK] = useState(true);
 	const [passwordOK, setPasswordOK] = useState(true);
-	const [passwordHidden, setPasswordHidden] = useState(true);
 	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState<null | string>(null);
   const [errorMsg, setErrorMsg] = useState(false);
-
 
 	const handleUsernameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const newUsername = e.target.value;
@@ -60,7 +55,6 @@ const page = () => {
 			return;
 		}
 
-		setError(null);
 		setIsLoading(true);
 
 		try {
@@ -129,16 +123,15 @@ const page = () => {
           throw new Error('Failed to fetch written threads.')
         }  
 
-      } catch (err: any) {
+      } catch (err) {
         console.log(`error: ${err}`)
       }
 
       setErrorMsg(false);
 			console.log('Updated user data!');
 			router.push('/');
-    } catch (err: any) {
-			console.log("error during login: ", err.message);
-      setError(err.message);
+    } catch (err: unknown) {
+			console.log("error during login: ", (err as Error).message);
       setErrorMsg(true);
     } finally {
       setIsLoading(false);
@@ -183,7 +176,10 @@ const page = () => {
         <Typography variant='h3' sx={{marginBottom: theme.spacing(2)}}>
 					1chan
 				</Typography>
-				<Card>
+				<Card sx={{
+          width: '100%',
+          maxWidth: '750px'
+        }}>
 					<CardContent>
 						<TextField
 							error={!usernameOK}
@@ -192,10 +188,12 @@ const page = () => {
 							fullWidth 
 							label="Username"
 							variant='outlined'
+              disabled={user.username ? true : false}
 						/>
 						<FormControl variant='outlined' fullWidth>
 							<InputLabel htmlFor='password-input'>Password</InputLabel>
 							<OutlinedInput
+                disabled={user.username ? true : false}
 								fullWidth
 								onChange={handlePasswordInput}
 								id='password-input'
@@ -224,14 +222,14 @@ const page = () => {
 							fullWidth
 							sx={classes.button}
 							onClick={handleLogin}
-							startIcon={<LoginSharp />}
-							disabled={!(usernameOK && passwordOK) && isLoading}
-						>{isLoading ? 'Logging in...' : 'Login'}</Button>
+							startIcon={isLoading ? <CircularProgress size={24} /> : <LoginSharp />}
+							disabled={!(usernameOK && passwordOK) || isLoading || user.username !== undefined }
+						>{isLoading ? 'Logging in...' : user.username ? 'Logged in' : 'Login'}</Button>
 						<Container sx={{marginTop: theme.spacing(3)}}>
 
 						</Container>
 						<Typography variant='body2'>
-							Don't have an account?  <Link style={{color: 'inherit'}} href="/register">Register</Link>
+							Don&apos;t have an account?  <Link style={{color: 'inherit'}} href="/register">Register</Link>
 						</Typography>
 					</CardContent>
 				</Card>
@@ -239,4 +237,4 @@ const page = () => {
   );
 }
 
-export default page;
+export default Page;

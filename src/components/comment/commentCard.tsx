@@ -26,9 +26,8 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  TextField,
   Typography,
-  useTheme,
+  useTheme
 } from '@mui/material';
 import { format } from 'date-fns';
 import MuiMarkdown, { getOverrides } from 'mui-markdown';
@@ -38,7 +37,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import LikeDislikeButton from '../button/likeDislikeButton';
 import StandardCard from '../StandardCard';
 import UserAvatar from '../user/userAvatar';
-import BareContainer from '../wrapper/bareContainer';
+import CommentReportDialog from './commentDialogs';
 
 const CommentCard = ({
   width,
@@ -70,10 +69,19 @@ const CommentCard = ({
     null
   );
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [commentDeleteDialogOpen, setCommentDeleteDialogOpen] = useState(false);
 
   const reportRef = useRef<HTMLInputElement | null>(null);
 
   const creation_date = new Date(comment.creation_date);
+
+  const openCommentDeleteDialog = () => {
+    setCommentDeleteDialogOpen(true);
+  };
+
+  const closeCommentDeleteDialog = () => {
+    setCommentDeleteDialogOpen(false);
+  };
 
   const handleEditComment = () => {
     router.push(`/edit/comment/${comment.id}`);
@@ -123,6 +131,30 @@ const CommentCard = ({
       handleLikeDislike(0, true);
     } else {
       handleLikeDislike(0);
+    }
+  };
+
+  const handleDeleteComment = async (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+
+    try {
+      const response = await customFetch(
+        `${BASE_API_URL}/comments/${comment.id}`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      if (response.ok) {
+        alert(
+          `Comment with ID of ${comment.id}) successfully deleted.`
+        );
+        closeCommentDeleteDialog();
+      } else {
+        throw new Error('unexpected error occurred.');
+      }
+    } catch (err) {
+      alert(`Failed to delete comment: ${err}`);
     }
   };
 
@@ -247,7 +279,10 @@ const CommentCard = ({
             Report
           </MenuItem>
           {isOwnedByCurrentUser ? (
-            <MenuItem onClick={handleEditComment}>Edit</MenuItem>
+            <Box>
+              <MenuItem onClick={handleEditComment}>Edit</MenuItem>
+              <MenuItem onClick={openCommentDeleteDialog}>Delete</MenuItem>
+            </Box>
           ) : null}
         </Menu>
         <Container sx={{ padding: '0 !important', margin: '0 !important' }}>
@@ -280,39 +315,25 @@ const CommentCard = ({
         />
       </CardActions>
 
-      {/* Report dialog */}
-      <Dialog open={reportDialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>Report Comment</DialogTitle>
+      {/* Delete confirmation dialog */}
+      <Dialog open={commentDeleteDialogOpen} onClose={closeCommentDeleteDialog}>
+        <DialogTitle>{`Delete comment?`}</DialogTitle>
         <DialogContent>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: theme.spacing(2),
-            }}
-          >
-            <BareContainer>
-              <Typography>{`ID: ${comment.id}`}</Typography>
-              <Typography>{`Commenter: ${comment.username}`}</Typography>
-            </BareContainer>
-            <TextField
-              sx={{
-                width: '30ch',
-                [theme.breakpoints.up('sm')]: { width: '50ch' },
-              }}
-              rows={6}
-              multiline
-              label="Reason"
-              placeholder="Tell us more what's wrong about this comment..."
-              inputRef={reportRef}
-            />
-          </Box>
+          <Typography>{`ID: ${comment.id}`}</Typography>
+          <Typography>&nbsp;</Typography>
+          <Typography>{`Are you sure you want to delete this commment?`}</Typography>
+          <Typography color="warning">
+            This action is <b>irreversible</b>.
+          </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose}>Cancel</Button>
-          <Button onClick={handleReport}>Report</Button>
+          <Button onClick={closeCommentDeleteDialog}>Cancel</Button>
+          <Button onClick={handleDeleteComment}>Delete</Button>
         </DialogActions>
       </Dialog>
+
+      {/* Report dialog */}
+      <CommentReportDialog open={reportDialogOpen} comment={comment} handleReport={handleReport} onClose={handleDialogClose}/>
     </StandardCard>
   );
 };

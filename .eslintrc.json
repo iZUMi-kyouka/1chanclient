@@ -1,0 +1,7 @@
+{
+  "rules": {
+    "no-unused-vars": ["warn"], // Warns about unused variables
+    "no-unused-imports/no-unused-imports": "warn", // Requires eslint-plugin-no-unused-imports
+    "semi": ["error", "always"]
+  }
+}

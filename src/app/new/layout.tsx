@@ -1,27 +1,36 @@
 'use client';
 
-import { Container, useTheme } from '@mui/material'
-import React, { ReactNode } from 'react'
-import '@mdxeditor/editor/style.css'
+import Sidebar from '@/components/layout/sidebar';
+import RowFlexBox from '@/components/wrapper/rowFlexContainer';
+import '@mdxeditor/editor/style.css';
+import { Container, useTheme } from '@mui/material';
+import { ReactNode } from 'react';
 
-const layout = ({ children }: { children: ReactNode}) => {
+const Layout = ({ children }: { children: ReactNode}) => {
   const theme = useTheme();
 
   return (
-    <Container
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: theme.spacing(2),
-        paddingTop: theme.spacing(2),
-        paddingBottom: theme.spacing(2)
-        // justifyContent: 'center',
-        // alignItems: 'center',
-      }}
-    >
-      {children}
-    </Container>
+    <RowFlexBox>
+      <Sidebar sx={{
+        [theme.breakpoints.down(900)]: {
+          display: 'none'
+        }
+      }}/>
+      <Container
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: theme.spacing(2),
+          paddingTop: theme.spacing(2),
+          paddingBottom: theme.spacing(2)
+          // justifyContent: 'center',
+          // alignItems: 'center',
+        }}
+      >
+        {children}
+      </Container>
+    </RowFlexBox>
   )
 }
 
-export default layout
+export default Layout;

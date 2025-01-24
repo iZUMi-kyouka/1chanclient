@@ -1,5 +1,3 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../store";
 import {
   LikedComments,
   LikedThreads,
@@ -9,6 +7,8 @@ import {
   WrittenComments,
   WrittenThreads,
 } from "@/interfaces/user";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../store";
 
 const userAccountInitialState: UserAccount = {
   id: undefined,
@@ -37,7 +37,7 @@ const initialState: User = {
 };
 
 const userSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {
     updateUser(
@@ -55,6 +55,12 @@ const userSlice = createSlice({
     },
     updateWrittenComments(state, action: PayloadAction<WrittenComments>) {
       state.comments = action.payload;
+    },
+    addToWrittenThreads(state, action: PayloadAction<number>) {
+      state.threads[action.payload] = 0;
+    },
+    addToWrittenComments(state, action: PayloadAction<number>) {
+      state.comments[action.payload] = 0;
     },
     updateThreadLike(state, action: PayloadAction<LikedThreads>) {
       state.liked_threads = action.payload;
@@ -103,6 +109,8 @@ export const {
   addToCommentLike,
   removeFromCommentLikeDislike,
   updateCommentLike,
+  addToWrittenComments,
+  addToWrittenThreads
 } = userSlice.actions;
 export const selectUserAccount = (state: RootState) => state.user.account;
 export const selectUserProfile = (state: RootState) => state.user.profile;

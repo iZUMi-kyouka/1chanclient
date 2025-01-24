@@ -15,7 +15,13 @@ let refreshAccessTokenPromise: Promise<string> | null = null;
  * @param {RequestInit?} options
  * @returns {Promise<Void>}
  */
-export const generalFetch = (options?: RequestInit) => (url: string) => fetch(url, options).then(response => response.json());
+export const generalFetch = (options?: RequestInit) => (url: string) => fetch(url, options).then(response => {
+  if (response.ok) {
+    return response.json();
+  } else {
+    throw new Error(`${response.status}`)
+  }
+});
 
 /**
  * A fetcher function for requests that require authentication. This function automatically
@@ -58,6 +64,7 @@ export async function customFetch(url: string, options?: RequestInit): Promise<R
                 ...options?.headers,
                 'Device-ID': store.getState().auth.deviceID
               },
+              body: null // ensure that body is null since this is a 'GET' request
             }
           ).then(async (refreshResponse) => {
             if (!refreshResponse.ok) {

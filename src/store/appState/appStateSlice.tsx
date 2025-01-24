@@ -7,6 +7,8 @@ export interface AppState {
   currentHomePage: PostCategoryPlain;
   copyPasteSnackbarOpen: boolean;
   mobileSiderbarOpen: boolean;
+  alwaysShowTags: boolean;
+  alwaysShowCustomTags: boolean;
 }
 
 const appstateInitialState: AppState = {
@@ -14,6 +16,8 @@ const appstateInitialState: AppState = {
   currentHomePage: HomeCategory,
   copyPasteSnackbarOpen: false,
   mobileSiderbarOpen: false,
+  alwaysShowTags: false,
+  alwaysShowCustomTags: false,
 };
 
 const appstateSlice = createSlice({
@@ -32,6 +36,12 @@ const appstateSlice = createSlice({
     setMobileSidebarOpen(state, action: PayloadAction<boolean>) {
       state.mobileSiderbarOpen = action.payload;
     },
+    setAlwaysShowTags(state, action: PayloadAction<boolean>) {
+      state.alwaysShowTags = action.payload;
+    },
+    setAlwaysShowCustomTags(state, action: PayloadAction<boolean>) {
+      state.alwaysShowCustomTags = action.payload;
+    }
   },
 });
 
@@ -40,6 +50,8 @@ export const {
   openCopyPasteSnackbar,
   closeCopyPasteSnackbar,
   setMobileSidebarOpen,
+  setAlwaysShowCustomTags,
+  setAlwaysShowTags
 } = appstateSlice.actions;
 export const selectCurrentHomePage = (state: RootState) =>
   state.appstate.currentHomePage;
@@ -47,4 +59,7 @@ export const selectOpenCopyPasteSnackbar = (state: RootState) =>
   state.appstate.copyPasteSnackbarOpen;
 export const selectMobileSidebarOpen = (state: RootState) =>
   state.appstate.mobileSiderbarOpen;
+export const selectAlwaysShowTags = (state: RootState) => state.appstate.alwaysShowTags;
+export const selectAlwaysShowCustomTags = (state: RootState) =>
+  state.appstate.alwaysShowCustomTags;
 export default appstateSlice.reducer;

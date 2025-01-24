@@ -1,15 +1,24 @@
 import PaginatedResponse from '@/interfaces/paginatedResponse';
 import { Thread } from '@/interfaces/thread';
+import { selectAlwaysShowCustomTags, selectAlwaysShowTags } from '@/store/appState/appStateSlice';
 import { Container, Typography, useTheme } from '@mui/material';
+import { useSelector } from 'react-redux';
+import { KeyedMutator } from 'swr/_internal';
+import ColFlexBox from '../wrapper/colFlexContainer';
 import ThreadCard from './threadCard';
 
 export type ThreadListResponse = PaginatedResponse<Thread>
 
-const fetcher = (url: string) => fetch(url).then(response => response.json())
-
-const ThreadList = ({ threads }: { threads: ThreadListResponse}) => {
+const ThreadList = ({ threads, mutateHook }: { threads: ThreadListResponse[], mutateHook?: KeyedMutator<ThreadListResponse>}) => {
     const theme = useTheme();
-  
+    const showTags = useSelector(selectAlwaysShowTags);
+    const showCustomTags = useSelector(selectAlwaysShowCustomTags);
+
+    const responses: Thread[] = [];
+    if (threads.length !== 0) {
+      threads.forEach(threadsObj => threadsObj.response ? threadsObj.response.forEach(r => responses.push(r)) : null);
+    }
+
     return (
       <>
         <Container sx={{  
@@ -24,11 +33,11 @@ const ThreadList = ({ threads }: { threads: ThreadListResponse}) => {
           paddingBottom: theme.spacing(4),
         }}>
           {
-            threads.response  
-            ? threads.response.map(thread => (
-              <ThreadCard key={thread.id} thread={thread} />
+            responses.length > 0
+            ? responses.map(thread => (
+              <ThreadCard showTags={showTags} showCustomTags={showCustomTags} mutateHook={mutateHook} key={thread.id} thread={thread} />
             )) 
-            : <div><Typography>No threads are found.</Typography></div>
+            : <ColFlexBox><Typography>No threads are found.</Typography></ColFlexBox>
           }
         </Container>
       </>

@@ -16,7 +16,7 @@ const StandardCard = ({
   return (
     <Card
       sx={{
-        width: width || '85ch',
+        width: width || '925px',
         [theme.breakpoints.down('lg')]: {
           width: '100%',
         },

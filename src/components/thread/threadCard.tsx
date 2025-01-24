@@ -12,9 +12,8 @@ import {
   selectUserWrittenThreads,
 } from '@/store/user/userSlice';
 import { customFetch } from '@/utils/customFetch';
-import {
-  MoreVertSharp
-} from '@mui/icons-material';
+import { splitCustomTags, splitTags } from '@/utils/tagsSplitter';
+import { MoreVertSharp } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -28,32 +27,44 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Stack,
   TextField,
   Tooltip,
   Typography,
-  useTheme
+  useTheme,
 } from '@mui/material';
 import { format } from 'date-fns/format';
 import MuiMarkdown, { getOverrides } from 'mui-markdown';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { KeyedMutator } from 'swr';
 import LikeDislikeButton from '../button/likeDislikeButton';
 import ShareButton from '../button/shareButton';
 import CommentCountChip from '../chip/commentCountChip';
+import CustomTagChip from '../chip/customTagChip';
+import TagChip from '../chip/tagChip';
 import ViewCountChip from '../chip/viewCountChip';
 import StandardCard from '../StandardCard';
 import UserAvatar from '../user/userAvatar';
 import BareContainer from '../wrapper/bareContainer';
+import RowFlexBox from '../wrapper/rowFlexContainer';
+import { ThreadListResponse } from './threadList';
 
 const ThreadCard = ({
   thread,
   width,
   disableOnClick,
+  mutateHook,
+  showTags,
+  showCustomTags,
 }: {
   thread: Thread;
   width?: string;
   disableOnClick?: boolean;
+  mutateHook?: KeyedMutator<ThreadListResponse>;
+  showTags?: boolean;
+  showCustomTags?: boolean;
 }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -64,6 +75,8 @@ const ThreadCard = ({
   const accessToken = useSelector(selectAccessToken);
 
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
   const [likeCount, setLikeCount] = useState(thread.like_count);
   const [dislikeCount, setDislikeCount] = useState(thread.dislike_count);
   const [reportAnchorEl, setReportAnchorEl] = useState<null | HTMLElement>(
@@ -84,6 +97,9 @@ const ThreadCard = ({
     : '';
 
   const handleLikeClick = (e: React.MouseEvent<HTMLElement>) => {
+    if (mutateHook) {
+      mutateHook();
+    }
     e.stopPropagation();
     if (!isDisliked && !isLiked) {
       handleLikeDislike(1);
@@ -95,6 +111,9 @@ const ThreadCard = ({
   };
 
   const handleDislikeClick = (e: React.MouseEvent<HTMLElement>) => {
+    if (mutateHook) {
+      mutateHook();
+    }
     e.stopPropagation();
     if (!isDisliked && !isLiked) {
       handleLikeDislike(0);
@@ -104,6 +123,16 @@ const ThreadCard = ({
       handleLikeDislike(0);
     }
   };
+
+  const handleDeleteDialogOpen = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    setDeleteDialogOpen(true);
+  }
+
+  const handleDeleteDialogClose = () => {
+    setDeleteDialogOpen(false);
+  };
+
   const handleReport = async () => {
     try {
       const response = await customFetch(
@@ -142,49 +171,72 @@ const ThreadCard = ({
     router.push(`/edit/thread/${thread.id}`);
   };
 
-  const handleLikeDislike =
-    async (likeDislike: number, remove?: boolean) => {
-      let url: string;
-      if (likeDislike === 1) {
-        url = `${BASE_API_URL}/threads/like/${thread.id}`;
+  const handleDeleteThread = async (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+
+    try {
+      const response = await customFetch(
+        `${BASE_API_URL}/threads/${thread.id}`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      if (response.ok) {
+        alert(
+          `Thread "${thread.title}" (ID: ${thread.id}) successfully deleted.`
+        );
+        setDeleteDialogOpen(false);
       } else {
-        url = `${BASE_API_URL}/threads/dislike/${thread.id}`;
+        throw new Error('unexpected error occurred.');
       }
+    } catch (err) {
+      alert(`Failed to delete thread: ${err}`);
+    }
+  };
 
-      try {
-        const response = await customFetch(url, {
-          method: 'PUT',
-        });
+  const handleLikeDislike = async (likeDislike: number, remove?: boolean) => {
+    let url: string;
+    if (likeDislike === 1) {
+      url = `${BASE_API_URL}/threads/like/${thread.id}`;
+    } else {
+      url = `${BASE_API_URL}/threads/dislike/${thread.id}`;
+    }
 
-        if (response.ok) {
-          console.log('response ok');
-          if (remove) {
-            if (likeDislike === 1) {
-              setLikeCount(likeCount - 1);
-            } else {
+    try {
+      const response = await customFetch(url, {
+        method: 'PUT',
+      });
+
+      if (response.ok) {
+        console.log('response ok');
+        if (remove) {
+          if (likeDislike === 1) {
+            setLikeCount(likeCount - 1);
+          } else {
+            setDislikeCount(dislikeCount - 1);
+          }
+          dispatch(removeFromThreadLikeDislike(thread.id));
+        } else {
+          if (likeDislike === 1) {
+            setLikeCount(likeCount + 1);
+            if (isDisliked) {
               setDislikeCount(dislikeCount - 1);
             }
-            dispatch(removeFromThreadLikeDislike(thread.id));
+            dispatch(addToThreadLike(thread.id));
           } else {
-            if (likeDislike === 1) {
-              setLikeCount(likeCount + 1);
-              if (isDisliked) {
-                setDislikeCount(dislikeCount - 1);
-              }
-              dispatch(addToThreadLike(thread.id));
-            } else {
-              setDislikeCount(dislikeCount + 1);
-              if (isLiked) {
-                setLikeCount(likeCount - 1);
-              }
-              dispatch(addToThreadDislike(thread.id));
+            setDislikeCount(dislikeCount + 1);
+            if (isLiked) {
+              setLikeCount(likeCount - 1);
             }
+            dispatch(addToThreadDislike(thread.id));
           }
         }
-      } catch (err) {
-        console.log(`error: ${err}`);
       }
-    };
+    } catch (err) {
+      console.log(`error: ${err}`);
+    }
+  };
 
   const handleDialogClose = () => {
     setReportDialogOpen(false);
@@ -195,7 +247,7 @@ const ThreadCard = ({
     <StandardCard
       elevation={1}
       sx={{
-        width: width || '85ch',
+        width: width || '925px',
         [theme.breakpoints.down('lg')]: {
           width: '100%',
         },
@@ -246,7 +298,10 @@ const ThreadCard = ({
             Report
           </MenuItem>
           {isOwnedByCurrentUser ? (
-            <MenuItem onClick={handleEditThread}>Edit</MenuItem>
+            <Box>
+              <MenuItem onClick={handleEditThread}>Edit</MenuItem>
+              <MenuItem onClick={handleDeleteDialogOpen}>Delete</MenuItem>
+            </Box>
           ) : null}
         </Menu>
         <CardHeader
@@ -281,16 +336,26 @@ const ThreadCard = ({
           subheader={`by ${thread.username} | ${format(thread.creation_date, 'MMM d, y')}${updatedDate ? ` (edited ${updatedDate})` : ''}`}
         />
 
-        <CardContent>
+        <CardContent
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: theme.spacing(2),
+          }}
+        >
           <MuiMarkdown
             overrides={{
               ...getOverrides({}),
               img: {
                 props: {
                   style: {
+                    display: 'block',
                     width: '100%',
                     height: 'auto',
-                    objectFit: 'cover',
+                    margin: '0 auto',
+                    objectFit: 'contain',
+                    maxHeight: '400px',
+                    borderRadius: theme.spacing(1),
                   },
                 },
               },
@@ -298,8 +363,47 @@ const ThreadCard = ({
           >
             {thread.original_post}
           </MuiMarkdown>
+          {showCustomTags || showTags ? (
+            <Stack
+              marginBottom={theme.spacing(1)}
+              direction={'column'}
+              gap={theme.spacing(0.75)}
+            >
+              <RowFlexBox
+                sx={{
+                  flexWrap: 'wrap',
+                }}
+              >
+                {thread.tags && showTags ? (
+                  splitTags(thread.tags).map((tag, idx) => {
+                    return <TagChip key={idx} tagID={tag} />;
+                  })
+                ) : (
+                  <></>
+                )}
+              </RowFlexBox>
+              <RowFlexBox
+                sx={{
+                  flexWrap: 'wrap',
+                }}
+              >
+                {thread.custom_tags && showCustomTags ? (
+                  splitCustomTags(thread.custom_tags).map((customTag, idx) => {
+                    return <CustomTagChip key={idx} customTag={customTag} />;
+                  })
+                ) : (
+                  <></>
+                )}
+              </RowFlexBox>
+            </Stack>
+          ) : null}
         </CardContent>
-        <CardActions>
+        <CardActions
+          sx={{
+            paddingLeft: `${theme.spacing(2)} !important`,
+            paddingRight: `${theme.spacing(2)} !important`,
+          }}
+        >
           <LikeDislikeButton
             disabled={likesDisabled}
             likeCount={likeCount}
@@ -311,17 +415,33 @@ const ThreadCard = ({
           <ShareButton onCopyToClipboard={copyToClipboard} />
 
           <Box sx={{ flexGrow: 1 }} />
-          <ViewCountChip viewCount={thread.view_count}/>
+          <ViewCountChip viewCount={thread.view_count} />
           <Tooltip
             title={
               lastCommentDate ? `Last comment was on ${lastCommentDate}` : null
             }
           >
             <Box>
-              <CommentCountChip commentCount={thread.comment_count}/>
+              <CommentCountChip commentCount={thread.comment_count} />
             </Box>
           </Tooltip>
         </CardActions>
+
+        {/* Delete confirmation dialog */}
+        <Dialog open={deleteDialogOpen} onClose={handleDeleteDialogClose}>
+          <DialogTitle>{`Delete thread?`}</DialogTitle>
+          <DialogContent>
+            <Typography>{`Title: ${thread.title}`}</Typography>
+            <Typography>{`ID: ${thread.id}`}</Typography>
+            <Typography>&nbsp;</Typography>
+            <Typography>{`Are you sure you want to delete this thread?`}</Typography>
+            <Typography color='warning'>This action is <b>irreversible</b>.</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleDeleteDialogClose}>Cancel</Button>
+            <Button onClick={handleDeleteThread}>Delete</Button>
+          </DialogActions>
+        </Dialog>
 
         {/* Report dialog */}
         <Dialog open={reportDialogOpen} onClose={handleDialogClose}>

@@ -1,4 +1,4 @@
-import { BrushSharp, BusinessCenterSharp, CoffeeSharp, DevicesSharp, DirectionsCarSharp, ExploreSharp, FavoriteSharp, GavelSharp, HandymanSharp, HomeSharp, MovieSharp, PeopleSharp, PetsSharp, RamenDiningRounded, RamenDiningSharp, SchoolSharp, ScienceSharp, SportsVolleyballSharp, SurfingSharp, VideogameAssetSharp, WhatshotSharp, WorkSharp } from "@mui/icons-material";
+import { BrushSharp, BusinessCenterSharp, CoffeeSharp, DevicesSharp, DirectionsCarSharp, ExploreSharp, FavoriteSharp, GavelSharp, HandymanSharp, MovieSharp, PeopleSharp, PetsSharp, RamenDiningSharp, SchoolSharp, ScienceSharp, SportsVolleyballSharp, SurfingSharp, VideogameAssetSharp, WorkSharp } from "@mui/icons-material";
 
 export interface PostCategory {
     id: number,
@@ -49,3 +49,8 @@ export const postCategories = [
     newCategory(17, "Travel", "travel", <ExploreSharp />),
     newCategory(18, "Food & Drinks", "food_drinks", <RamenDiningSharp />),
 ].sort((a, b) => a.name < b.name ? -1 : 1);
+
+export const postCategoriesDict = postCategories.reduce((acc: {[id: number]: PostCategory}, category: PostCategory) => {
+  acc[category.id] = category;
+  return acc;
+}, {});

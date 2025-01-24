@@ -1,13 +1,13 @@
 'use client';
-import { LoginSharp, MarginTwoTone, VisibilityOffSharp, VisibilitySharp } from '@mui/icons-material';
-import { alpha, Button, Card, CardContent, colors, Container, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material'
-import React, { useState } from 'react'
-import theme from '../theme';
+import { selectDeviceID, updateAccessToken } from '@/store/auth/authSlice';
+import { updateUser } from '@/store/user/userSlice';
+import { LoginSharp, VisibilityOffSharp, VisibilitySharp } from '@mui/icons-material';
+import { Button, Card, CardContent, CircularProgress, Container, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectUserAccount, updateUser } from '@/store/user/userSlice';
-import { selectDeviceID, updateAccessToken } from '@/store/auth/authSlice';
+import theme from '../theme';
 
 // const classes = {
 // 	field: {
@@ -21,8 +21,7 @@ import { selectDeviceID, updateAccessToken } from '@/store/auth/authSlice';
 // 	}
 // }
 
-const page = () => {
-	const user = useSelector(selectUserAccount);
+const Page = () => {
 	const deviceID = useSelector(selectDeviceID);
 	const router = useRouter();
 	const dispatch = useDispatch();
@@ -106,9 +105,9 @@ const page = () => {
       );
 		console.log('Updated user data!');
 		router.push('/');
-    } catch (err: any) {
-			console.log("error during login: ", err.message);
-      setError(err.message);
+    } catch (err: unknown) {
+			console.log("error during login: ", (err as Error).message);
+      setError((err as Error).message);
     } finally {
       setIsLoading(false);
     }
@@ -168,7 +167,10 @@ const page = () => {
 				>
 					1chan
 				</Typography>
-				<Card>
+				<Card sx={{
+          width: '100%',
+          maxWidth: '750px'
+        }}>
 					<CardContent>
 						<TextField
 							error={!usernameOK}
@@ -236,8 +238,8 @@ const page = () => {
 						<Button
 							fullWidth
 							onClick={handleRegister}
-							startIcon={<LoginSharp />}
-							disabled={!(usernameOK && passwordOK) && isLoading}
+              startIcon={isLoading ? <CircularProgress size={24} /> : <LoginSharp />}
+							disabled={!(usernameOK && passwordOK) || isLoading}
               sx={{ marginTop: theme.spacing(1.25)}}
 						>{isLoading ? 'Registering...' : 'Register'}</Button>
 						<Container sx={{marginTop: theme.spacing(3)}}>
@@ -252,4 +254,4 @@ const page = () => {
   );
 }
 
-export default page;
+export default Page;

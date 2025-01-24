@@ -19,10 +19,14 @@ const testComment: Comment = {
   dislike_count: 0
 }
 
-export default function Page() {
+// eslint-disable-next-line @next/next/no-async-client-component
+export default async function Page({ params }: { params: Promise<{ locale: string }>}) {
+  const locale = (await params).locale;
+
   return (
     <>
       <Typography>This is development route root.</Typography>
+      This is the {locale} route.
       <ForwardRefEditor markdown={"Hello, **world**!"} />
       <Container
         sx={{

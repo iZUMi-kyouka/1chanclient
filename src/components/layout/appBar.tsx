@@ -16,8 +16,7 @@ import {
   LoginSharp,
   MenuSharp,
   NotificationsSharp,
-  SearchSharp,
-  SettingsSharp,
+  SearchSharp
 } from '@mui/icons-material';
 import {
   AppBar,
@@ -25,6 +24,7 @@ import {
   Button,
   ButtonBase,
   IconButton,
+  InputAdornment,
   Menu,
   MenuItem,
   Snackbar,
@@ -39,7 +39,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ColorSchemeSwitcher from '../button/colorSchemeSwitcherButton';
-import { Search, SearchBarIconWrapper, SearchBarInputBase } from '../input/searchBar';
+import { Search, SearchBarInputBase } from '../input/searchBar';
 import UserAvatar from '../user/userAvatar';
 
 export default function PrimaryAppBar() {
@@ -47,19 +47,19 @@ export default function PrimaryAppBar() {
   const dispatch = useDispatch();
   const theme = useTheme();
   const { colorScheme } = useColorScheme();
-  
+
   const user = useSelector(selectUserAccount);
   const accessToken = useSelector(selectAccessToken);
   const deviceID = useSelector(selectDeviceID);
   const mobileSidebarOpen = useSelector(selectMobileSidebarOpen);
-  
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [logoutSnackbarState, setLogoutSnackbarState] = useState(false);
-  
+
   const isDesktopWidth = useMediaQuery('(min-width: 900px)');
-  
+
   const searchBarRef = useRef<HTMLInputElement | null>(null);
-  
+
   const isDarkMode = colorScheme === 'dark';
   const isMenuOpen = Boolean(anchorEl);
 
@@ -115,8 +115,10 @@ export default function PrimaryAppBar() {
     }
   };
 
-  const handleSearch = (q: string) => {
-    router.push(`/search/${q}`);
+  const handleSearch = () => {
+    if (searchBarRef.current) {
+      router.push(`/search?q=${searchBarRef.current.value}`);
+    }
   };
 
   const profileMenu = (
@@ -181,16 +183,25 @@ export default function PrimaryAppBar() {
         position="fixed"
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 1,
+          height: '64px'
         }}
       >
-        <Toolbar sx={{ alignItems: 'center' }}>
+        <Toolbar sx={{ alignItems: 'center', height: '100%', [theme.breakpoints.down('sm')]: {
+          paddingLeft: theme.spacing(2),
+          paddingRight: theme.spacing(1.25) 
+        } }}>
           {/* Hamburger menu icon */}
           <IconButton
             size="large"
             edge="start"
             color="inherit"
             aria-label="open drawer"
-            sx={{ mr: 1 }}
+            sx={{
+              mr: 1,
+              [theme.breakpoints.up('md')]: {
+                display: 'none',
+              },
+            }}
             onClick={() => {
               dispatch(setMobileSidebarOpen(!mobileSidebarOpen));
             }}
@@ -200,6 +211,11 @@ export default function PrimaryAppBar() {
 
           {/* 1chan Logo */}
           <ButtonBase
+            sx={{
+              [theme.breakpoints.down(450)]: {
+                display: 'none'
+              }
+            }}
             onClick={() => router.push('/')}
             disableRipple
             disableTouchRipple
@@ -213,9 +229,6 @@ export default function PrimaryAppBar() {
 
           {/* Search bar */}
           <Search>
-            <SearchBarIconWrapper>
-              <SearchSharp />
-            </SearchBarIconWrapper>
             <SearchBarInputBase
               ref={searchBarRef}
               id="app-main-search"
@@ -224,11 +237,20 @@ export default function PrimaryAppBar() {
               onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  if (searchBarRef.current?.value) {
-                    handleSearch(searchBarRef.current.value);
-                  }
+                  handleSearch();
                 }
               }}
+              endAdornment={
+                <InputAdornment position="end" sx={{ mr: theme.spacing(1) }}>
+                  <IconButton onClick={handleSearch}>
+                    <SearchSharp
+                      sx={{
+                        color: `${colorScheme === 'dark' ? 'inherit' : 'white'}`,
+                      }}
+                    />
+                  </IconButton>
+                </InputAdornment>
+              }
             />
           </Search>
 
@@ -267,9 +289,6 @@ export default function PrimaryAppBar() {
             <IconButton size="large" color="inherit">
               <NotificationsSharp />
             </IconButton>
-            <IconButton size="large" color="inherit">
-              <SettingsSharp />
-            </IconButton>
             <ColorSchemeSwitcher />
           </Box>
           <Box>
@@ -287,6 +306,9 @@ export default function PrimaryAppBar() {
                 color="secondary"
                 sx={{
                   marginLeft: theme.spacing(2),
+                  [theme.breakpoints.down('md')]: {
+                    marginLeft: 0
+                  },
                   backgroundColor: `${isDarkMode ? 'default' : 'white'}`,
                   color: `${isDarkMode ? 'default' : theme.palette.primary.main}`,
                   height: '48px',

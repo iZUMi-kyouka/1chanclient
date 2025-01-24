@@ -3,6 +3,7 @@
 import { BASE_API_URL } from '@/app/layout';
 import { ForwardRefEditor } from '@/components/input/forwardRefEditor';
 import FullPageSpinner from '@/components/loading/fullPageLoading';
+import ColFlexBox from '@/components/wrapper/colFlexContainer';
 import { ThreadViewResponse } from '@/interfaces/thread';
 import { customFetch, generalFetch } from '@/utils/customFetch';
 import { MDXEditorMethods } from '@mdxeditor/editor';
@@ -33,13 +34,13 @@ const Edit = ({ params }: { params: Promise<Params>}) => {
       });
 
       if (response.ok) {
-        alert('Original post updated successfully!');
+        alert('Thread updated successfully!');
         router.back();
       } else {
-        throw new Error('Failed to edit original post');
+        throw new Error('unhandled errror');
       }
-    } catch (err: any) {
-      alert(`Error: ${err}`);
+    } catch (err: unknown) {
+      throw err;
     }
   };
 
@@ -48,7 +49,19 @@ const Edit = ({ params }: { params: Promise<Params>}) => {
   }
 
   if (error) {
-    throw new Error(error);
+    return (
+      <ColFlexBox>
+        <Typography color="error">{`Failed to fetch thread: ${error}`}</Typography>
+      </ColFlexBox>
+    );
+  }
+
+  if (data && data.thread === undefined) {
+    return (
+      <ColFlexBox>
+        <Typography color="error">Thread has been deleted or does not exist.</Typography>
+      </ColFlexBox>
+    );
   }
 
   if (data) {

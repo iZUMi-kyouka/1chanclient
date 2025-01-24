@@ -1,34 +1,73 @@
 'use client';
 
 import { ForwardRefEditor } from '@/components/input/forwardRefEditor';
+import IconPadding from '@/components/wrapper/IconPadding';
+import RowFlexBox from '@/components/wrapper/rowFlexContainer';
 import { customFetch, generalFetch } from '@/utils/customFetch';
+import { checkInvalidCustomTag } from '@/utils/inputValidator';
 import { MDXEditorMethods } from '@mdxeditor/editor';
-import { RestartAltSharp, SendSharp } from '@mui/icons-material';
-import { Box, Button, Card, CardContent, Chip, CircularProgress, FormControl, IconButton, InputLabel, MenuItem, OutlinedInput, Select, SelectChangeEvent, TextField, Tooltip, Typography, useTheme } from '@mui/material';
+import { InfoSharp, RestartAltSharp, SendSharp } from '@mui/icons-material';
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Chip,
+  CircularProgress,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+  SelectChangeEvent,
+  TextField,
+  Tooltip,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
 import useSWR from 'swr';
+import { postCategories, postCategoriesDict } from '../categories';
 import { BASE_API_URL } from '../layout';
 
 export interface Tag {
-  id: number,
-  tag: string
+  id: number;
+  tag: string;
 }
 
-const TagsPicker = ({ selectedTags, setTags }: { selectedTags: Tag[], setTags: React.Dispatch<React.SetStateAction<Tag[]>>}) => {
-  const { data, error, isLoading } = useSWR<{tags: Tag[]}>(`${BASE_API_URL}/threads/tags`, generalFetch());
+const TagsPicker = ({
+  selectedTags,
+  setTags,
+}: {
+  selectedTags: Tag[];
+  setTags: React.Dispatch<React.SetStateAction<Tag[]>>;
+}) => {
+  const { data, error, isLoading } = useSWR<{ tags: Tag[] }>(
+    `${BASE_API_URL}/threads/tags`,
+    generalFetch()
+  );
   const theme = useTheme();
-  
+
   const handleEditTag = (event: SelectChangeEvent<number[]>) => {
     const newTags = event.target.value as number[];
-    const newSelectedTags = (data as {tags: Tag[]}).tags.filter(tag => newTags.includes(tag.id))
+    const newSelectedTags = (data as { tags: Tag[] }).tags
+      .filter((tag) => newTags.includes(tag.id));
     setTags(newSelectedTags);
     // console.log(`Tag changed: ${newTags}`);
   };
-  
-  if (isLoading) return <CircularProgress />
-  if (error) return <Typography color="error">{`Unable to load tags: ${error}`}</Typography>
+
+  if (isLoading) return <CircularProgress />;
+  if (error)
+    return (
+      <Typography color="error">{`Unable to load tags: ${error}`}</Typography>
+    );
   if (data) {
+    if (data.tags) {
+      data.tags.sort((a, b) => (a.tag < b.tag ? -1 : 1));
+    }
+
     return (
       <FormControl>
         <InputLabel id="tags-selector-chip-label">Tags</InputLabel>
@@ -37,7 +76,7 @@ const TagsPicker = ({ selectedTags, setTags }: { selectedTags: Tag[], setTags: R
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
-            gap: theme.spacing(1)
+            gap: theme.spacing(1),
           }}
         >
           <Select
@@ -46,65 +85,64 @@ const TagsPicker = ({ selectedTags, setTags }: { selectedTags: Tag[], setTags: R
               PaperProps: {
                 style: {
                   maxHeight: '320px',
-                  marginTop: theme.spacing(1)
-                }
-              }
+                  marginTop: theme.spacing(1),
+                },
+              },
             }}
             fullWidth
             labelId="tags-selector-chip-label"
             id="tags-selector-chip"
             multiple
-            value={selectedTags.map(tag => tag.id)}
+            value={selectedTags.map((tag) => tag.id)}
             onChange={handleEditTag}
-            input={<OutlinedInput id="select-multiple-tags" label="Tags" fullWidth/>}
-            renderValue={(selected) => (
-              <Box sx={{
-                display: 'flex',
-                gap: theme.spacing(1),
-                flexWrap: 'wrap',
-              }}>
-                {
-                  selectedTags.map(tag => (
-                    <Chip key={tag.id} label={tag.tag} />
-                  ))
-                }
+            input={
+              <OutlinedInput id="select-multiple-tags" label="Tags" fullWidth />
+            }
+            renderValue={() => (
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: theme.spacing(1),
+                  flexWrap: 'wrap',
+                  alignItems: 'center'
+                }}
+              >
+                {selectedTags.map((tag, idx) => (
+                  <Chip sx={{pl: theme.spacing(1)}} icon={postCategoriesDict[tag.id].icon} key={tag.id} label={tag.tag} />
+                ))}
               </Box>
             )}
           >
-            {data.tags.map((tag) => (
-              <MenuItem
-                key={tag.id}
-                value={tag.id}
-              >
-                {tag.tag}
-              </MenuItem>
-            ))}
+            {
+              data.tags ?
+                data.tags.map((tag, idx) => (
+                  <MenuItem key={tag.id} value={tag.id}>
+                    <RowFlexBox>
+                      {postCategories[idx].icon}
+                      {tag.tag}
+                    </RowFlexBox>
+                  </MenuItem>
+                )) :
+                <MenuItem disabled>Tags are currently unavailable.</MenuItem>
+          }
           </Select>
-          <Tooltip
-            title="Reset tags"
-          >
-            <IconButton
-              sx={{
-                width: theme.spacing(6),
-                height: theme.spacing(6)
-              }}
-              onClick={() => setTags([])}
-            >
+          <Tooltip title="Reset tags">
+            <IconButton onClick={() => setTags([])}>
               <RestartAltSharp />
             </IconButton>
           </Tooltip>
-
         </Box>
-     
-    </FormControl>
+      </FormControl>
     );
   }
 };
 
-const page = () => {
+const Page = () => {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const ref = useRef<MDXEditorMethods>(null);
   const titleRef = useRef<HTMLInputElement>(null);
+  const customTagsRef = useRef<HTMLInputElement>(null);
+
   const theme = useTheme();
   const router = useRouter();
 
@@ -113,10 +151,26 @@ const page = () => {
       try {
         if (titleRef.current && titleRef.current.value === '') {
           alert('Title must not be empty.');
-          return
+          return;
         } else if (ref.current.getMarkdown() === '') {
           alert('Post must not be empty.');
-          return
+          return;
+        }
+
+        let customTags: string[] = [];
+        if (customTagsRef.current) {
+          if (customTagsRef.current.value !== '') {
+            customTags = customTagsRef.current.value.split(' ');
+          }
+        }
+
+        for (let i = 0; i < customTags.length; i++) {
+          if (checkInvalidCustomTag(customTags[i])) {
+            alert(
+              'Custom tag contains symbols other than "_". Custom tags can contain anything except symbols other than "_". Multiple words are joined with "_".'
+            );
+            return;
+          }
         }
 
         const request = customFetch(`${BASE_API_URL}/threads/new`, {
@@ -124,42 +178,51 @@ const page = () => {
           body: JSON.stringify({
             title: titleRef.current ? titleRef.current.value : '',
             original_post: ref.current.getMarkdown(),
-            tags: selectedTags
-          })
+            tags: selectedTags,
+            custom_tags: customTags,
+          }),
         });
-  
+
         const response = await request;
         if (response.ok) {
-          alert("Thread successfully created.")
-          router.push("/");
+          alert('Thread successfully created.');
+          router.push('/');
+        } else if (response.status === 400) {
+          throw new Error('post object is invalid. check for any warning');
         } else {
-          throw new Error("failed to post")
+          throw new Error('unhandled error');
         }
-      } catch (err: any) {
-          console.log(err);
+      } catch (err) {
+        alert(`Failed to post a new thread: ${err}`);
       }
     }
   };
 
   return (
     <>
-      <Typography variant='h4'>New Post</Typography>
+      <Typography variant="h4">New Post</Typography>
       <br />
       <Card>
         <CardContent
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            gap: theme.spacing(2)
+            gap: theme.spacing(2),
           }}
         >
-          <Typography variant='h5'>Post Information</Typography>
-          <TextField
-            fullWidth
-            label='Title'
-            inputRef={titleRef}
-          />
-          <TagsPicker selectedTags={selectedTags} setTags={setSelectedTags}/>
+          <Typography variant="h5">Post Information</Typography>
+          <TextField fullWidth label="Title" inputRef={titleRef} />
+          <TagsPicker selectedTags={selectedTags} setTags={setSelectedTags} />
+          <RowFlexBox>
+            <TextField inputRef={customTagsRef} fullWidth label="Custom Tags" />
+            <Tooltip title="Custom tags are case insensitive and space-separated. Multiple words are joined with underscore e.g. 'ice_skating japan'.">
+              <Box>
+                <IconPadding>
+                  <InfoSharp />
+                </IconPadding>
+              </Box>
+            </Tooltip>
+          </RowFlexBox>
         </CardContent>
       </Card>
       <Card>
@@ -167,25 +230,22 @@ const page = () => {
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            gap: theme.spacing(1)
+            gap: theme.spacing(1),
           }}
         >
-          <Typography variant='h5'>Post Content</Typography>
-          <ForwardRefEditor
-            markdown=''
-            ref={ref}
-          />          
+          <Typography variant="h5">Post Content</Typography>
+          <ForwardRefEditor markdown="" ref={ref} />
         </CardContent>
       </Card>
-      <Button 
+      <Button
         startIcon={<SendSharp />}
-        variant='contained' 
-        onClick={handlePost}>
+        variant="contained"
+        onClick={handlePost}
+      >
         Post
       </Button>
     </>
+  );
+};
 
-  )
-}
-
-export default page
+export default Page;

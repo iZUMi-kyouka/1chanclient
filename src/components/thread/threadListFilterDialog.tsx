@@ -24,7 +24,7 @@ type SortState = {
   direction: string;
 };
 
-const ThreadListFilterDropdown = () => {
+const ThreadListFilterDropdown = ({disableRelevance}: {disableRelevance?: boolean}) => {
   const [isOpen, setIsOpen] = useState(false);
   const theme = useTheme();
   const router = useRouter();
@@ -32,7 +32,7 @@ const ThreadListFilterDropdown = () => {
   const params = useSearchParams();
 
   const [sortState, setSortState] = useState<SortState>({
-    criteria: params.get('sort_by') || 'relevance',
+    criteria: params.get('sort_by') || disableRelevance ? 'views' : 'relevance',
     direction: params.get('order') || 'desc',
   });
 
@@ -76,7 +76,7 @@ const ThreadListFilterDropdown = () => {
                   flexShrink: '0 !important',
                 }}
               >
-                <ToggleButton value="relevance">Relevance</ToggleButton>
+                {disableRelevance ? null : <ToggleButton value="relevance">Relevance</ToggleButton>}
                 <ToggleButton value="views">Views</ToggleButton>
                 <ToggleButton value="date">Date</ToggleButton>
                 <ToggleButton value="likes">Likes</ToggleButton>
