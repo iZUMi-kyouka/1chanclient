@@ -1,5 +1,5 @@
 export default interface Auth {
-  accessToken: string,
-  deviceID: string,
-  isRefreshing: boolean
+  accessToken: string;
+  deviceID: string;
+  isRefreshing: boolean;
 }

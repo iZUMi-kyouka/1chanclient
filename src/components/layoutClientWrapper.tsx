@@ -3,9 +3,9 @@ import CopyPasteSnackbar from './snackbar/copiedToClipboardSnakbar';
 const LayoutClientWrapper = () => {
   return (
     <>
-    <CopyPasteSnackbar />
+      <CopyPasteSnackbar />
     </>
-  )
-}
+  );
+};
 
 export default LayoutClientWrapper;

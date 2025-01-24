@@ -35,12 +35,11 @@ const Page = ({ params }: { params: Promise<Params> }) => {
     categoryId = undefined;
   }
 
-  
   const getKey = (pageIndex: number, previousPageData: ThreadListResponse) => {
     if (
       previousPageData &&
       previousPageData.pagination.current_page ===
-      previousPageData.pagination.last_page
+        previousPageData.pagination.last_page
     ) {
       return null;
     }
@@ -53,17 +52,22 @@ const Page = ({ params }: { params: Promise<Params> }) => {
       tags: categoryId !== undefined ? [categoryId] : undefined,
     });
   };
-  
+
   const { ref, inView } = useInView({ threshold: 0.5 });
-  const { data, error, isLoading, size, setSize, mutate } = useSWRInfinite<ThreadListResponse>(
-    getKey,
-    generalFetch()
-  );
-  
+  const { data, error, isLoading, size, setSize, mutate } =
+    useSWRInfinite<ThreadListResponse>(getKey, generalFetch());
+
   useInfiniteScroll(size, setSize, inView);
 
-  if (categoryId === undefined || postCategoriesDict[categoryId] === undefined) {
-    return <ColFlexBox><Typography>Invalid category.</Typography></ColFlexBox>
+  if (
+    categoryId === undefined ||
+    postCategoriesDict[categoryId] === undefined
+  ) {
+    return (
+      <ColFlexBox>
+        <Typography>Invalid category.</Typography>
+      </ColFlexBox>
+    );
   }
 
   return (
@@ -74,12 +78,22 @@ const Page = ({ params }: { params: Promise<Params> }) => {
         }
 
         if (error) {
-          throw new Error(error);
+          return (
+            <ColFlexBox>
+              <title>{`1chan | Thread`}</title>
+              <Typography>
+                Failed to fetch the list of threads.
+              </Typography>
+              <Typography>Please refresh the page.</Typography>
+            </ColFlexBox>
+          );
         }
 
         if (data) {
           const threads: ThreadListResponse[] = [];
-          data.forEach(threadViewResponse => threads.push(threadViewResponse));
+          data.forEach((threadViewResponse) =>
+            threads.push(threadViewResponse)
+          );
 
           return (
             <Box

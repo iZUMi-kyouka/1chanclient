@@ -8,11 +8,11 @@ const theme = createTheme({
     fontFamily: 'var(--font-roboto)',
   },
   palette: {
-    primary: purple
+    primary: purple,
   },
   colorSchemes: {
-    dark: true
-  }
+    dark: true,
+  },
 });
 
 export default theme;

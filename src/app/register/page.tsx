@@ -1,8 +1,25 @@
 'use client';
 import { selectDeviceID, updateAccessToken } from '@/store/auth/authSlice';
 import { updateUser } from '@/store/user/userSlice';
-import { LoginSharp, VisibilityOffSharp, VisibilitySharp } from '@mui/icons-material';
-import { Button, Card, CardContent, CircularProgress, Container, FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput, TextField, Typography } from '@mui/material';
+import {
+  LoginSharp,
+  VisibilityOffSharp,
+  VisibilitySharp,
+} from '@mui/icons-material';
+import {
+  Button,
+  Card,
+  CardContent,
+  CircularProgress,
+  Container,
+  FormControl,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+  TextField,
+  Typography,
+} from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -22,67 +39,75 @@ import theme from '../theme';
 // }
 
 const Page = () => {
-	const deviceID = useSelector(selectDeviceID);
-	const router = useRouter();
-	const dispatch = useDispatch();
+  const deviceID = useSelector(selectDeviceID);
+  const router = useRouter();
+  const dispatch = useDispatch();
 
-	const [username, setUsername] = useState("");
-	const [password, setPassword] = useState("");
-  const [passwordVerify, setPasswordVerify] = useState("");
-	const [showPassword, setShowPassword] = useState(false);
-	const [usernameOK, setUsernameOK] = useState(true);
-	const [passwordOK, setPasswordOK] = useState(true);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordVerify, setPasswordVerify] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [usernameOK, setUsernameOK] = useState(true);
+  const [passwordOK, setPasswordOK] = useState(true);
   const [passwordVerifyOK, setPasswordVerifyOK] = useState(true);
-	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState<null | string>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<null | string>(null);
 
-
-	const handleUsernameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-		if (error === "Username already exists.") {
+  const handleUsernameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (error === 'Username already exists.') {
       setError(null);
     }
 
     const newUsername = e.target.value;
-		if (newUsername === "") {
-			setUsernameOK(false);
-			return;
-		} else {
-			setUsernameOK(true);
-		}
+    if (newUsername === '') {
+      setUsernameOK(false);
+      return;
+    } else {
+      setUsernameOK(true);
+    }
 
-		setUsername(newUsername);
-	};
+    setUsername(newUsername);
+  };
 
-	const handleRegister = async () => {
-		if (!usernameOK || !passwordOK || !passwordVerifyOK || isLoading || password !== passwordVerify) {
-			return;
-		}
+  const handleRegister = async () => {
+    if (
+      !usernameOK ||
+      !passwordOK ||
+      !passwordVerifyOK ||
+      isLoading ||
+      password !== passwordVerify
+    ) {
+      return;
+    }
 
-		setError(null);
-		setIsLoading(true);
+    setError(null);
+    setIsLoading(true);
 
-		try {
-      const response = await fetch('http://localhost:8080/api/v1/users/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Device-ID': deviceID
-        },
-        body: JSON.stringify({ username, password }),
-			credentials: 'include'
-      });
+    try {
+      const response = await fetch(
+        'http://localhost:8080/api/v1/users/register',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Device-ID': deviceID,
+          },
+          body: JSON.stringify({ username, password }),
+          credentials: 'include',
+        }
+      );
 
       if (!response.ok) {
         if (response.status === 409) {
-          throw new Error("Username already exists.")
+          throw new Error('Username already exists.');
         } else {
           throw new Error('Failed to register. Please try again soon.');
         }
       }
-      
+
       const data = await response.json();
 
-	    dispatch(updateAccessToken(data.account.access_token));
+      dispatch(updateAccessToken(data.account.access_token));
 
       dispatch(
         updateUser({
@@ -103,49 +128,53 @@ const Page = () => {
           },
         })
       );
-		console.log('Updated user data!');
-		router.push('/');
+      console.log('Updated user data!');
+      router.push('/');
     } catch (err: unknown) {
-			console.log("error during login: ", (err as Error).message);
+      console.log('error during login: ', (err as Error).message);
       setError((err as Error).message);
     } finally {
       setIsLoading(false);
     }
-		
-	};
+  };
 
-	const handlePasswordInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const newPassword = e.target.value;
-		if (newPassword === "" || newPassword.length < 8) {
-			setPasswordOK(false);
-		} else {
-			setPasswordOK(true);
-		}
+  const handlePasswordInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPassword = e.target.value;
+    if (newPassword === '' || newPassword.length < 8) {
+      setPasswordOK(false);
+    } else {
+      setPasswordOK(true);
+    }
 
-		setPassword(newPassword);
-	};
+    setPassword(newPassword);
+  };
 
-  const handlePasswordInputVerify = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const newPassword = e.target.value;
-		if (newPassword === "" || newPassword.length < 8) {
-			setPasswordVerifyOK(false);
-		} else {
-			setPasswordVerifyOK(true);
-		}
+  const handlePasswordInputVerify = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const newPassword = e.target.value;
+    if (newPassword === '' || newPassword.length < 8) {
+      setPasswordVerifyOK(false);
+    } else {
+      setPasswordVerifyOK(true);
+    }
 
-		setPasswordVerify(newPassword);
-	};
+    setPasswordVerify(newPassword);
+  };
 
+  const handleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
-	const handleShowPassword = () => {
-		setShowPassword(!showPassword);
-	};
-
-	const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
     event.preventDefault();
   };
 
-  const handleMouseUpPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleMouseUpPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
     event.preventDefault();
   };
 
@@ -290,6 +319,6 @@ const Page = () => {
       </Card>
     </Container>
   );
-}
+};
 
 export default Page;

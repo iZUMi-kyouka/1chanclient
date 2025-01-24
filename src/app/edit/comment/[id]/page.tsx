@@ -61,18 +61,22 @@ const Edit = ({ params }: { params: Promise<Params> }) => {
   }
 
   if (error) {
-    return <ColFlexBox><Typography color='error'>{`Failed to fetch comment: ${error}`}</Typography></ColFlexBox>;
+    return (
+      <ColFlexBox>
+        <Typography color="error">{`Failed to fetch comment: ${error}`}</Typography>
+      </ColFlexBox>
+    );
   }
 
-    if (data && data.comment === undefined) {
-      return (
-        <ColFlexBox>
-          <Typography color="error">
-            Comments has been deleted or does not exist.
-          </Typography>
-        </ColFlexBox>
-      );
-    }
+  if (data && data.comment === undefined) {
+    return (
+      <ColFlexBox>
+        <Typography color="error">
+          Comments has been deleted or does not exist.
+        </Typography>
+      </ColFlexBox>
+    );
+  }
 
   if (data) {
     return (

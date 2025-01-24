@@ -165,8 +165,14 @@ const Profile = ({ params }: { params: Promise<Params> }) => {
   if (error) {
     if (error.message === 'user does not exist') {
       return (
-        <Box display={'flex'} flexGrow={1} justifyContent={'center'} alignItems={'center'} minHeight={'calc(100vh - 64px)'}>
-          <Typography>User does not exist.</Typography> 
+        <Box
+          display={'flex'}
+          flexGrow={1}
+          justifyContent={'center'}
+          alignItems={'center'}
+          minHeight={'calc(100vh - 64px)'}
+        >
+          <Typography>User does not exist.</Typography>
         </Box>
       );
     }
@@ -189,7 +195,7 @@ const Profile = ({ params }: { params: Promise<Params> }) => {
           gap: theme.spacing(2),
         }}
       >
-        <title>{`1chan | ${isOwner ? "My Profile" : `${username}'s Profile`}`}</title>
+        <title>{`1chan | ${isOwner ? 'My Profile' : `${username}'s Profile`}`}</title>
         {isOwner ? (
           <Typography variant="h4">My Account</Typography>
         ) : (

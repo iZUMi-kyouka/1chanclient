@@ -150,7 +150,7 @@ const Page = () => {
   const ref = useRef<MDXEditorMethods>(null);
   const titleRef = useRef<HTMLInputElement>(null);
   const customTagsRef = useRef<HTMLInputElement>(null);
-  
+
   const dispatch = useDispatch();
   const theme = useTheme();
   const router = useRouter();

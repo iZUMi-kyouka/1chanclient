@@ -76,13 +76,12 @@ export const ThreadDeleteDialog = forwardRef<
     handleDeleteThread: (e: React.MouseEvent<HTMLElement>) => void;
   }
 >(({ thread, handleDeleteThread, ...props }, _ref) => {
-
   const handleClose = noPropagate(() => {
     if (props.onClose) {
       props.onClose({}, 'backdropClick');
     }
   });
-  
+
   return (
     <Dialog {...props} ref={_ref}>
       <DialogTitle>{`Delete thread?`}</DialogTitle>

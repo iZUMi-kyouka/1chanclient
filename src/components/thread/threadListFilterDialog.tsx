@@ -24,7 +24,11 @@ type SortState = {
   direction: string;
 };
 
-const ThreadListFilterDropdown = ({disableRelevance}: {disableRelevance?: boolean}) => {
+const ThreadListFilterDropdown = ({
+  disableRelevance,
+}: {
+  disableRelevance?: boolean;
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const theme = useTheme();
   const router = useRouter();
@@ -76,7 +80,9 @@ const ThreadListFilterDropdown = ({disableRelevance}: {disableRelevance?: boolea
                   flexShrink: '0 !important',
                 }}
               >
-                {disableRelevance ? null : <ToggleButton value="relevance">Relevance</ToggleButton>}
+                {disableRelevance ? null : (
+                  <ToggleButton value="relevance">Relevance</ToggleButton>
+                )}
                 <ToggleButton value="views">Views</ToggleButton>
                 <ToggleButton value="date">Date</ToggleButton>
                 <ToggleButton value="likes">Likes</ToggleButton>

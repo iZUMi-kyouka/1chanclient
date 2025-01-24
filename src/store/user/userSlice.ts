@@ -6,9 +6,9 @@ import {
   UserProfile,
   WrittenComments,
   WrittenThreads,
-} from "@/interfaces/user";
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../store";
+} from '@/interfaces/user';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '../store';
 
 const userAccountInitialState: UserAccount = {
   id: undefined,
@@ -16,15 +16,15 @@ const userAccountInitialState: UserAccount = {
 };
 
 const userProfileInitialState: UserProfile = {
-  profile_picture_path: "",
-  biodata: "",
-  email: "",
+  profile_picture_path: '',
+  biodata: '',
+  email: '',
   post_count: -1,
   comment_count: -1,
-  preferred_lang: "en",
-  preferred_theme: "auto",
-  creation_date: "",
-  last_login: "",
+  preferred_lang: 'en',
+  preferred_theme: 'auto',
+  creation_date: '',
+  last_login: '',
 };
 
 const initialState: User = {
@@ -110,7 +110,7 @@ export const {
   removeFromCommentLikeDislike,
   updateCommentLike,
   addToWrittenComments,
-  addToWrittenThreads
+  addToWrittenThreads,
 } = userSlice.actions;
 export const selectUserAccount = (state: RootState) => state.user.account;
 export const selectUserProfile = (state: RootState) => state.user.profile;

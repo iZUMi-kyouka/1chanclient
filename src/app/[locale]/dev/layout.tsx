@@ -1,15 +1,12 @@
-import { ReactNode } from "react";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import '@mdxeditor/editor/style.css'
-import { Paper } from "@mui/material";
+import '@mdxeditor/editor/style.css';
+import Typography from '@mui/material/Typography';
+import { ReactNode } from 'react';
 
-export default function Layout(
-  { children }: { children: ReactNode}) {
+export default function Layout({ children }: { children: ReactNode }) {
   return (
     <>
-      <Typography variant={"h5"}>Development</Typography>
-      { children }
+      <Typography variant={'h5'}>Development</Typography>
+      {children}
     </>
-  )
+  );
 }

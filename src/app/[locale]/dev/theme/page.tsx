@@ -1,12 +1,12 @@
 'use client';
 
-import Typography from "@mui/material/Typography";
-import {createTheme} from "@mui/material/styles";
-import ThemeProvider from "@mui/material/styles/ThemeProvider";
-import {purple} from "@mui/material/colors";
-import {Button} from "@mui/material";
+import Typography from '@mui/material/Typography';
+import { createTheme } from '@mui/material/styles';
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
+import { purple } from '@mui/material/colors';
+import { Button } from '@mui/material';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Quicksand } from "next/font/google";
+import { Quicksand } from 'next/font/google';
 
 const quicksand = Quicksand({
   subsets: ['latin'],
@@ -19,7 +19,7 @@ export default function ThemePage() {
       primary: {
         main: '#9b9b9b',
       },
-      secondary: purple
+      secondary: purple,
     },
     typography: {
       fontFamily: 'Quicksand',
@@ -36,12 +36,13 @@ export default function ThemePage() {
       <ThemeProvider theme={theme}>
         <Typography>Testing various themes</Typography>
         <Button
-          color={"secondary"}
-          variant={"contained"}
+          color={'secondary'}
+          variant={'contained'}
           endIcon={<KeyboardArrowRightIcon />}
-        >Submit
+        >
+          Submit
         </Button>
       </ThemeProvider>
     </>
-  )
+  );
 }

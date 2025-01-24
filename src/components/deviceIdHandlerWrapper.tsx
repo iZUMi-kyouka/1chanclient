@@ -1,9 +1,7 @@
-import HandleDeviceID from './deviceIdHandler'
+import HandleDeviceID from './deviceIdHandler';
 
 const DeviceIdHandlerWrapper = () => {
-  return (
-    <HandleDeviceID />
-  )
-}
+  return <HandleDeviceID />;
+};
 
-export default DeviceIdHandlerWrapper
+export default DeviceIdHandlerWrapper;

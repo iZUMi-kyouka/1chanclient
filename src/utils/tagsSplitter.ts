@@ -11,7 +11,7 @@ export function splitCustomTags(tags: string): string[] {
   const tagsArray = tags.split(',');
   if (tagsArray.length === 1 && tagsArray[0] === '') {
     return [];
-  } 
+  }
 
   return tagsArray;
 }

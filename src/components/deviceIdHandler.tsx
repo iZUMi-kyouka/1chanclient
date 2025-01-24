@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 /**
  * Retrieves deviceID from localStorage and update the Redux store, if available,
  * generating and storing one if it is missing.
- * @returns 
+ * @returns
  */
 const HandleDeviceID = () => {
   const dispatch = useDispatch();

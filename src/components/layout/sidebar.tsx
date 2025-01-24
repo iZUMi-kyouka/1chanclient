@@ -12,7 +12,12 @@ import {
   setMobileSidebarOpen,
   updateCurrentHomePage,
 } from '@/store/appState/appStateSlice';
-import { EditSharp, ExpandMoreSharp, HomeSharp, SettingsSharp } from '@mui/icons-material';
+import {
+  EditSharp,
+  ExpandMoreSharp,
+  HomeSharp,
+  SettingsSharp,
+} from '@mui/icons-material';
 import {
   Accordion,
   AccordionDetails,
@@ -33,7 +38,7 @@ import {
   Switch,
   Toolbar,
   Typography,
-  useTheme
+  useTheme,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { ComponentProps, forwardRef, useState } from 'react';
@@ -42,222 +47,240 @@ import ColorSchemeSwitcher from '../button/colorSchemeSwitcherButton';
 
 const drawerWidth = 225;
 
-const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(({...props}, ref) => {
-  const theme = useTheme();
-  const dispatch = useDispatch();
-  const router = useRouter();
-  const isAlwaysShowTags = useSelector(selectAlwaysShowTags);
-  const isAlwaysShowCustomTags = useSelector(selectAlwaysShowCustomTags);
+const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(
+  ({ ...props }, ref) => {
+    const theme = useTheme();
+    const dispatch = useDispatch();
+    const router = useRouter();
+    const isAlwaysShowTags = useSelector(selectAlwaysShowTags);
+    const isAlwaysShowCustomTags = useSelector(selectAlwaysShowCustomTags);
 
-  const currentHomePage = useSelector(selectCurrentHomePage);
-  const mobileOpen = useSelector(selectMobileSidebarOpen);
+    const currentHomePage = useSelector(selectCurrentHomePage);
+    const mobileOpen = useSelector(selectMobileSidebarOpen);
 
-  const [_isClosing, setIsClosing] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
+    const [_isClosing, setIsClosing] = useState(false);
+    const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const handleDrawerClose = () => {
-    setIsClosing(true);
-    dispatch(setMobileSidebarOpen(false));
-  };
-
-  const handleDrawerTransitionEnd = () => {
-    setIsClosing(false);
-  };
-
-  const handleSwitches = (toggle: "alwaysShowTags" | "alwaysShowCustomTags") => () => {
-    if (toggle === "alwaysShowTags") {
-      dispatch(setAlwaysShowTags(!isAlwaysShowTags));
-    } else if (toggle === "alwaysShowCustomTags") {
-      dispatch(setAlwaysShowCustomTags(!isAlwaysShowCustomTags));
-    }
-  };
-
-  const handleChangeCategory =
-    ({
-      id,
-      name,
-      displayName,
-    }: {
-      id: number;
-      name: string;
-      displayName: string;
-    }) =>
-    () => {
-      dispatch(updateCurrentHomePage({ id, name, displayName }));
-      router.push(`/top/${id}`);
+    const handleDrawerClose = () => {
+      setIsClosing(true);
+      dispatch(setMobileSidebarOpen(false));
     };
 
-  const drawer = (
-    <Box display={'flex'} flexDirection={'column'}>
-      <Toolbar sx={{height: '64px'}}/>
-      {/* <Divider /> */}
-      <List>
-        <ListItem key={'home'} disablePadding>
-          <ListItemButton
-            selected={currentHomePage.name === 'home'}
-            onClick={() => {
-              dispatch(
-                updateCurrentHomePage({
-                  id: 0,
-                  name: 'home',
-                  displayName: 'Home',
-                })
-              );
-              router.push('/');
+    const handleDrawerTransitionEnd = () => {
+      setIsClosing(false);
+    };
+
+    const handleSwitches =
+      (toggle: 'alwaysShowTags' | 'alwaysShowCustomTags') => () => {
+        if (toggle === 'alwaysShowTags') {
+          dispatch(setAlwaysShowTags(!isAlwaysShowTags));
+        } else if (toggle === 'alwaysShowCustomTags') {
+          dispatch(setAlwaysShowCustomTags(!isAlwaysShowCustomTags));
+        }
+      };
+
+    const handleChangeCategory =
+      ({
+        id,
+        name,
+        displayName,
+      }: {
+        id: number;
+        name: string;
+        displayName: string;
+      }) =>
+      () => {
+        dispatch(updateCurrentHomePage({ id, name, displayName }));
+        router.push(`/top/${id}`);
+      };
+
+    const drawer = (
+      <Box display={'flex'} flexDirection={'column'}>
+        <Toolbar sx={{ height: '64px' }} />
+        {/* <Divider /> */}
+        <List>
+          <ListItem key={'home'} disablePadding>
+            <ListItemButton
+              selected={currentHomePage.name === 'home'}
+              onClick={() => {
+                dispatch(
+                  updateCurrentHomePage({
+                    id: 0,
+                    name: 'home',
+                    displayName: 'Home',
+                  })
+                );
+                router.push('/');
+              }}
+            >
+              <ListItemIcon>
+                <HomeSharp />
+              </ListItemIcon>
+              <ListItemText primary={'Home'} />
+            </ListItemButton>
+          </ListItem>
+          <ListItem
+            key={'new'}
+            disablePadding
+            sx={{
+              [theme.breakpoints.up('sm')]: {
+                display: 'none',
+              },
             }}
           >
-            <ListItemIcon>
-              <HomeSharp />
-            </ListItemIcon>
-            <ListItemText primary={'Home'} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem key={'new'} disablePadding sx={{
-          [theme.breakpoints.up('sm')]: {
-            display: 'none'
-          }
-        }}>
-          <ListItemButton
-            onClick={() => {
-              router.push('/new');
-            }}
-          >
-            <ListItemIcon>
-              <EditSharp />
-            </ListItemIcon>
-            <ListItemText primary={'New Post'} />
-          </ListItemButton>
-        </ListItem>
-      </List>
-      {/* <Divider /> */}
-      <Accordion
-        elevation={1}
-        defaultExpanded
-        sx={{
-          boxShadow: 'none',
-          border: 'none',
-        }}
-      >
-        <AccordionSummary expandIcon={<ExpandMoreSharp />}>
-          <Typography>Explore</Typography>
-        </AccordionSummary>
-        <AccordionDetails
+            <ListItemButton
+              onClick={() => {
+                router.push('/new');
+              }}
+            >
+              <ListItemIcon>
+                <EditSharp />
+              </ListItemIcon>
+              <ListItemText primary={'New Post'} />
+            </ListItemButton>
+          </ListItem>
+        </List>
+        {/* <Divider /> */}
+        <Accordion
+          elevation={1}
+          defaultExpanded
           sx={{
-            padding: 0,
-            maxHeight: theme.spacing(50),
-            overflowY: 'auto',
-            overscrollBehavior: 'contain',
+            boxShadow: 'none',
+            border: 'none',
           }}
         >
-          <List>
-            {postCategories.map(({ id, name, displayName, icon }, _index) => (
-              <ListItem key={name} disablePadding>
-                <ListItemButton
-                  selected={currentHomePage.name === name}
-                  onClick={handleChangeCategory({ id, name, displayName })}
-                >
-                  <ListItemIcon>{icon}</ListItemIcon>
-                  <ListItemText primary={displayName} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </AccordionDetails>
-      </Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreSharp />}>
+            <Typography>Explore</Typography>
+          </AccordionSummary>
+          <AccordionDetails
+            sx={{
+              padding: 0,
+              maxHeight: theme.spacing(50),
+              overflowY: 'auto',
+              overscrollBehavior: 'contain',
+            }}
+          >
+            <List>
+              {postCategories.map(({ id, name, displayName, icon }, _index) => (
+                <ListItem key={name} disablePadding>
+                  <ListItemButton
+                    selected={currentHomePage.name === name}
+                    onClick={handleChangeCategory({ id, name, displayName })}
+                  >
+                    <ListItemIcon>{icon}</ListItemIcon>
+                    <ListItemText primary={displayName} />
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+          </AccordionDetails>
+        </Accordion>
 
-      <Divider />
+        <Divider />
 
-      <List>
-        <ListItemButton
-          onClick={() => {
-            setSettingsOpen(true);
+        <List>
+          <ListItemButton
+            onClick={() => {
+              setSettingsOpen(true);
+            }}
+          >
+            <ListItemIcon>
+              <SettingsSharp />
+            </ListItemIcon>
+            <ListItemText primary={'Settings'} />
+          </ListItemButton>
+        </List>
+      </Box>
+    );
+
+    return (
+      <Box
+        component="nav"
+        sx={{
+          width: { xs: 0, sm: 0, md: drawerWidth },
+          flexShrink: { sm: 0 },
+          padding: theme.spacing(0),
+          ...props.sx,
+        }}
+        aria-label="mailbox folders"
+      >
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onTransitionEnd={handleDrawerTransitionEnd}
+          onClose={handleDrawerClose}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: 'block', sm: 'block', md: 'none' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: drawerWidth,
+            },
           }}
         >
-          <ListItemIcon>
-            <SettingsSharp />
-          </ListItemIcon>
-          <ListItemText primary={'Settings'} />
-        </ListItemButton>
-      </List>
-    </Box>
-  );
+          {drawer}
+        </Drawer>
 
-  return (
-    <Box
-      component="nav"
-      sx={{
-        width: { xs: 0, sm: 0, md: drawerWidth },
-        flexShrink: { sm: 0 },
-        padding: theme.spacing(0),
-        ...props.sx,
-      }}
-      aria-label="mailbox folders"
-    >
+        {/* Desktop sidebar */}
+        <Drawer
+          variant="permanent"
+          sx={{
+            padding: theme.spacing(1),
+            display: { xs: 'none', sm: 'none', md: 'block' },
+            '& .MuiDrawer-paper': {
+              boxSizing: 'border-box',
+              width: { xs: 0, sm: 0, md: drawerWidth },
+            },
+          }}
+          open
+        >
+          {drawer}
+        </Drawer>
 
-      <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onTransitionEnd={handleDrawerTransitionEnd}
-        onClose={handleDrawerClose}
-        ModalProps={{
-          keepMounted: true, // Better open performance on mobile.
-        }}
-        sx={{
-          display: { xs: 'block', sm: 'block', md: 'none' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-        }}
-      >
-        {drawer}
-      </Drawer>
-
-      {/* Desktop sidebar */}
-      <Drawer
-        variant="permanent"
-        sx={{
-          padding: theme.spacing(1),
-          display: { xs: 'none', sm: 'none', md: 'block' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: {xs: 0, sm: 0, md: drawerWidth} },
-        }}
-        open
-      >
-        {drawer}
-      </Drawer>
-
-      {/* Settings Popup */}
-      <Dialog
-        fullWidth
-        maxWidth="xs"
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-      >
-        <DialogTitle>Settings</DialogTitle>
-        <DialogContent>
-          <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Typography>Color Scheme</Typography>
-              <Box sx={{ flexGrow: 1 }} />
-              <ColorSchemeSwitcher />
+        {/* Settings Popup */}
+        <Dialog
+          fullWidth
+          maxWidth="xs"
+          open={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+        >
+          <DialogTitle>Settings</DialogTitle>
+          <DialogContent>
+            <Box>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography>Color Scheme</Typography>
+                <Box sx={{ flexGrow: 1 }} />
+                <ColorSchemeSwitcher />
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography>Show tags on threads list</Typography>
+                <Box sx={{ flexGrow: 1 }} />
+                <Switch
+                  checked={isAlwaysShowTags}
+                  onChange={handleSwitches('alwaysShowTags')}
+                />
+              </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography>Show custom tags on threads list</Typography>
+                <Box sx={{ flexGrow: 1 }} />
+                <Switch
+                  checked={isAlwaysShowCustomTags}
+                  onChange={handleSwitches('alwaysShowCustomTags')}
+                />
+              </Box>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Typography>Show tags on threads list</Typography>
-              <Box sx={{ flexGrow: 1 }} />
-              <Switch checked={isAlwaysShowTags} onChange={handleSwitches("alwaysShowTags")}/>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Typography>Show custom tags on threads list</Typography>
-              <Box sx={{ flexGrow: 1 }} />
-              <Switch checked={isAlwaysShowCustomTags} onChange={handleSwitches("alwaysShowCustomTags")}/>
-            </Box>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setSettingsOpen(false)}>Close</Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
-  );
-});
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setSettingsOpen(false)}>Close</Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    );
+  }
+);
 
-Sidebar.displayName = 'Sidebar'
+Sidebar.displayName = 'Sidebar';
 
 export default Sidebar;

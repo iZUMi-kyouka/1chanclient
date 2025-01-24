@@ -1,8 +1,8 @@
-import beautifyNumber from "@/utils/beautifyNumber";
-import { AdsClickSharp } from "@mui/icons-material";
-import { Chip, useTheme } from "@mui/material";
+import beautifyNumber from '@/utils/beautifyNumber';
+import { AdsClickSharp } from '@mui/icons-material';
+import { Chip, useTheme } from '@mui/material';
 
-const ViewCountChip = ({ viewCount }: { viewCount: number}) => {
+const ViewCountChip = ({ viewCount }: { viewCount: number }) => {
   const theme = useTheme();
 
   return (
@@ -18,6 +18,6 @@ const ViewCountChip = ({ viewCount }: { viewCount: number}) => {
       label={beautifyNumber(viewCount)}
     />
   );
-}
+};
 
-export default ViewCountChip
+export default ViewCountChip;

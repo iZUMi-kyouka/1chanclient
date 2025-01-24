@@ -7,6 +7,7 @@ import FullPageSpinner from '@/components/loading/fullPageLoading';
 import InfiniteScrollLoading from '@/components/loading/infiniteScrollLoading';
 import ThreadList from '@/components/thread/threadList';
 import ThreadListFilterDropdown from '@/components/thread/threadListFilterDialog';
+import ColFlexBox from '@/components/wrapper/colFlexContainer';
 import RowFlexBox from '@/components/wrapper/rowFlexContainer';
 import PaginatedResponse from '@/interfaces/paginatedResponse';
 import { Thread } from '@/interfaces/thread';
@@ -60,11 +61,17 @@ const Page = () => {
 
   useEffect(() => {
     setSize(size + 1);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
 
   if (error) {
-    throw new Error('failed to fetch search result');
+    return (
+      <ColFlexBox>
+        <title>{`1chan | Search`}</title>
+        <Typography>Failed to fetch search results.</Typography>
+        <Typography>Please refresh the page.</Typography>
+      </ColFlexBox>
+    );
   }
 
   if (isLoading) {
@@ -83,7 +90,7 @@ const Page = () => {
         gap={theme.spacing(2)}
         paddingTop={theme.spacing(2)}
       >
-        <title>{`1chan | Search Result`}</title>
+        <title>{`1chan | Search`}</title>
         <Typography variant="h5">{`${searchQuery ? `Search result for "${searchQuery}"` : 'Search Result'}`}</Typography>
         <RowFlexBox>
           {customTags

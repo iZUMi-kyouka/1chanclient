@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { BASE_API_URL } from '@/app/layout';
 import FullPageSpinner from '@/components/loading/fullPageLoading';
@@ -11,10 +11,13 @@ import { Params } from 'next/dist/server/request/params';
 import { use } from 'react';
 import useSWR from 'swr';
 
-const Page = ({ params }: { params: Promise<Params>}) => {
+const Page = ({ params }: { params: Promise<Params> }) => {
   const threadID = use(params).id;
-  const { data, error, isLoading } = useSWR<ThreadViewResponse>(`${BASE_API_URL}/threads/${threadID}`, generalFetch());
-  
+  const { data, error, isLoading } = useSWR<ThreadViewResponse>(
+    `${BASE_API_URL}/threads/${threadID}`,
+    generalFetch()
+  );
+
   if (isLoading) {
     return <FullPageSpinner />;
   }
@@ -37,7 +40,6 @@ const Page = ({ params }: { params: Promise<Params>}) => {
       </>
     );
   }
-
-}
+};
 
 export default Page;

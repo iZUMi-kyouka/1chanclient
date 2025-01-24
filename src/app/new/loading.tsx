@@ -1,9 +1,7 @@
-import FullPageSpinner from '@/components/loading/fullPageLoading'
+import FullPageSpinner from '@/components/loading/fullPageLoading';
 
 const loading = () => {
-  return (
-    <FullPageSpinner />
-  )
-}
+  return <FullPageSpinner />;
+};
 
-export default loading
+export default loading;

@@ -16,7 +16,7 @@ import {
   LoginSharp,
   MenuSharp,
   NotificationsSharp,
-  SearchSharp
+  SearchSharp,
 } from '@mui/icons-material';
 import {
   AppBar,
@@ -199,13 +199,19 @@ export default function PrimaryAppBar() {
         position="fixed"
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 1,
-          height: '64px'
+          height: '64px',
         }}
       >
-        <Toolbar sx={{ alignItems: 'center', height: '100%', [theme.breakpoints.down('sm')]: {
-          paddingLeft: theme.spacing(2),
-          paddingRight: theme.spacing(1.25) 
-        } }}>
+        <Toolbar
+          sx={{
+            alignItems: 'center',
+            height: '100%',
+            [theme.breakpoints.down('sm')]: {
+              paddingLeft: theme.spacing(2),
+              paddingRight: theme.spacing(1.25),
+            },
+          }}
+        >
           {/* Hamburger menu icon */}
           <IconButton
             size="large"
@@ -229,8 +235,8 @@ export default function PrimaryAppBar() {
           <ButtonBase
             sx={{
               [theme.breakpoints.down(450)]: {
-                display: 'none'
-              }
+                display: 'none',
+              },
             }}
             onClick={() => router.push('/')}
             disableRipple
@@ -323,7 +329,7 @@ export default function PrimaryAppBar() {
                 sx={{
                   marginLeft: theme.spacing(2),
                   [theme.breakpoints.down('md')]: {
-                    marginLeft: 0
+                    marginLeft: 0,
                   },
                   backgroundColor: `${isDarkMode ? 'default' : 'white'}`,
                   color: `${isDarkMode ? 'default' : theme.palette.primary.main}`,

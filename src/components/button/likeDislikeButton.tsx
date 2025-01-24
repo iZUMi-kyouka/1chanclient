@@ -47,15 +47,18 @@ const LikeDislikeButton = ({
   };
 
   return (
-    <Tooltip title={`${disabled ? "You must be logged in to like and dislike." : ''}`}>
-      <ButtonGroup disabled={disabled === true}
+    <Tooltip
+      title={`${disabled ? 'You must be logged in to like and dislike.' : ''}`}
+    >
+      <ButtonGroup
+        disabled={disabled === true}
         sx={{
           '& .MuiButtonBase-root:disabled': {
             cursor: 'not-allowed',
             pointerEvents: 'auto',
-          }
+          },
         }}
-      > 
+      >
         <Button
           onClick={disabled ? noPropagate() : handleLikeClick}
           sx={classes.buttonLike}
@@ -66,7 +69,9 @@ const LikeDislikeButton = ({
         <Button
           onClick={disabled ? noPropagate() : handleDislikeClick}
           sx={classes.buttonDislike}
-          endIcon={status === 'disliked' ? <ThumbDown /> : <ThumbDownOutlined />}
+          endIcon={
+            status === 'disliked' ? <ThumbDown /> : <ThumbDownOutlined />
+          }
         >
           {beautifyNumber(dislikeCount || 0)}
         </Button>

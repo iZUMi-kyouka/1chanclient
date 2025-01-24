@@ -8,7 +8,7 @@ import {
   CardHeader,
   Container,
   Typography,
-  useTheme
+  useTheme,
 } from '@mui/material';
 import { useRef } from 'react';
 import { useSelector } from 'react-redux';

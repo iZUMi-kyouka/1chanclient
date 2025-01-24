@@ -19,7 +19,7 @@ export const makeQueriedThreadListURL = ({
   pageIndex?: number;
   tags?: number[];
   customTags?: string[];
-  q?: string
+  q?: string;
 }): string => {
   const sortDirURL = sortDir !== undefined ? `&order=${sortDir}` : '';
   const sortParamURL = sortParam !== undefined ? `&sort_by=${sortParam}` : '';

@@ -80,6 +80,10 @@ export default function FetchUserData() {
           throw new Error('failed to fetch written threads.');
         }
       } catch (err) {
+        if ((err as Error).name === "TypeError") {
+          alert("1chan is currently unavailable or your internet connection may be unstable.")
+        }
+        
         console.log('error during login: ', err);
       }
     };

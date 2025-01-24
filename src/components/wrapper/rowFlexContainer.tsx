@@ -27,4 +27,4 @@ const RowFlexBox = forwardRef<HTMLDivElement, RowFlexBoxProps>(
 
 RowFlexBox.displayName = 'RowFlexBox';
 
-export default RowFlexBox
+export default RowFlexBox;

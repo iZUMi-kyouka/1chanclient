@@ -1,7 +1,7 @@
-import { Box } from '@mui/material'
-import React, { ReactNode } from 'react'
+import { Box } from '@mui/material';
+import React, { ReactNode } from 'react';
 
-const CenteredFlexBox = ({children}: {children: ReactNode}) => {
+const CenteredFlexBox = ({ children }: { children: ReactNode }) => {
   return (
     <Box
       display={'flex'}
@@ -11,7 +11,7 @@ const CenteredFlexBox = ({children}: {children: ReactNode}) => {
     >
       {children}
     </Box>
-  )
-}
+  );
+};
 
-export default CenteredFlexBox
+export default CenteredFlexBox;

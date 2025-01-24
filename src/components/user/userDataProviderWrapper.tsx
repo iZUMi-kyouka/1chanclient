@@ -1,9 +1,7 @@
-import FetchUserData from './userDataProvider'
+import FetchUserData from './userDataProvider';
 
 const UserDataProviderWrapper = () => {
-  return (
-    <FetchUserData />
-  )
-}
+  return <FetchUserData />;
+};
 
-export default UserDataProviderWrapper
+export default UserDataProviderWrapper;

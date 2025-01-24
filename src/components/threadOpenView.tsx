@@ -29,11 +29,11 @@ const ThreadOpenView = ({
   const theme = useTheme();
   const accessToken = useSelector(selectAccessToken);
   const [commentOpen, setCommentOpen] = useState(false);
-  const dispatch  = useDispatch();
+  const dispatch = useDispatch();
 
   const handleCommentSubmit = async (markdown: string) => {
     if (markdown === '') {
-      alert('Posting empty comment is not allowed.')
+      alert('Posting empty comment is not allowed.');
       return;
     }
 

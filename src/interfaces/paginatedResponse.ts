@@ -1,6 +1,6 @@
-import Pagination from "./pagination";
+import Pagination from './pagination';
 
 export default interface PaginatedResponse<T> {
-  response: T[],
-  pagination: Pagination
+  response: T[];
+  pagination: Pagination;
 }

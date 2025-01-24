@@ -1,14 +1,14 @@
-import DeviceIdHandlerWrapper from "@/components/deviceIdHandlerWrapper";
-import AppBarWrapper from "@/components/layout/appBarWrapper";
-import LayoutClientWrapper from "@/components/layoutClientWrapper";
-import UserDataProviderWrapper from "@/components/user/userDataProviderWrapper";
-import { CssBaseline, Paper, Toolbar } from "@mui/material";
-import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
-import { ThemeProvider } from "@mui/material/styles";
+import DeviceIdHandlerWrapper from '@/components/deviceIdHandlerWrapper';
+import AppBarWrapper from '@/components/layout/appBarWrapper';
+import LayoutClientWrapper from '@/components/layoutClientWrapper';
+import UserDataProviderWrapper from '@/components/user/userDataProviderWrapper';
+import { CssBaseline, Paper, Toolbar } from '@mui/material';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import { ThemeProvider } from '@mui/material/styles';
 import { Roboto } from 'next/font/google';
-import { ReactNode } from "react";
-import ReduxProvider from "./store";
-import theme from "./theme";
+import { ReactNode } from 'react';
+import ReduxProvider from './store';
+import theme from './theme';
 
 // export const metadata = metadataZ;
 
@@ -16,45 +16,60 @@ const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
   subsets: ['latin'],
   display: 'swap',
-  variable: '--font-roboto'
+  variable: '--font-roboto',
 });
 
-export const BASE_API_URL = "http://localhost:8080/api/v1";
-export const BASE_URL = "http://localhost:8080";
+export const BASE_API_URL = process.env.HTTPS_ENABLED === "true"
+  ? process.env.NODE_ENV === 'development'
+    ? 'https://localhost:8080/api/v1'
+    : 'https://54.169.160.66:8080/api/v1'
+  : process.env.NODE_ENV === 'development'
+  ? 'http://localhost:8080/api/v1'
+  : 'http://54.169.160.66:8080/api/v1';
+
+export const BASEURL =
+  process.env.HTTPS_ENABLED === 'true'
+    ? process.env.NODE_ENV === 'development'
+      ? 'https://localhost:8080'
+      : 'https://54.169.160.66:8080'
+    : process.env.NODE_ENV === 'development'
+      ? 'http://localhost:8080'
+      : 'http://54.169.160.66:8080';
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
-
   return (
     <html lang="en">
-    <head>
-      <title>1chan</title>
-    </head>
-    <CssBaseline />
+      <head>
+        <title>1chan</title>
+      </head>
+      <CssBaseline />
 
-    <body className={roboto.variable}>
-      {/* <InitColorSchemeScript attribute="class" /> */}
-      <ReduxProvider>
-        <AppRouterCacheProvider>  
-          <ThemeProvider theme={theme}>
-            <DeviceIdHandlerWrapper />
-            <UserDataProviderWrapper />
-            <AppBarWrapper />
-            <Toolbar sx={{ height: '64px' }}/>
-            <Paper elevation={0} sx={{minHeight: 'calc(100vh - 64px)', borderRadius: '0px'}}>
-              {/* <Box display='flex' flexGrow={1}> */}
-              {children}
-              {/* </Box> */}
-            <LayoutClientWrapper />
-            </Paper>
-          </ThemeProvider>
-        </AppRouterCacheProvider>
-      </ReduxProvider>
-    </body>
-
+      <body className={roboto.variable}>
+        {/* <InitColorSchemeScript attribute="class" /> */}
+        <ReduxProvider>
+          <AppRouterCacheProvider>
+            <ThemeProvider theme={theme}>
+              <DeviceIdHandlerWrapper />
+              <UserDataProviderWrapper />
+              <AppBarWrapper />
+              <Toolbar sx={{ height: '64px' }} />
+              <Paper
+                elevation={0}
+                sx={{ minHeight: 'calc(100vh - 64px)', borderRadius: '0px' }}
+              >
+                {/* <Box display='flex' flexGrow={1}> */}
+                {children}
+                {/* </Box> */}
+                <LayoutClientWrapper />
+              </Paper>
+            </ThemeProvider>
+          </AppRouterCacheProvider>
+        </ReduxProvider>
+      </body>
     </html>
   );
 }

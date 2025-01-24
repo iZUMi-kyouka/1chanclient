@@ -1,4 +1,4 @@
-'use client'
+'use client';
 // InitializedMDXEditor.tsx
 import { BASE_API_URL } from '@/app/layout';
 import {
@@ -25,29 +25,29 @@ import {
   tablePlugin,
   thematicBreakPlugin,
   toolbarPlugin,
-  UndoRedo
+  UndoRedo,
 } from '@mdxeditor/editor';
 import type { ForwardedRef } from 'react';
 
 const handleImageUpload = async (image: File) => {
   const formData = new FormData();
-  formData.append("image", image);
+  formData.append('image', image);
   try {
     const response = await fetch(`${BASE_API_URL}/upload/image`, {
       method: 'POST',
-      body: formData
+      body: formData,
     });
-  
+
     if (response.ok) {
       const imageURL = (await response.json()).url;
       return imageURL;
     } else if (response.status === 400) {
-      throw new Error("uploaded image is invalid.");
+      throw new Error('uploaded image is invalid.');
     }
   } catch (err) {
-    throw new Error(`Failed to upload image: ${err}`)
+    throw new Error(`Failed to upload image: ${err}`);
   }
-}
+};
 
 const simpleSandpackConfig: SandpackConfig = {
   defaultPreset: 'react',
@@ -60,11 +60,10 @@ const simpleSandpackConfig: SandpackConfig = {
       sandpackTheme: 'light',
       snippetFileName: '/App.js',
       snippetLanguage: 'jsx',
-      initialSnippetContent: ''
+      initialSnippetContent: '',
     },
-  ]
-}
-
+  ],
+};
 
 // Only import this to the next file
 export default function InitializedMDXEditor({
@@ -72,7 +71,11 @@ export default function InitializedMDXEditor({
   disableImage,
   editorRef,
   ...props
-}: { darkMode?: boolean, disableImage?: boolean, editorRef: ForwardedRef<MDXEditorMethods> | null } & MDXEditorProps) {
+}: {
+  darkMode?: boolean;
+  disableImage?: boolean;
+  editorRef: ForwardedRef<MDXEditorMethods> | null;
+} & MDXEditorProps) {
   return (
     <MDXEditor
       className={`${darkMode ? 'dark-theme dark-editor' : ''}`}
@@ -86,30 +89,43 @@ export default function InitializedMDXEditor({
         linkDialogPlugin(),
         thematicBreakPlugin(),
         markdownShortcutPlugin(),
-        codeBlockPlugin({ defaultCodeBlockLanguage: 'js'}),
+        codeBlockPlugin({ defaultCodeBlockLanguage: 'js' }),
         sandpackPlugin({ sandpackConfig: simpleSandpackConfig }),
-        codeMirrorPlugin({ codeBlockLanguages: {  html: 'HTML', css: 'CSS', js: 'JavaScript', ts: 'TypeScript', jsx: 'JSX', tsx: 'TSX', rust: 'Rust', c: 'C', cpp: 'C++', python: 'Python' } }),
+        codeMirrorPlugin({
+          codeBlockLanguages: {
+            html: 'HTML',
+            css: 'CSS',
+            js: 'JavaScript',
+            ts: 'TypeScript',
+            jsx: 'JSX',
+            tsx: 'TSX',
+            rust: 'Rust',
+            c: 'C',
+            cpp: 'C++',
+            python: 'Python',
+          },
+        }),
         toolbarPlugin({
-            toolbarClassName: 'mdxeditorToolbar',
-            toolbarContents: () => (
-              <>
-                {' '}
-                <UndoRedo />
-                <BoldItalicUnderlineToggles />
-                <CreateLink />
-                <ListsToggle options={['bullet', 'number']}/>
-                <InsertTable />
-                <InsertCodeBlock />
-                { disableImage ? <></> : <InsertImage />}
-              </>
-            )
-          }),
+          toolbarClassName: 'mdxeditorToolbar',
+          toolbarContents: () => (
+            <>
+              {' '}
+              <UndoRedo />
+              <BoldItalicUnderlineToggles />
+              <CreateLink />
+              <ListsToggle options={['bullet', 'number']} />
+              <InsertTable />
+              <InsertCodeBlock />
+              {disableImage ? <></> : <InsertImage />}
+            </>
+          ),
+        }),
         imagePlugin({
           imageUploadHandler: handleImageUpload,
-        })
+        }),
       ]}
       {...props}
       ref={editorRef}
     />
-  )
+  );
 }

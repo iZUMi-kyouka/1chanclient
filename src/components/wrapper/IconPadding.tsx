@@ -1,16 +1,16 @@
-import { IconButton } from '@mui/material'
-import { ReactNode } from 'react'
+import { IconButton } from '@mui/material';
+import { ReactNode } from 'react';
 
-const IconPadding = ({ children }: {children: ReactNode}) => {
+const IconPadding = ({ children }: { children: ReactNode }) => {
   return (
     <IconButton
       sx={{
-        pointerEvents: 'none'
+        pointerEvents: 'none',
       }}
     >
       {children}
     </IconButton>
-  )
-}
+  );
+};
 
-export default IconPadding
+export default IconPadding;

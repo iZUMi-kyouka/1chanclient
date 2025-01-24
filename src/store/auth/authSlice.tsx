@@ -15,7 +15,7 @@ const authSlice = createSlice({
     updateAccessToken(state, action: PayloadAction<string>) {
       state.accessToken = action.payload;
     },
-    updateDeviceID(state, action: PayloadAction<string>) { 
+    updateDeviceID(state, action: PayloadAction<string>) {
       state.deviceID = action.payload;
     },
     setIsRefreshing(state, action: PayloadAction<boolean>) {

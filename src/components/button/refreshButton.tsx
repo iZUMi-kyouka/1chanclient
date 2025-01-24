@@ -1,14 +1,16 @@
-import { RefreshSharp } from "@mui/icons-material"
-import { IconButton } from "@mui/material"
+import { RefreshSharp } from '@mui/icons-material';
+import { IconButton } from '@mui/material';
 
-const RefreshButton = ({ onClick }: { onClick?: (e?: React.MouseEvent<HTMLElement>) => void}) => {
+const RefreshButton = ({
+  onClick,
+}: {
+  onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
+}) => {
   return (
-    <IconButton
-      onClick={onClick}
-    >
+    <IconButton onClick={onClick}>
       <RefreshSharp />
     </IconButton>
-  )
-}
+  );
+};
 
-export default RefreshButton
+export default RefreshButton;

@@ -3,7 +3,7 @@ import { Box, CircularProgress } from '@mui/material';
 /**
  * Shows a full spage loading spinner centered horizontally and vertically.
  * The container will try to fill up all available space for a better visual.
- * @returns 
+ * @returns
  */
 const FullPageSpinner = () => {
   return (

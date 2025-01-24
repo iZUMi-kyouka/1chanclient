@@ -6,7 +6,10 @@ import { forwardRef } from 'react';
  * while centering the spinner for a better visual.
  * @returns {ReactNode}
  */
-const WrappedLoading = forwardRef<HTMLDivElement, React.ComponentProps<typeof CircularProgress>>((props, ref) => {
+const WrappedLoading = forwardRef<
+  HTMLDivElement,
+  React.ComponentProps<typeof CircularProgress>
+>((props, ref) => {
   return (
     <Container
       ref={ref}
@@ -17,9 +20,7 @@ const WrappedLoading = forwardRef<HTMLDivElement, React.ComponentProps<typeof Ci
         flexGrow: 1,
       }} // Pass down any additional props
     >
-      <CircularProgress
-        {...props}
-      />
+      <CircularProgress {...props} />
     </Container>
   );
 });
