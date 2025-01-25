@@ -1,16 +1,16 @@
-import { BASE_API_URL } from '@/app/layout';
+import { BASE_API_URL } from '@/app/[locale]/layout';
 import { UserLikes, WrittenComments, WrittenThreads } from '@/interfaces/user';
 import {
-  resetAuth,
-  setIsRefreshing,
-  updateAccessToken,
+    resetAuth,
+    setIsRefreshing,
+    updateAccessToken,
 } from '@/store/auth/authSlice';
 import {
-  resetUser,
-  updateCommentLike,
-  updateThreadLike,
-  updateWrittenComments,
-  updateWrittenThreads,
+    resetUser,
+    updateCommentLike,
+    updateThreadLike,
+    updateWrittenComments,
+    updateWrittenThreads,
 } from '@/store/user/userSlice';
 import { store } from '../store/store';
 

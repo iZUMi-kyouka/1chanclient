@@ -1,33 +1,33 @@
 'use client';
 
-import { BASE_API_URL } from '@/app/layout';
+import { BASE_API_URL } from '@/app/[locale]/layout';
 import FullPageSpinner from '@/components/loading/fullPageLoading';
 import UserAvatar from '@/components/user/userAvatar';
 import VisuallyHiddenInput from '@/components/visuallyHiddenInput';
 import RowFlexBox from '@/components/wrapper/rowFlexContainer';
 import { UserProfile } from '@/interfaces/user';
 import {
-  selectUserAccount,
-  updateProfilePicture,
+    selectUserAccount,
+    updateProfilePicture,
 } from '@/store/user/userSlice';
 import { customFetch } from '@/utils/customFetch';
 import { EditSharp, KeySharp } from '@mui/icons-material';
 import {
-  Avatar,
-  Badge,
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Container,
-  InputLabel,
-  Stack,
-  TextField,
-  Typography,
-  useMediaQuery,
-  useTheme,
+    Avatar,
+    Badge,
+    Box,
+    Button,
+    Card,
+    CardActions,
+    CardContent,
+    CardHeader,
+    Container,
+    InputLabel,
+    Stack,
+    TextField,
+    Typography,
+    useMediaQuery,
+    useTheme,
 } from '@mui/material';
 import { Params } from 'next/dist/server/request/params';
 import React, { use, useEffect, useRef, useState } from 'react';

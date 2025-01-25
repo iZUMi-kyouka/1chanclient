@@ -1,4 +1,4 @@
-import { postCategoriesDict } from '@/app/categories';
+import { postCategoriesDict } from '@/app/[locale]/categories';
 import { Chip, useTheme } from '@mui/material';
 import { useRouter } from 'next/navigation';
 

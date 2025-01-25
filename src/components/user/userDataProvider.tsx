@@ -1,6 +1,6 @@
 'use client';
 
-import { BASE_API_URL } from '@/app/layout';
+import { BASE_API_URL } from '@/app/[locale]/layout';
 import { UserLikes, WrittenComments, WrittenThreads } from '@/interfaces/user';
 import { openSnackbarWithMessage } from '@/store/appState/appStateSlice';
 import { updateAccessToken } from '@/store/auth/authSlice';

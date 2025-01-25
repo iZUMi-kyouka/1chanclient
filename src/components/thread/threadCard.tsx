@@ -1,6 +1,6 @@
 'use client';
 
-import { BASE_API_URL } from '@/app/layout';
+import { BASE_API_URL } from '@/app/[locale]/layout';
 import { Thread } from '@/interfaces/thread';
 import { openCopyPasteSnackbar } from '@/store/appState/appStateSlice';
 import { selectAccessToken } from '@/store/auth/authSlice';

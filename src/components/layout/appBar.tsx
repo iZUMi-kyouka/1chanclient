@@ -1,6 +1,6 @@
 'use client';
 
-import { BASE_API_URL } from '@/app/layout';
+import { BASE_API_URL } from '@/app/[locale]/layout';
 import {
   openMobileSidebar
 } from '@/store/appState/appStateSlice';

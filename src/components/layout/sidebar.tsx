@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
-import { postCategories } from '@/app/categories';
+import { postCategories } from '@/app/[locale]/categories';
 import {
   closeMobileSidebar,
   selectAlwaysShowCustomTags,

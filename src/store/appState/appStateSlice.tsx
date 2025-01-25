@@ -1,4 +1,4 @@
-import { HomeCategory, PostCategoryPlain } from '@/app/categories';
+import { HomeCategory, PostCategoryPlain } from '@/app/[locale]/categories';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 

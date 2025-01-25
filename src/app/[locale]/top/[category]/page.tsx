@@ -1,6 +1,6 @@
 'use client';
 
-import { postCategoriesDict } from '@/app/categories';
+import { postCategoriesDict } from '@/app/[locale]/categories';
 import RefreshButton from '@/components/button/refreshButton';
 import FullPageSpinner from '@/components/loading/fullPageLoading';
 import InfiniteScrollLoading from '@/components/loading/infiniteScrollLoading';

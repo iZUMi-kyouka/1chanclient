@@ -1,6 +1,6 @@
 'use client';
 
-import { BASE_API_URL } from '@/app/layout';
+import { BASE_API_URL } from '@/app/[locale]/layout';
 import { ForwardRefEditor } from '@/components/input/forwardRefEditor';
 import FullPageSpinner from '@/components/loading/fullPageLoading';
 import ColFlexBox from '@/components/wrapper/colFlexContainer';
@@ -10,13 +10,13 @@ import { MDXEditorMethods } from '@mdxeditor/editor';
 import '@mdxeditor/editor/style.css';
 import { EditSharp } from '@mui/icons-material';
 import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Container,
-  Typography,
-  useTheme,
+    Button,
+    Card,
+    CardActions,
+    CardContent,
+    Container,
+    Typography,
+    useTheme,
 } from '@mui/material';
 import { Params } from 'next/dist/server/request/params';
 import { useRouter } from 'next/navigation';

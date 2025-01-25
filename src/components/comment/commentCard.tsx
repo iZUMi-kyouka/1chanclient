@@ -1,28 +1,28 @@
 'use client';
 
-import { BASE_API_URL } from '@/app/layout';
+import { BASE_API_URL } from '@/app/[locale]/layout';
 import Comment from '@/interfaces/comment';
 import { selectAccessToken } from '@/store/auth/authSlice';
 import {
-  addToCommentDislike,
-  addToCommentLike,
-  removeFromCommentLikeDislike,
-  selectUserLikedComments,
-  selectUserWrittenComments,
+    addToCommentDislike,
+    addToCommentLike,
+    removeFromCommentLikeDislike,
+    selectUserLikedComments,
+    selectUserWrittenComments,
 } from '@/store/user/userSlice';
 import { customFetch } from '@/utils/customFetch';
 import { MoreVertSharp } from '@mui/icons-material';
 import {
-  Box,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Container,
-  IconButton,
-  Menu,
-  MenuItem,
-  Typography,
-  useTheme,
+    Box,
+    CardActions,
+    CardContent,
+    CardHeader,
+    Container,
+    IconButton,
+    Menu,
+    MenuItem,
+    Typography,
+    useTheme,
 } from '@mui/material';
 import { format } from 'date-fns';
 import MuiMarkdown, { getOverrides } from 'mui-markdown';
