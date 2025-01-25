@@ -21,7 +21,7 @@ import {
 } from '@mui/material';
 import { Params } from 'next/dist/server/request/params';
 import { useRouter } from 'next/navigation';
-import { use, useRef } from 'react';
+import { use, useEffect, useRef } from 'react';
 import useSWR from 'swr';
 
 const Edit = ({ params }: { params: Promise<Params> }) => {
@@ -58,6 +58,10 @@ const Edit = ({ params }: { params: Promise<Params> }) => {
       throw err;
     }
   };
+
+    useEffect(() => {
+      editorRef.current?.focus();
+    });
 
   if (isLoading) {
     return <FullPageSpinner />;

@@ -28,7 +28,7 @@ import {
   useTheme,
 } from '@mui/material';
 import { useRouter } from 'next/navigation';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import useSWR from 'swr';
 import { postCategories, postCategoriesDict } from '../categories';
@@ -207,6 +207,10 @@ const Page = () => {
       }
     }
   };
+
+  useEffect(() => {
+    titleRef.current?.focus();
+  });
 
   return (
     <>

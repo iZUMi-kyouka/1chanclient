@@ -11,7 +11,7 @@ import {
   updateProfilePicture,
 } from '@/store/user/userSlice';
 import { customFetch } from '@/utils/customFetch';
-import { EditSharp, KeySharp } from '@mui/icons-material';
+import { CakeSharp, CommentSharp, EditSharp, KeySharp } from '@mui/icons-material';
 import {
   Avatar,
   Badge,
@@ -21,6 +21,7 @@ import {
   CardActions,
   CardContent,
   CardHeader,
+  Chip,
   Container,
   InputLabel,
   Stack,
@@ -29,6 +30,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import { format } from 'date-fns';
 import { Params } from 'next/dist/server/request/params';
 import React, { use, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -151,6 +153,8 @@ const Profile = ({ params }: { params: Promise<Params> }) => {
     }
   };
 
+  // This useEffect is required to ensure the disabled text fields are 
+  // re-rendered properly upon successful fetch of profile data (prevents visual bug)
   useEffect(() => {
     if (data) {
       console.log(data);
@@ -184,6 +188,8 @@ const Profile = ({ params }: { params: Promise<Params> }) => {
     );
   }
 
+  const creationDate: null | string = profile ? format(new Date(profile.creation_date), 'MMM d, y') : null;
+
   if (data) {
     return (
       <Container
@@ -206,153 +212,113 @@ const Profile = ({ params }: { params: Promise<Params> }) => {
           <CardHeader title={'Profile'} />
           <CardContent
             sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: theme.spacing(5),
               padding: theme.spacing(3),
             }}
           >
-            {isDesktopWidth ? (
-              <Stack direction="row" gap={theme.spacing(2)}>
-                <Container sx={{ flexShrink: 1, width: 'auto' }}>
-                  {isOwner ? (
-                    <InputLabel
-                      htmlFor="upload-profile-picture"
-                      sx={{ '& :hover': { cursor: 'pointer' } }}
-                    >
-                      <Badge
-                        overlap="circular"
-                        anchorOrigin={{
-                          vertical: 'bottom',
-                          horizontal: 'right',
-                        }}
-                        badgeContent={
-                          <Avatar sx={{ bgcolor: theme.palette.grey[700] }}>
-                            <EditSharp />
-                          </Avatar>
-                        }
-                      >
-                        <UserAvatar
-                          currentUser={true}
-                          sx={{ width: '160px', height: '160px' }}
-                          fontSize={'6rem'}
-                        />
-                      </Badge>
-                      <VisuallyHiddenInput
-                        onChange={handleUploadProfilePicture}
-                        type="file"
-                        id="upload-profile-picture"
-                      />
-                    </InputLabel>
-                  ) : (
-                    <UserAvatar
-                      fontSize="6rem"
-                      username={username as string | undefined}
-                      sx={{ width: '160px', height: '160px' }}
-                    />
-                  )}
-                  <Typography
-                    sx={{ marginTop: theme.spacing(2) }}
-                    textAlign={'center'}
-                    variant="h6"
+            <Stack
+              direction={`${isDesktopWidth ? 'row' : 'column'}`}
+              gap={theme.spacing(2)}
+            >
+              <Container sx={{ flexShrink: 1, width: 'auto' }}>
+                {/* Make profile picure clickable only if current user is owner of the profile */}
+                {isOwner ? (
+                  <InputLabel
+                    htmlFor="upload-profile-picture"
+                    sx={{ '& :hover': { cursor: 'pointer' } }}
                   >
-                    {username}
-                  </Typography>
-                </Container>
-                <Stack
-                  direction="column"
-                  gap={theme.spacing(2)}
-                  sx={{ width: '100%' }}
-                >
-                  <TextField
-                    id="outlined-multiline-static"
-                    label="Biodata"
-                    multiline
-                    fullWidth
-                    rows={4}
-                    defaultValue={profile?.biodata}
-                    inputRef={biodataRef}
-                    variant="outlined"
-                    disabled={!isEditing}
-                  />
-                  <TextField
-                    inputRef={emailRef}
-                    label="Email"
-                    defaultValue={profile?.email}
-                    disabled={!isEditing}
-                  />
-                </Stack>
-              </Stack>
-            ) : (
-              <Stack direction="column" gap={theme.spacing(2)}>
-                <Container sx={{ flexShrink: 1, width: 'auto' }}>
-                  {isOwner ? (
-                    <InputLabel
-                      htmlFor="upload-profile-picture"
-                      sx={{ '& :hover': { cursor: 'pointer' } }}
+                    <Badge
+                      overlap="circular"
+                      anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                      }}
+                      badgeContent={
+                        <Avatar sx={{ bgcolor: theme.palette.grey[700] }}>
+                          <EditSharp />
+                        </Avatar>
+                      }
                     >
-                      <Badge
-                        overlap="circular"
-                        anchorOrigin={{
-                          vertical: 'bottom',
-                          horizontal: 'right',
-                        }}
-                        badgeContent={
-                          <Avatar sx={{ bgcolor: theme.palette.grey[700] }}>
-                            <EditSharp />
-                          </Avatar>
-                        }
-                      >
-                        <UserAvatar
-                          currentUser={true}
-                          sx={{ width: '160px', height: '160px' }}
-                          fontSize={'6rem'}
-                        />
-                      </Badge>
-                      <VisuallyHiddenInput
-                        onChange={handleUploadProfilePicture}
-                        type="file"
-                        id="upload-profile-picture"
+                      <UserAvatar
+                        currentUser={true}
+                        sx={{ width: '160px', height: '160px' }}
+                        fontSize={'6rem'}
                       />
-                    </InputLabel>
-                  ) : (
-                    <UserAvatar
-                      fontSize="6rem"
-                      username={username as string | undefined}
-                      sx={{ width: '160px', height: '160px' }}
+                    </Badge>
+                    <VisuallyHiddenInput
+                      onChange={handleUploadProfilePicture}
+                      type="file"
+                      id="upload-profile-picture"
                     />
-                  )}
-                  <Typography
-                    sx={{ marginTop: theme.spacing(2) }}
-                    textAlign={'center'}
-                    variant="h6"
-                  >
-                    {username}
-                  </Typography>
-                </Container>
-                <Stack
-                  direction="column"
-                  gap={theme.spacing(2)}
-                  sx={{ width: '100%' }}
+                  </InputLabel>
+                ) : (
+                  <UserAvatar
+                    fontSize="6rem"
+                    username={username as string | undefined}
+                    sx={{ width: '160px', height: '160px' }}
+                  />
+                )}
+                <Typography
+                  sx={{ marginTop: theme.spacing(2) }}
+                  textAlign={'center'}
+                  variant="h6"
                 >
-                  <TextField
-                    id="outlined-multiline-static"
-                    label="Biodata"
-                    multiline
-                    fullWidth
-                    rows={4}
-                    defaultValue={profile?.biodata}
-                    inputRef={biodataRef}
-                    variant="outlined"
-                    disabled={!isEditing}
-                  />
-                  <TextField
-                    inputRef={emailRef}
-                    label="Email"
-                    defaultValue={profile?.email}
-                    disabled={!isEditing}
-                  />
-                </Stack>
+                  {username}
+                </Typography>
+              </Container>
+              <Stack
+                direction="column"
+                gap={theme.spacing(2)}
+                sx={{ width: '100%' }}
+              >
+                <TextField
+                  id="outlined-multiline-static"
+                  label="Biodata"
+                  multiline
+                  fullWidth
+                  rows={4}
+                  defaultValue={profile?.biodata}
+                  inputRef={biodataRef}
+                  variant="outlined"
+                  disabled={!isEditing}
+                />
+                <TextField
+                  inputRef={emailRef}
+                  label="Email"
+                  defaultValue={profile?.email}
+                  disabled={!isEditing}
+                />
               </Stack>
-            )}
+            </Stack>
+            <RowFlexBox>
+              {/* <Typography>{creationDate ? `1channer since ${creationDate}.` : ''}</Typography> */}
+              {creationDate ? (
+                <Chip
+                  sx={{ padding: theme.spacing(1.5), fontSize: '0.9rem' }}
+                  icon={<CakeSharp />}
+                  label={creationDate}
+                />
+              ) : null}
+              {profile ? (
+                <>
+                  <Chip
+                    sx={{ padding: theme.spacing(1), fontSize: '0.9rem' }}
+                    icon={<EditSharp />}
+                    label={profile.post_count}
+                  />
+                  <Chip
+                    sx={{ padding: theme.spacing(1), fontSize: '0.9rem' }}
+                    icon={<CommentSharp />}
+                    label={profile.comment_count}
+                  />
+                </>
+              ) : null}
+            </RowFlexBox>
           </CardContent>
+
+          {/* Show account card only if current user is owner of the profile */}
           {isOwner ? (
             <CardActions>
               {isEditing ? (
@@ -364,9 +330,7 @@ const Profile = ({ params }: { params: Promise<Params> }) => {
                 <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
               )}
             </CardActions>
-          ) : (
-            <></>
-          )}
+          ) : null}
         </Card>
 
         {isOwner ? (

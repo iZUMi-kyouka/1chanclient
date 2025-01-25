@@ -10,7 +10,7 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { ForwardRefEditor } from '../input/forwardRefEditor';
 import StandardCard from '../StandardCard';
@@ -44,6 +44,10 @@ const CommentCardEdit = ({
       onSubmit(ref.current ? ref.current.getMarkdown() : '');
     }
   };
+
+  useEffect(() => {
+    ref.current?.focus();
+  });
 
   return (
     <StandardCard width={width}>

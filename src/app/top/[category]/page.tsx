@@ -53,7 +53,7 @@ const Page = ({ params }: { params: Promise<Params> }) => {
     });
   };
 
-  const { ref, inView } = useInView({ threshold: 0.5 });
+  const { ref, inView } = useInView({ threshold: 1 });
   const { data, error, isLoading, size, setSize, mutate } =
     useSWRInfinite<ThreadListResponse>(getKey, generalFetch());
 

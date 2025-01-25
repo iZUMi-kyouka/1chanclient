@@ -31,6 +31,10 @@ const ThreadOpenView = ({
   const [commentOpen, setCommentOpen] = useState(false);
   const dispatch = useDispatch();
 
+  const handleOpenComment = () => {
+    setCommentOpen(true);
+  };
+
   const handleCommentSubmit = async (markdown: string) => {
     if (markdown === '') {
       alert('Posting empty comment is not allowed.');
@@ -131,7 +135,7 @@ const ThreadOpenView = ({
             <span>
               <Button
                 variant="contained"
-                onClick={() => setCommentOpen(true)}
+                onClick={handleOpenComment}
                 startIcon={<AddCommentSharp />}
                 size="large"
                 disabled={accessToken === ''}

@@ -41,7 +41,7 @@ export default function Home() {
     });
   };
 
-  const { ref, inView } = useInView({ threshold: 0.5 });
+  const { ref, inView } = useInView({ threshold: 1 });
   const { data, error, isLoading, mutate, size, setSize } = useSWRInfinite(
     getKey,
     generalFetch(),
