@@ -10,8 +10,10 @@ import {
   selectMobileSidebarOpen,
   setAlwaysShowCustomTags,
   setAlwaysShowTags,
+  SupportedLanguages,
   updateCurrentHomePage
 } from '@/store/appState/appStateSlice';
+import { withLocale } from '@/utils/makeUrl';
 import {
   EditSharp,
   ExpandMoreSharp,
@@ -40,6 +42,8 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
+import { useLocale } from 'next-intl';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ComponentProps, forwardRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -48,13 +52,14 @@ import ColorSchemeSwitcher from '../button/colorSchemeSwitcherButton';
 const drawerWidth = 225;
 
 const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(
-  ({ ...props }, ref) => {
+  ({ ...props }, _ref) => {
     const theme = useTheme();
     const dispatch = useDispatch();
     const router = useRouter();
     const isAlwaysShowTags = useSelector(selectAlwaysShowTags);
     const isAlwaysShowCustomTags = useSelector(selectAlwaysShowCustomTags);
 
+    const locale = useLocale() as SupportedLanguages;
     const currentHomePage = useSelector(selectCurrentHomePage);
     const mobileOpen = useSelector(selectMobileSidebarOpen);
 
@@ -91,7 +96,7 @@ const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(
       }) =>
       () => {
         dispatch(updateCurrentHomePage({ id, name, displayName }));
-        router.push(`/top/${id}`);
+        router.push(withLocale(locale, `/top/${id}`));
         dispatch(closeMobileSidebar());
       };
 
@@ -102,6 +107,8 @@ const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(
         <List>
           <ListItem key={'home'} disablePadding>
             <ListItemButton
+              LinkComponent={Link}
+              href='/'
               selected={currentHomePage.name === 'home'}
               onClick={() => {
                 dispatch(
@@ -111,7 +118,6 @@ const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(
                     displayName: 'Home',
                   })
                 );
-                router.push('/');
                 dispatch(closeMobileSidebar());
               }}
             >
@@ -132,7 +138,7 @@ const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(
           >
             <ListItemButton
               onClick={() => {
-                router.push('/new');
+                router.push(withLocale(locale, '/new'));
                 dispatch(closeMobileSidebar());
               }}
             >

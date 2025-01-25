@@ -2,7 +2,7 @@
 
 import { BASE_API_URL } from '@/app/[locale]/layout';
 import { Thread } from '@/interfaces/thread';
-import { openCopyPasteSnackbar } from '@/store/appState/appStateSlice';
+import { openCopyPasteSnackbar, SupportedLanguages } from '@/store/appState/appStateSlice';
 import { selectAccessToken } from '@/store/auth/authSlice';
 import {
   addToThreadDislike,
@@ -12,6 +12,7 @@ import {
   selectUserWrittenThreads,
 } from '@/store/user/userSlice';
 import { customFetch } from '@/utils/customFetch';
+import { withLocale } from '@/utils/makeUrl';
 import { splitCustomTags, splitTags } from '@/utils/tagsSplitter';
 import { MoreVertSharp } from '@mui/icons-material';
 import {
@@ -28,6 +29,7 @@ import {
 } from '@mui/material';
 import { format } from 'date-fns/format';
 import MuiMarkdown, { getOverrides } from 'mui-markdown';
+import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -62,6 +64,7 @@ const ThreadCard = ({
   const dispatch = useDispatch();
   const theme = useTheme();
   const router = useRouter();
+  const locale = useLocale() as SupportedLanguages;
 
   const likes = useSelector(selectUserLikedThreads);
   const writtenThreads = useSelector(selectUserWrittenThreads);
@@ -166,7 +169,7 @@ const ThreadCard = ({
 
   const handleEditThread = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
-    router.push(`/edit/thread/${thread.id}`);
+    router.push(withLocale(locale, `/edit/thread/${thread.id}`));
   };
 
   const handleDeleteThread = async (e: React.MouseEvent<HTMLElement>) => {
@@ -274,7 +277,7 @@ const ThreadCard = ({
         }}
         onClick={() => {
           if (!disableOnClick && !reportDialogOpen) {
-            router.push(`/thread/${thread.id}`);
+            router.push(withLocale(locale, `/thread/${thread.id}`));
           }
         }}
       >
@@ -307,7 +310,7 @@ const ThreadCard = ({
             <IconButton
               onClick={(e: React.MouseEvent<HTMLElement>) => {
                 e.stopPropagation();
-                router.push(`/profile/${thread.username}`);
+                router.push(withLocale(locale, `/profile/${thread.username}`));
               }}
               sx={{
                 padding: '0px !important',

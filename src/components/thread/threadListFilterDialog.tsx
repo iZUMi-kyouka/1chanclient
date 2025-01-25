@@ -1,3 +1,5 @@
+import { SupportedLanguages } from '@/store/appState/appStateSlice';
+import { withLocale } from '@/utils/makeUrl';
 import {
   ArrowDownwardSharp,
   ArrowUpwardSharp,
@@ -16,6 +18,7 @@ import {
   Typography,
   useTheme,
 } from '@mui/material';
+import { useLocale } from 'next-intl';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 
@@ -34,21 +37,22 @@ const ThreadListFilterDropdown = ({
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
+  const locale = useLocale() as SupportedLanguages;
 
   const [sortState, setSortState] = useState<SortState>({
     criteria: params.get('sort_by') || disableRelevance ? 'views' : 'relevance',
     direction: params.get('order') || 'desc',
   });
 
+  const handleClose = () => setIsOpen(false);
   const handleRefresh = () => {
     const newParams: URLSearchParams = new URLSearchParams(params.toString());
     newParams.set('sort_by', sortState.criteria);
     newParams.set('order', sortState.direction);
-    router.push(`${pathname}?${newParams.toString()}`);
-    setIsOpen(false);
+    router.push(withLocale(locale, `${pathname}?${newParams.toString()}`));
+    handleClose();
   };
 
-  const handleClose = () => setIsOpen(false);
 
   return (
     <>

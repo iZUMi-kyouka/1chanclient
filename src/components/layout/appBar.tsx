@@ -2,7 +2,8 @@
 
 import { BASE_API_URL } from '@/app/[locale]/layout';
 import {
-  openMobileSidebar
+  openMobileSidebar,
+  SupportedLanguages
 } from '@/store/appState/appStateSlice';
 import {
   resetAuth,
@@ -11,6 +12,7 @@ import {
 } from '@/store/auth/authSlice';
 import { resetUser, selectUserAccount } from '@/store/user/userSlice';
 import { customFetch } from '@/utils/customFetch';
+import { withLocale } from '@/utils/makeUrl';
 import {
   CreateSharp,
   LoginSharp,
@@ -34,6 +36,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -51,6 +54,7 @@ export default function PrimaryAppBar() {
   const user = useSelector(selectUserAccount);
   const accessToken = useSelector(selectAccessToken);
   const deviceID = useSelector(selectDeviceID);
+  const locale = useLocale() as SupportedLanguages;
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   // const [notificationAnchorEl, setNotificationAnchorEl] = useState<null | HTMLElement>();
@@ -129,7 +133,7 @@ export default function PrimaryAppBar() {
 
   const handleSearch = () => {
     if (searchBarRef.current) {
-      router.push(`/search?q=${searchBarRef.current.value}`);
+      router.push(withLocale(locale, `/search?q=${searchBarRef.current.value}`));
     }
   };
 
@@ -154,7 +158,7 @@ export default function PrimaryAppBar() {
           <MenuItem onClick={handleLogout}>Logout</MenuItem>
           <MenuItem
             onClick={() => {
-              router.push(`/profile/${user.username}`);
+              router.push(withLocale(locale, `/profile/${user.username}`));
               setAnchorEl(null);
             }}
           >
@@ -282,9 +286,8 @@ export default function PrimaryAppBar() {
             {user.username ? (
               <Button
                 disableElevation
-                onClick={() => {
-                  router.push('/new');
-                }}
+                href='/new'
+                LinkComponent={Link}
                 sx={{
                   backgroundColor: `${isDarkMode ? 'default' : 'white'}`,
                   color: `${isDarkMode ? 'default' : theme.palette.primary.main}`,
@@ -332,7 +335,7 @@ export default function PrimaryAppBar() {
                   height: '48px',
                 }}
                 startIcon={<LoginSharp color="inherit" />}
-                href="/login"
+                href={withLocale(locale, '/login')}
                 LinkComponent={Link}
                 variant="contained"
               >

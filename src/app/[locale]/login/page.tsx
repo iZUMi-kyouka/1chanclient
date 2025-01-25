@@ -4,6 +4,7 @@ import {
   WrittenComments,
   WrittenThreads,
 } from '@/interfaces/user';
+import { LocaleParams } from '@/store/appState/appStateSlice';
 import { selectDeviceID, updateAccessToken } from '@/store/auth/authSlice';
 import {
   selectUserAccount,
@@ -13,6 +14,7 @@ import {
   updateWrittenThreads,
 } from '@/store/user/userSlice';
 import { customFetch } from '@/utils/customFetch';
+import { withLocale } from '@/utils/makeUrl';
 import {
   LoginSharp,
   VisibilityOffSharp,
@@ -35,7 +37,7 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { BASE_API_URL } from '../layout';
 
@@ -51,12 +53,13 @@ const classes = {
   },
 };
 
-const Page = () => {
+const Page = ({ params }: LocaleParams) => {
   const user = useSelector(selectUserAccount);
   const deviceID = useSelector(selectDeviceID);
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useDispatch();
+  const locale = use(params).locale;
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -291,7 +294,7 @@ const Page = () => {
           <Container sx={{ marginTop: theme.spacing(3) }}></Container>
           <Typography variant="body2">
             Don&apos;t have an account?{' '}
-            <Link style={{ color: 'inherit' }} href="/register">
+            <Link style={{ color: 'inherit' }} href={withLocale(locale, '/register')}>
               Register
             </Link>
           </Typography>

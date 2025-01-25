@@ -1,9 +1,10 @@
 import DeviceIdHandlerWrapper from '@/components/deviceIdHandlerWrapper';
-import AppBarWrapper from '@/components/layout/appBarWrapper';
+import PrimaryAppBar from '@/components/layout/appBar';
 import Sidebar from '@/components/layout/sidebar';
 import LayoutClientWrapper from '@/components/layoutClientWrapper';
-import UserDataProviderWrapper from '@/components/user/userDataProviderWrapper';
+import FetchUserData from '@/components/user/userDataProvider';
 import { routing } from '@/i18n/routing';
+import { SupportedLanguages } from '@/store/appState/appStateSlice';
 import { Box, CssBaseline, Paper, Toolbar } from '@mui/material';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeProvider } from '@mui/material/styles';
@@ -34,49 +35,49 @@ import theme from './theme';
 //       : 'http://54.169.160.55';
 
 export const BASE_API_URL = `https://onechan.xyz/api/v1`;
-export const BASE_URL = `https://onechan.xyz`
+export const BASE_URL = `https://onechan.xyz`;
 
 export default async function RootLayout({
   children,
-  params
+  params,
 }: Readonly<{
   children: ReactNode;
-  params: Promise<{locale: 'ja' | 'en'}>
+  params: Promise<{ locale: SupportedLanguages }>;
 }>) {
   const locale = (await params).locale;
 
   if (!routing.locales.includes(locale)) {
     notFound();
   }
-  
+
   const messages = await getMessages();
-  
+
   return (
-      <>
+    <>
       <CssBaseline />
-        {/* <InitColorSchemeScript attribute="class" /> */}
-        <ReduxProvider>
+      {/* <InitColorSchemeScript attribute="class" /> */}
+      <ReduxProvider>
+        <NextIntlClientProvider messages={messages}>
           <AppRouterCacheProvider>
             <ThemeProvider theme={theme}>
               <DeviceIdHandlerWrapper />
-              <UserDataProviderWrapper />
-              <NextIntlClientProvider messages={messages}>
-                <AppBarWrapper />
-                <Toolbar sx={{ height: '64px' }} />
-                <Paper
-                  elevation={0}
-                  sx={{ minHeight: 'calc(100vh - 64px)', borderRadius: '0px' }}
-                >
-                  <Box display='flex'>
-                    <Sidebar />
-                    {children}
-                  </Box>
-                  <LayoutClientWrapper />
-                </Paper>
-              </NextIntlClientProvider>
+              <FetchUserData locale={locale}/>
+              <PrimaryAppBar />
+              <Toolbar sx={{ height: '64px' }} />
+              <Paper
+                elevation={0}
+                sx={{ minHeight: 'calc(100vh - 64px)', borderRadius: '0px' }}
+              >
+                <Box display="flex">
+                  <Sidebar />
+                  {children}
+                </Box>
+                <LayoutClientWrapper />
+              </Paper>
             </ThemeProvider>
           </AppRouterCacheProvider>
-        </ReduxProvider>
-      </>
+        </NextIntlClientProvider>
+      </ReduxProvider>
+    </>
   );
 }

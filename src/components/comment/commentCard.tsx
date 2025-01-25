@@ -2,30 +2,33 @@
 
 import { BASE_API_URL } from '@/app/[locale]/layout';
 import Comment from '@/interfaces/comment';
+import { SupportedLanguages } from '@/store/appState/appStateSlice';
 import { selectAccessToken } from '@/store/auth/authSlice';
 import {
-    addToCommentDislike,
-    addToCommentLike,
-    removeFromCommentLikeDislike,
-    selectUserLikedComments,
-    selectUserWrittenComments,
+  addToCommentDislike,
+  addToCommentLike,
+  removeFromCommentLikeDislike,
+  selectUserLikedComments,
+  selectUserWrittenComments,
 } from '@/store/user/userSlice';
 import { customFetch } from '@/utils/customFetch';
+import { withLocale } from '@/utils/makeUrl';
 import { MoreVertSharp } from '@mui/icons-material';
 import {
-    Box,
-    CardActions,
-    CardContent,
-    CardHeader,
-    Container,
-    IconButton,
-    Menu,
-    MenuItem,
-    Typography,
-    useTheme,
+  Box,
+  CardActions,
+  CardContent,
+  CardHeader,
+  Container,
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography,
+  useTheme,
 } from '@mui/material';
 import { format } from 'date-fns';
 import MuiMarkdown, { getOverrides } from 'mui-markdown';
+import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -45,6 +48,7 @@ const CommentCard = ({
   const dispatch = useDispatch();
   const router = useRouter();
 
+  const locale = useLocale() as SupportedLanguages;
   const accessToken = useSelector(selectAccessToken);
   const likes = useSelector(selectUserLikedComments);
   const writtenComments = useSelector(selectUserWrittenComments);
@@ -79,7 +83,7 @@ const CommentCard = ({
   };
 
   const handleEditComment = () => {
-    router.push(`/edit/comment/${comment.id}`);
+    router.push(withLocale(locale, `/edit/comment/${comment.id}`));
   };
 
   const handleReport = async () => {
@@ -214,7 +218,7 @@ const CommentCard = ({
             }}
             onClick={(e: React.MouseEvent<HTMLElement>) => {
               e.preventDefault();
-              router.push(`/profile/${comment.username}`);
+              router.push(withLocale(locale, `/profile/${comment.username}`));
             }}
           >
             <UserAvatar
