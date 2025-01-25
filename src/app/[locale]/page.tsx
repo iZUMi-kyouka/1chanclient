@@ -42,7 +42,7 @@ export default function Home() {
     });
   };
 
-  const { ref, inView } = useInView({ threshold: 0.5 });
+  const { ref, inView } = useInView({ threshold: 0.2 });
   const { data, error, isLoading, mutate, size, setSize } = useSWRInfinite(
     getKey,
     generalFetch(),
@@ -70,23 +70,8 @@ export default function Home() {
           }}
         >
           {(() => {
-            if (isLoading) {
-              return <FullPageSpinner />;
-            }
-
-            if (error) {
-              return (
-                <RowFlexBox>
-                  <Typography>
-                    Failed to fetch threads. Sort parameters may be invalid.
-                  </Typography>
-                </RowFlexBox>
-              );
-            }
-
-            if (data) {
               const threads: PaginatedResponse<Thread>[] = [];
-              data.forEach((threadViewResponse) =>
+              data?.forEach((threadViewResponse) =>
                 threads.push(threadViewResponse)
               );
 
@@ -96,33 +81,40 @@ export default function Home() {
                   flexDirection="column"
                   gap={theme.spacing(2)}
                   paddingBottom={theme.spacing(4)}
+                  width={'925px'}
                   sx={{
                     [theme.breakpoints.down('lg')]: {
                       width: '100%',
                     },
                   }}
                 >
-                  <Container
-                    sx={{ margin: '0 !important', padding: '0 !important' }}
-                  >
-                    {threads.length > 0 && threads[0].response ? (
-                      <Box display={'flex'} gap={theme.spacing(1)}>
-                        <ThreadListFilterDropdown disableRelevance />
-                        <RefreshButton onClick={() => mutate(undefined)} />
-                      </Box>
-                    ) : (
-                      <></>
-                    )}
-                  </Container>
-                  <Typography>{t('title')}</Typography>
-                  <ThreadList threads={threads} />
-                  <InfiniteScrollLoading
-                    ref={ref}
-                    pagination={data[data.length - 1].pagination}
-                  />
+                    <Box display={'flex'} gap={theme.spacing(1)} flexGrow={1} alignItems={'center'}>
+                      <ThreadListFilterDropdown disabled={isLoading} disableRelevance />
+                      <RefreshButton disabled={isLoading} onClick={() => mutate(undefined)} />
+                    </Box>
+                  {/* <Typography>{t('title')}</Typography> */}
+
+                  {error && (
+                    <RowFlexBox>
+                      <Typography>
+                        Failed to fetch threads. Sort parameters may be invalid.
+                      </Typography>
+                    </RowFlexBox>
+                  )}
+
+                  {data ? (
+                    <>
+                      <ThreadList threads={data} />
+                      <InfiniteScrollLoading
+                        ref={ref}
+                        pagination={data[data.length - 1].pagination}
+                      />
+                    </>
+                  ) : (
+                    isLoading && <FullPageSpinner />
+                  )}
                 </Box>
               );
-            }
           })()}
         </Container>
       {/* </Box> */}

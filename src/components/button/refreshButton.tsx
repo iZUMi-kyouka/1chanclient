@@ -1,15 +1,21 @@
 import { RefreshSharp } from '@mui/icons-material';
-import { IconButton } from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
 
 const RefreshButton = ({
   onClick,
+  disabled
 }: {
+  disabled?: boolean
   onClick?: (e?: React.MouseEvent<HTMLElement>) => void;
 }) => {
   return (
-    <IconButton onClick={onClick}>
-      <RefreshSharp />
-    </IconButton>
+    <Tooltip title='Refresh'>
+      <Box>
+        <IconButton onClick={onClick} disabled={disabled}>
+          <RefreshSharp />
+        </IconButton>
+      </Box>
+    </Tooltip>
   );
 };
 

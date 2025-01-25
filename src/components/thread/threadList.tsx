@@ -53,7 +53,7 @@ const ThreadList = ({
               showTags={showTags}
               showCustomTags={showCustomTags}
               mutateHook={mutateHook}
-              key={thread.id}
+              key={'_'+Math.random().toString(36).substring(2, 9)}
               thread={thread}
             />
           ))

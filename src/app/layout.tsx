@@ -1,3 +1,4 @@
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { ReactNode } from "react";
 import { roboto } from "./[locale]/fonts";
 
@@ -9,7 +10,9 @@ export default function RootLayout({
   return (
     <html>
       <body className={roboto.variable}>
-        {children}
+        <NuqsAdapter>
+          {children}
+        </NuqsAdapter>
       </body>
     </html>
   )

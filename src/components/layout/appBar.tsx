@@ -286,7 +286,7 @@ export default function PrimaryAppBar() {
             {user.username ? (
               <Button
                 disableElevation
-                href='/new'
+                href={withLocale(locale, '/new')}
                 LinkComponent={Link}
                 sx={{
                   backgroundColor: `${isDarkMode ? 'default' : 'white'}`,
