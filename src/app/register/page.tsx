@@ -24,6 +24,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { BASE_API_URL } from '../layout';
 import theme from '../theme';
 
 // const classes = {
@@ -84,18 +85,15 @@ const Page = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        'http://localhost:8080/api/v1/users/register',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Device-ID': deviceID,
-          },
-          body: JSON.stringify({ username, password }),
-          credentials: 'include',
-        }
-      );
+      const response = await fetch(`${BASE_API_URL}/users/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Device-ID': deviceID,
+        },
+        body: JSON.stringify({ username, password }),
+        credentials: 'include',
+      });
 
       if (!response.ok) {
         if (response.status === 409) {

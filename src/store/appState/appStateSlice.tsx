@@ -6,6 +6,7 @@ export interface AppState {
   theme: 'dark' | 'light' | 'auto';
   currentHomePage: PostCategoryPlain;
   copyPasteSnackbarOpen: boolean;
+  snackBarMessage: string;
   mobileSiderbarOpen: boolean;
   alwaysShowTags: boolean;
   alwaysShowCustomTags: boolean;
@@ -15,6 +16,7 @@ const appstateInitialState: AppState = {
   theme: 'auto',
   currentHomePage: HomeCategory,
   copyPasteSnackbarOpen: false,
+  snackBarMessage: '',
   mobileSiderbarOpen: false,
   alwaysShowTags: false,
   alwaysShowCustomTags: false,
@@ -28,10 +30,16 @@ const appstateSlice = createSlice({
       state.currentHomePage = action.payload;
     },
     openCopyPasteSnackbar(state) {
+      state.snackBarMessage = 'Link copied successfully.';
       state.copyPasteSnackbarOpen = true;
     },
     closeCopyPasteSnackbar(state) {
       state.copyPasteSnackbarOpen = false;
+      state.snackBarMessage = '';
+    },
+    openSnackbarWithMessage(state, action: PayloadAction<string>) {
+      state.snackBarMessage = action.payload;
+      state.copyPasteSnackbarOpen = true;
     },
     setMobileSidebarOpen(state, action: PayloadAction<boolean>) {
       state.mobileSiderbarOpen = action.payload;
@@ -52,6 +60,7 @@ export const {
   setMobileSidebarOpen,
   setAlwaysShowCustomTags,
   setAlwaysShowTags,
+  openSnackbarWithMessage
 } = appstateSlice.actions;
 export const selectCurrentHomePage = (state: RootState) =>
   state.appstate.currentHomePage;
@@ -63,4 +72,6 @@ export const selectAlwaysShowTags = (state: RootState) =>
   state.appstate.alwaysShowTags;
 export const selectAlwaysShowCustomTags = (state: RootState) =>
   state.appstate.alwaysShowCustomTags;
+export const selectSnackBarMessage = (state: RootState) =>
+  state.appstate.snackBarMessage;
 export default appstateSlice.reducer;

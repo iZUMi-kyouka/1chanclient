@@ -86,7 +86,7 @@ const Page = () => {
     setIsLoading(true);
 
     try {
-      let response = await fetch('http://localhost:8080/api/v1/users/login', {
+      let response = await fetch(`${BASE_API_URL}/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -161,11 +161,11 @@ const Page = () => {
         (err as Error).message ===
         'NetworkError when attempting to fetch resource.'
       ) {
-          alert(
-            '1chan is currently unavailable or your internet connection may be unstable.'
-          );
+        alert(
+          '1chan is currently unavailable or your internet connection may be unstable.'
+        );
       }
-        setErrorMsg(true);
+      setErrorMsg(true);
     } finally {
       setIsLoading(false);
     }

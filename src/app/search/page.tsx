@@ -89,6 +89,11 @@ const Page = () => {
         alignItems={'center'}
         gap={theme.spacing(2)}
         paddingTop={theme.spacing(2)}
+        sx={{
+          [theme.breakpoints.down('lg')]: {
+            width: '100%'
+          }
+        }}
       >
         <title>{`1chan | Search`}</title>
         <Typography variant="h5">{`${searchQuery ? `Search result for "${searchQuery}"` : 'Search Result'}`}</Typography>

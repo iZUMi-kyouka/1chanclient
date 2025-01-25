@@ -2,6 +2,7 @@
 
 import { BASE_API_URL } from '@/app/layout';
 import { UserLikes, WrittenComments, WrittenThreads } from '@/interfaces/user';
+import { openSnackbarWithMessage } from '@/store/appState/appStateSlice';
 import { updateAccessToken } from '@/store/auth/authSlice';
 import { AppDispatch } from '@/store/store';
 import {
@@ -21,17 +22,24 @@ export default function FetchUserData() {
   useEffect(() => {
     const fetchFunction = async () => {
       try {
-        let response = await fetch(
-          'http://localhost:8080/api/v1/users/refresh_new',
-          {
-            method: 'GET',
-            headers: {
-              'Device-ID': localStorage.getItem('deviceID') || '',
-            },
-            credentials: 'include',
-          }
-        );
+        let response = await fetch(`${BASE_API_URL}/users/refresh_new`, {
+          method: 'GET',
+          headers: {
+            'Device-ID': localStorage.getItem('deviceID') || '',
+          },
+          credentials: 'include',
+        });
+        
+        if (response.status === 401) {
+          // dispatch(openSnackbarWithMessage('You may be offline.'));
+          return;
+        }
 
+        if (!response.ok) {
+          dispatch(openSnackbarWithMessage('You mau be offline. Check your internet connection.'))
+          return;
+        }
+        
         const data = await response.json();
 
         dispatch(updateAccessToken(data.account.access_token));
@@ -80,10 +88,12 @@ export default function FetchUserData() {
           throw new Error('failed to fetch written threads.');
         }
       } catch (err) {
-        if ((err as Error).name === "TypeError") {
-          alert("1chan is currently unavailable or your internet connection may be unstable.")
+        if ((err as Error).name === 'TypeError') {
+          alert(
+            '1chan is currently unavailable or your internet connection may be unstable.'
+          );
         }
-        
+
         console.log('error during login: ', err);
       }
     };

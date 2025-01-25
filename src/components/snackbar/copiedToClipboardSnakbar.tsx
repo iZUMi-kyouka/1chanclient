@@ -3,6 +3,7 @@
 import {
   closeCopyPasteSnackbar,
   selectOpenCopyPasteSnackbar,
+  selectSnackBarMessage,
 } from '@/store/appState/appStateSlice';
 import { Snackbar } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
@@ -14,6 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
  */
 const CopyPasteSnackbar = () => {
   const snackBarOpen = useSelector(selectOpenCopyPasteSnackbar);
+  const snackBarMessage = useSelector(selectSnackBarMessage);
   const dispatch = useDispatch();
 
   return (
@@ -21,7 +23,7 @@ const CopyPasteSnackbar = () => {
       open={snackBarOpen}
       autoHideDuration={5000}
       onClose={() => dispatch(closeCopyPasteSnackbar())}
-      message={'Link copied to clipboard!'}
+      message={snackBarMessage}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
     />
   );

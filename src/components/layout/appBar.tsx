@@ -1,5 +1,6 @@
 'use client';
 
+import { BASE_API_URL } from '@/app/layout';
 import {
   selectMobileSidebarOpen,
   setMobileSidebarOpen,
@@ -103,17 +104,14 @@ export default function PrimaryAppBar() {
 
   const handleLogout = async () => {
     try {
-      const response = await customFetch(
-        'http://localhost:8080/api/v1/users/logout',
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Device-ID': deviceID,
-          },
-          credentials: 'include',
-        }
-      );
+      const response = await customFetch(`${BASE_API_URL}/users/logout`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Device-ID': deviceID,
+        },
+        credentials: 'include',
+      });
 
       if (response.ok) {
         console.log('Logout success.');

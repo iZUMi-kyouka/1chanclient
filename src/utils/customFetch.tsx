@@ -67,19 +67,16 @@ export async function customFetch(
 
         try {
           // Set the global access token refresh promise
-          refreshAccessTokenPromise = fetch(
-            'http://localhost:8080/api/v1/users/refresh',
-            {
-              ...options,
-              method: 'GET',
-              credentials: 'include', // include the refresh token
-              headers: {
-                ...options?.headers,
-                'Device-ID': store.getState().auth.deviceID,
-              },
-              body: null, // ensure that body is null since this is a 'GET' request
-            }
-          ).then(async (refreshResponse) => {
+          refreshAccessTokenPromise = fetch(`${BASE_API_URL}/users/refresh`, {
+            ...options,
+            method: 'GET',
+            credentials: 'include', // include the refresh token
+            headers: {
+              ...options?.headers,
+              'Device-ID': store.getState().auth.deviceID,
+            },
+            body: null, // ensure that body is null since this is a 'GET' request
+          }).then(async (refreshResponse) => {
             if (!refreshResponse.ok) {
               // Token refresh failed. Reset all user and auth state, and prompt user to relogin.
               store.dispatch(resetUser());

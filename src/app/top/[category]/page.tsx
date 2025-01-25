@@ -81,9 +81,7 @@ const Page = ({ params }: { params: Promise<Params> }) => {
           return (
             <ColFlexBox>
               <title>{`1chan | Thread`}</title>
-              <Typography>
-                Failed to fetch the list of threads.
-              </Typography>
+              <Typography>Failed to fetch the list of threads.</Typography>
               <Typography>Please refresh the page.</Typography>
             </ColFlexBox>
           );
