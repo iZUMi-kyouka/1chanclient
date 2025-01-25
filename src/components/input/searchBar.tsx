@@ -17,6 +17,7 @@ export const Search = styled('div')(({ theme }) => ({
   marginLeft: theme.spacing(3),
   [theme.breakpoints.down(450)]: {
     marginLeft: 0,
+    width: '100%'
   },
 }));
 
@@ -49,6 +50,9 @@ export const SearchBarInputBase = styled(
         width: '40ch',
       },
     },
+    [theme.breakpoints.down(450)]: {
+      marginRight: '30px'
+    }
   },
 }));
 

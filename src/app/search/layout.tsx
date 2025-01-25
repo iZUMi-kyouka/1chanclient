@@ -1,15 +1,14 @@
 'use client';
 
-import Sidebar from '@/components/layout/sidebar';
-import { Box, Container, useTheme } from '@mui/material';
+import { Container, useTheme } from '@mui/material';
 import { ReactNode } from 'react';
 
 const Layout = ({ children }: { children: ReactNode }) => {
   const theme = useTheme();
 
   return (
-    <Box display={'flex'}>
-      <Sidebar />
+    // <Box display={'flex'}>
+      // <Sidebar />
       <Container
         sx={{
           display: 'flex',
@@ -21,7 +20,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       >
         {children}
       </Container>
-    </Box>
+    // </Box>
   );
 };
 

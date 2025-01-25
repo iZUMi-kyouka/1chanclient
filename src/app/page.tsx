@@ -1,7 +1,6 @@
 'use client';
 
 import RefreshButton from '@/components/button/refreshButton';
-import Sidebar from '@/components/layout/sidebar';
 import FullPageSpinner from '@/components/loading/fullPageLoading';
 import InfiniteScrollLoading from '@/components/loading/infiniteScrollLoading';
 import ThreadList from '@/components/thread/threadList';
@@ -57,8 +56,8 @@ export default function Home() {
 
   return (
     <>
-      <Box sx={{ display: 'flex' }}>
-        <Sidebar />
+      {/* <Box sx={{ display: 'flex' }}> */}
+        {/* <Sidebar /> */}
         <Container
           sx={{
             display: 'flex',
@@ -124,7 +123,7 @@ export default function Home() {
             }
           })()}
         </Container>
-      </Box>
+      {/* </Box> */}
     </>
   );
 }

@@ -3,14 +3,14 @@
 
 import { postCategories } from '@/app/categories';
 import {
+  closeMobileSidebar,
   selectAlwaysShowCustomTags,
   selectAlwaysShowTags,
   selectCurrentHomePage,
   selectMobileSidebarOpen,
   setAlwaysShowCustomTags,
   setAlwaysShowTags,
-  setMobileSidebarOpen,
-  updateCurrentHomePage,
+  updateCurrentHomePage
 } from '@/store/appState/appStateSlice';
 import {
   EditSharp,
@@ -63,7 +63,7 @@ const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(
 
     const handleDrawerClose = () => {
       setIsClosing(true);
-      dispatch(setMobileSidebarOpen(false));
+      dispatch(closeMobileSidebar());
     };
 
     const handleDrawerTransitionEnd = () => {
@@ -92,6 +92,7 @@ const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(
       () => {
         dispatch(updateCurrentHomePage({ id, name, displayName }));
         router.push(`/top/${id}`);
+        dispatch(closeMobileSidebar());
       };
 
     const drawer = (
@@ -111,6 +112,7 @@ const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(
                   })
                 );
                 router.push('/');
+                dispatch(closeMobileSidebar());
               }}
             >
               <ListItemIcon>
@@ -131,6 +133,7 @@ const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(
             <ListItemButton
               onClick={() => {
                 router.push('/new');
+                dispatch(closeMobileSidebar());
               }}
             >
               <ListItemIcon>
@@ -182,6 +185,7 @@ const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(
           <ListItemButton
             onClick={() => {
               setSettingsOpen(true);
+              dispatch(closeMobileSidebar());
             }}
           >
             <ListItemIcon>
@@ -273,7 +277,9 @@ const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setSettingsOpen(false)}>Close</Button>
+            <Button onClick={() => {
+              setSettingsOpen(false);
+            }}>Close</Button>
           </DialogActions>
         </Dialog>
       </Box>

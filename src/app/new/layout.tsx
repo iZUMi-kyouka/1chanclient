@@ -1,7 +1,5 @@
 'use client';
 
-import Sidebar from '@/components/layout/sidebar';
-import RowFlexBox from '@/components/wrapper/rowFlexContainer';
 import '@mdxeditor/editor/style.css';
 import { Container, useTheme } from '@mui/material';
 import { ReactNode } from 'react';
@@ -10,14 +8,14 @@ const Layout = ({ children }: { children: ReactNode }) => {
   const theme = useTheme();
 
   return (
-    <RowFlexBox>
-      <Sidebar
-        sx={{
-          [theme.breakpoints.down(900)]: {
-            display: 'none',
-          },
-        }}
-      />
+    // <RowFlexBox>
+    //   <Sidebar
+    //     sx={{
+    //       [theme.breakpoints.down(900)]: {
+    //         display: 'none',
+    //       },
+    //     }}
+    //   />
       <Container
         sx={{
           display: 'flex',
@@ -31,7 +29,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       >
         {children}
       </Container>
-    </RowFlexBox>
+    // </RowFlexBox>
   );
 };
 

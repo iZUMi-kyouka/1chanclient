@@ -44,6 +44,12 @@ const appstateSlice = createSlice({
     setMobileSidebarOpen(state, action: PayloadAction<boolean>) {
       state.mobileSiderbarOpen = action.payload;
     },
+    openMobileSidebar(state) {
+      state.mobileSiderbarOpen = true;
+    },
+    closeMobileSidebar(state) {
+      state.mobileSiderbarOpen = false;
+    },
     setAlwaysShowTags(state, action: PayloadAction<boolean>) {
       state.alwaysShowTags = action.payload;
     },
@@ -60,7 +66,9 @@ export const {
   setMobileSidebarOpen,
   setAlwaysShowCustomTags,
   setAlwaysShowTags,
-  openSnackbarWithMessage
+  openSnackbarWithMessage,
+  openMobileSidebar,
+  closeMobileSidebar
 } = appstateSlice.actions;
 export const selectCurrentHomePage = (state: RootState) =>
   state.appstate.currentHomePage;

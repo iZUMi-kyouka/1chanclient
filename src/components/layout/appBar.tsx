@@ -2,8 +2,7 @@
 
 import { BASE_API_URL } from '@/app/layout';
 import {
-  selectMobileSidebarOpen,
-  setMobileSidebarOpen,
+  openMobileSidebar
 } from '@/store/appState/appStateSlice';
 import {
   resetAuth,
@@ -52,7 +51,6 @@ export default function PrimaryAppBar() {
   const user = useSelector(selectUserAccount);
   const accessToken = useSelector(selectAccessToken);
   const deviceID = useSelector(selectDeviceID);
-  const mobileSidebarOpen = useSelector(selectMobileSidebarOpen);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   // const [notificationAnchorEl, setNotificationAnchorEl] = useState<null | HTMLElement>();
@@ -223,7 +221,7 @@ export default function PrimaryAppBar() {
               },
             }}
             onClick={() => {
-              dispatch(setMobileSidebarOpen(!mobileSidebarOpen));
+              dispatch(openMobileSidebar());
             }}
           >
             <MenuSharp />

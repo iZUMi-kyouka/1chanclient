@@ -413,16 +413,22 @@ const ThreadCard = ({
           <ShareButton onCopyToClipboard={copyToClipboard} />
 
           <Box sx={{ flexGrow: 1 }} />
-          <ViewCountChip viewCount={thread.view_count} />
-          <Tooltip
-            title={
-              lastCommentDate ? `Last comment was on ${lastCommentDate}` : null
+          <RowFlexBox sx={{
+            [theme.breakpoints.down(375)]: {
+              display: 'none'
             }
-          >
-            <Box>
-              <CommentCountChip commentCount={thread.comment_count} />
-            </Box>
-          </Tooltip>
+          }}>
+            <ViewCountChip viewCount={thread.view_count} />
+            <Tooltip
+              title={
+                lastCommentDate ? `Last comment was on ${lastCommentDate}` : null
+              }
+            >
+              <Box>
+                <CommentCountChip commentCount={thread.comment_count} />
+              </Box>
+            </Tooltip>
+          </RowFlexBox>
         </CardActions>
 
         <ThreadDeleteDialog

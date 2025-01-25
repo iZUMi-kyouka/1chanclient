@@ -1,8 +1,9 @@
 import DeviceIdHandlerWrapper from '@/components/deviceIdHandlerWrapper';
 import AppBarWrapper from '@/components/layout/appBarWrapper';
+import Sidebar from '@/components/layout/sidebar';
 import LayoutClientWrapper from '@/components/layoutClientWrapper';
 import UserDataProviderWrapper from '@/components/user/userDataProviderWrapper';
-import { CssBaseline, Paper, Toolbar } from '@mui/material';
+import { Box, CssBaseline, Paper, Toolbar } from '@mui/material';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 import { ThemeProvider } from '@mui/material/styles';
 import { Roboto } from 'next/font/google';
@@ -65,9 +66,10 @@ export default function RootLayout({
                 elevation={0}
                 sx={{ minHeight: 'calc(100vh - 64px)', borderRadius: '0px' }}
               >
-                {/* <Box display='flex' flexGrow={1}> */}
-                {children}
-                {/* </Box> */}
+                <Box display='flex'>
+                  <Sidebar />
+                  {children}
+                </Box>
                 <LayoutClientWrapper />
               </Paper>
             </ThemeProvider>

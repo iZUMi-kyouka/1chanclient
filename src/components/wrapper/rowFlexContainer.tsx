@@ -1,13 +1,7 @@
 import { Box, useTheme } from '@mui/material';
-import { forwardRef, ReactNode } from 'react';
+import { forwardRef } from 'react';
 
-interface RowFlexBoxProps {
-  children: ReactNode;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any; // Allow forwarding of any additional props
-}
-
-const RowFlexBox = forwardRef<HTMLDivElement, RowFlexBoxProps>(
+const RowFlexBox = forwardRef<HTMLDivElement, React.ComponentProps<typeof Box>>(
   ({ children, ...props }, ref) => {
     const theme = useTheme();
 
