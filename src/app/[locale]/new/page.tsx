@@ -168,7 +168,7 @@ const Page = () => {
         let customTags: string[] = [];
         if (customTagsRef.current) {
           if (customTagsRef.current.value !== '') {
-            customTags = customTagsRef.current.value.split(' ');
+            customTags = customTagsRef.current.value.trim().split(' ');
           }
         }
 

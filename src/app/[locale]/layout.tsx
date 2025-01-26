@@ -1,7 +1,7 @@
-import DeviceIdHandlerWrapper from '@/components/deviceIdHandlerWrapper';
+import HandleDeviceID from '@/components/deviceIdHandler';
 import PrimaryAppBar from '@/components/layout/appBar';
 import Sidebar from '@/components/layout/sidebar';
-import LayoutClientWrapper from '@/components/layoutClientWrapper';
+import CopyPasteSnackbar from '@/components/snackbar/copiedToClipboardSnakbar';
 import FetchUserData from '@/components/user/userDataProvider';
 import { routing } from '@/i18n/routing';
 import { SupportedLanguages } from '@/store/appState/appStateSlice';
@@ -15,6 +15,7 @@ import { ReactNode } from 'react';
 import ReduxProvider from './store';
 import theme from './theme';
 
+// For cloud deployment:
 // export const BASE_API_URL = `https://onechan.xyz/api/v1`;
 // export const BASE_URL = `https://onechan.xyz`;
 
@@ -44,7 +45,7 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <AppRouterCacheProvider>
             <ThemeProvider theme={theme}>
-              <DeviceIdHandlerWrapper />
+              <HandleDeviceID />
               <FetchUserData locale={locale}/>
               <PrimaryAppBar />
               <Toolbar sx={{ height: '64px' }} />
@@ -56,7 +57,7 @@ export default async function RootLayout({
                   <Sidebar />
                   {children}
                 </Box>
-                <LayoutClientWrapper />
+                <CopyPasteSnackbar />
               </Paper>
             </ThemeProvider>
           </AppRouterCacheProvider>

@@ -11,7 +11,6 @@ import { generalFetch } from '@/utils/customFetch';
 import { makeQueriedThreadListURL } from '@/utils/makeUrl';
 import { splitCustomTags, splitTags } from '@/utils/tagsSplitter';
 import { Box, Container, Typography, useTheme } from '@mui/material';
-import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
@@ -20,7 +19,6 @@ import useSWRInfinite from 'swr/infinite';
 
 export default function Home() {
   const theme = useTheme();
-  const localeText = useTranslations('HomePage');
   const listParams = useSearchParams();
   const sortParam = listParams.get('sort_by');
   const sortDir = listParams.get('order');

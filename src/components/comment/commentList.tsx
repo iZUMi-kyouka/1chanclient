@@ -52,6 +52,7 @@ const CommentList = ({ threadID }: { threadID: number }) => {
 
   useEffect(() => {
     setSize(size + 1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
 
   const comments: Comment[] = [];
