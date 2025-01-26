@@ -1,6 +1,6 @@
 'use client';
 
-import { BASE_API_URL } from '@/app/layout';
+import { BASE_API_URL } from '@/app/[locale]/layout';
 import FullPageSpinner from '@/components/loading/fullPageLoading';
 import ThreadOpenView from '@/components/threadOpenView';
 import ColFlexBox from '@/components/wrapper/colFlexContainer';

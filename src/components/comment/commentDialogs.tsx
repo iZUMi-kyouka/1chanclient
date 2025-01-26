@@ -1,14 +1,14 @@
-import theme from '@/app/theme';
+import theme from '@/app/[locale]/theme';
 import Comment from '@/interfaces/comment';
 import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-  Typography,
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    TextField,
+    Typography,
 } from '@mui/material';
 import React, { forwardRef, RefObject } from 'react';
 import BareContainer from '../wrapper/bareContainer';

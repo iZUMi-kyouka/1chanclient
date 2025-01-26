@@ -1,18 +1,29 @@
 'use client';
 import {
+  LikedComments,
   LikedThreads,
   WrittenComments,
   WrittenThreads,
 } from '@/interfaces/user';
-import { selectDeviceID, updateAccessToken } from '@/store/auth/authSlice';
+import {
+  LocaleParams,
+  openSnackbarWithMessage,
+} from '@/store/appState/appStateSlice';
+import {
+  selectDeviceID,
+  updateAccessToken,
+  updateDeviceID,
+} from '@/store/auth/authSlice';
 import {
   selectUserAccount,
+  updateCommentLike,
   updateThreadLike,
   updateUser,
   updateWrittenComments,
   updateWrittenThreads,
 } from '@/store/user/userSlice';
 import { customFetch } from '@/utils/customFetch';
+import { withLocale } from '@/utils/makeUrl';
 import {
   LoginSharp,
   VisibilityOffSharp,
@@ -35,8 +46,9 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { v4 as uuidv4 } from 'uuid';
 import { BASE_API_URL } from '../layout';
 
 const classes = {
@@ -51,12 +63,13 @@ const classes = {
   },
 };
 
-const Page = () => {
+const Page = ({ params }: LocaleParams) => {
   const user = useSelector(selectUserAccount);
   const deviceID = useSelector(selectDeviceID);
   const theme = useTheme();
   const router = useRouter();
   const dispatch = useDispatch();
+  const locale = use(params).locale;
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -64,7 +77,7 @@ const Page = () => {
   const [usernameOK, setUsernameOK] = useState(true);
   const [passwordOK, setPasswordOK] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleUsernameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newUsername = e.target.value;
@@ -86,6 +99,11 @@ const Page = () => {
     setIsLoading(true);
 
     try {
+      if (deviceID === '') {
+        dispatch(updateDeviceID(uuidv4()));
+      }
+
+      // Send login info
       let response = await fetch(`${BASE_API_URL}/users/login`, {
         method: 'POST',
         headers: {
@@ -96,14 +114,23 @@ const Page = () => {
         credentials: 'include',
       });
 
+      // Handle login error
       if (!response.ok) {
-        throw new Error('Failed to login. Please check your credentials.');
+        const error = await response.json();
+        if (
+          response.status === 400 &&
+          error.description &&
+          error.description === 'missing device ID'
+        ) {
+          throw new Error('deviceID missing');
+        } else {
+          throw new Error('unhandled error');
+        }
       }
 
+      // Update local user state
       const data = await response.json();
-
       dispatch(updateAccessToken(data.account.access_token));
-
       dispatch(
         updateUser({
           account: {
@@ -114,58 +141,58 @@ const Page = () => {
         })
       );
 
-      // Get liked threads
-      try {
-        response = await customFetch(`${BASE_API_URL}/users/likes`, {
-          method: 'GET',
-        });
-
-        if (response.ok) {
-          const likes = (await response.json()) as LikedThreads;
-          dispatch(updateThreadLike(likes));
-        } else {
-          throw new Error('Failed to fetch liked threads.');
-        }
-
-        response = await customFetch(`${BASE_API_URL}/users/threads`, {
-          method: 'GET',
-        });
-
-        if (response.ok) {
-          const threads = (await response.json()) as WrittenThreads;
-          dispatch(updateWrittenThreads(threads));
-        } else {
-          throw new Error('Failed to fetch written threads.');
-        }
-
-        response = await customFetch(`${BASE_API_URL}/users/comments`, {
-          method: 'GET',
-        });
-
-        if (response.ok) {
-          const comments = (await response.json()) as WrittenComments;
-          dispatch(updateWrittenComments(comments));
-        } else {
-          throw new Error('Failed to fetch written threads.');
-        }
-      } catch (err) {
-        console.log(`error: ${err}`);
+      // Fetch other user information (likes, dislikes, comments, and thread owned)
+      response = await customFetch(`${BASE_API_URL}/users/likes`, {
+        method: 'GET',
+      });
+      if (response.ok) {
+        const jsonResponse = await response.json();
+        const threadLikes = jsonResponse.threads as LikedThreads;
+        const commentLikes = jsonResponse.comments as LikedComments;
+        dispatch(updateCommentLike(commentLikes));
+        dispatch(updateThreadLike(threadLikes));
+      } else {
+        throw new Error('Failed to fetch liked threads.');
       }
 
-      setErrorMsg(false);
-      console.log('Updated user data!');
+      response = await customFetch(`${BASE_API_URL}/users/threads`, {
+        method: 'GET',
+      });
+      if (response.ok) {
+        const threads = (await response.json()) as WrittenThreads;
+        dispatch(updateWrittenThreads(threads));
+      } else {
+        throw new Error('Failed to fetch written threads.');
+      }
+
+      response = await customFetch(`${BASE_API_URL}/users/comments`, {
+        method: 'GET',
+      });
+      if (response.ok) {
+        const comments = (await response.json()) as WrittenComments;
+        dispatch(updateWrittenComments(comments));
+      } else {
+        throw new Error('Failed to fetch written threads.');
+      }
+      
+      // Remove error message and redirect user to homepage
+      setErrorMsg('');
       router.push('/');
     } catch (err: unknown) {
-      console.log('error during login: ', (err as Error).message);
-      if (
-        (err as Error).message ===
-        'NetworkError when attempting to fetch resource.'
-      ) {
-        alert(
-          '1chan is currently unavailable or your internet connection may be unstable.'
+      // Make error message more user friendly
+      const error = err as Error;
+      if (error.message === 'NetworkError when attempting to fetch resource.') {
+        dispatch(
+          openSnackbarWithMessage(
+            '1chan is currently unavailable or your internet may be unstable.'
+          )
         );
+        setErrorMsg('Nework error.');
+      } else if (error.message === 'deviceID missing') {
+        setErrorMsg('Device ID has been reset. Please try again.');
+      } else {
+        setErrorMsg(`Username or password may be invalid.`);
       }
-      setErrorMsg(true);
     } finally {
       setIsLoading(false);
     }
@@ -261,7 +288,7 @@ const Page = () => {
                 color="error"
                 sx={{ marginTop: theme.spacing(1) }}
               >
-                Invalid username or password.
+                {errorMsg}
               </Typography>
             ) : (
               <div style={{ display: 'block', marginTop: theme.spacing(1) }}>
@@ -291,7 +318,10 @@ const Page = () => {
           <Container sx={{ marginTop: theme.spacing(3) }}></Container>
           <Typography variant="body2">
             Don&apos;t have an account?{' '}
-            <Link style={{ color: 'inherit' }} href="/register">
+            <Link
+              style={{ color: 'inherit' }}
+              href={withLocale(locale, '/register')}
+            >
               Register
             </Link>
           </Typography>

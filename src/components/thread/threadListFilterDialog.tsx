@@ -1,117 +1,164 @@
 import {
+  AdsClickSharp,
   ArrowDownwardSharp,
   ArrowUpwardSharp,
+  CalendarMonthSharp,
+  CommentSharp,
+  FilterListSharp,
   SortSharp,
+  ThumbDownSharp,
+  ThumbUpSharp,
 } from '@mui/icons-material';
 import {
-  Box,
   Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
+  CardContent,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
-  useTheme,
+  useTheme
 } from '@mui/material';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import React, { useState } from 'react';
-
-type SortState = {
-  criteria: string;
-  direction: string;
-};
+import { AnimatePresence, motion } from 'motion/react';
+import { useQueryState } from 'nuqs';
+import React, { ReactElement, useState } from 'react';
+import RefreshButton from '../button/refreshButton';
+import StandardCard from '../StandardCard';
+import ColFlexBox from '../wrapper/colFlexContainer';
+import RowFlexBox from '../wrapper/rowFlexContainer';
 
 const ThreadListFilterDropdown = ({
+  disabled,
   disableRelevance,
+  onRefresh,
 }: {
+  disabled?: boolean;
   disableRelevance?: boolean;
+  onRefresh?: () => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const theme = useTheme();
-  const router = useRouter();
-  const pathname = usePathname();
-  const params = useSearchParams();
 
-  const [sortState, setSortState] = useState<SortState>({
-    criteria: params.get('sort_by') || disableRelevance ? 'views' : 'relevance',
-    direction: params.get('order') || 'desc',
+  const [sortParam, setSortParam] = useQueryState('sort_by', {
+    defaultValue: disableRelevance ? 'views' : 'relevance',
+  });
+  const [orderParam, setOrderParam] = useQueryState('order', {
+    defaultValue: 'desc',
   });
 
-  const handleRefresh = () => {
-    const newParams: URLSearchParams = new URLSearchParams(params.toString());
-    newParams.set('sort_by', sortState.criteria);
-    newParams.set('order', sortState.direction);
-    router.push(`${pathname}?${newParams.toString()}`);
+  const sortParams: [[string, ReactElement]] = [
+    ['relevance', <FilterListSharp />],
+    ['views', <AdsClickSharp />],
+    ['date', <CalendarMonthSharp />],
+    ['likes', <ThumbUpSharp />],
+    ['dislikes', <ThumbDownSharp />],
+    ['comments', <CommentSharp />],
+  ];
+  const handleClose = () => {
     setIsOpen(false);
   };
 
-  const handleClose = () => setIsOpen(false);
-
   return (
     <>
-      <Button
-        variant="contained"
-        onClick={() => setIsOpen(true)}
-        startIcon={<SortSharp />}
+      <ColFlexBox
+        sx={{
+          alignItems: 'flex-start',
+          gap: 0,
+        }}
       >
-        Filters
-      </Button>
-      <Dialog fullWidth maxWidth="xs" open={isOpen} onClose={handleClose}>
-        <DialogTitle>Filters</DialogTitle>
-        <DialogContent>
-          <Box display="flex" gap={theme.spacing(4)} justifyContent={'center'}>
-            <Box display="flex" flexDirection="column" gap={theme.spacing(1)}>
-              <Typography>SORT BY</Typography>
-              <Divider></Divider>
-              <ToggleButtonGroup
-                exclusive
-                orientation="vertical"
-                value={sortState.criteria}
-                onChange={(e: React.MouseEvent<HTMLElement>, val: string) => {
-                  // Ensure val is valid before setting
-                  if (val) {
-                    setSortState((prev) => ({ ...prev, criteria: val }));
-                  }
-                }}
+        <RowFlexBox>
+          <FormControl
+            sx={{ m: 1, minWidth: 160 }}
+            size="small"
+            disabled={disabled}
+          >
+            <InputLabel id="sort-param-label">Sort By</InputLabel>
+            <Select
+              labelId="sort-param-label"
+              id="sort-param"
+              value={sortParam}
+              label="Sort By"
+              onChange={(e: SelectChangeEvent<string>) =>
+                setSortParam(e.target.value)
+              }
+            >
+              {sortParams.map((p, idx) => {
+                if (disableRelevance && idx === 0) return null;
+                return (
+                  <MenuItem key={idx} value={p[0]}>
+                    <RowFlexBox>
+                      {p[1]}
+                      {p[0][0].toUpperCase() + p[0].slice(1)}
+                    </RowFlexBox>
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+          <ToggleButtonGroup
+            disabled={disabled}
+            size="small"
+            exclusive
+            value={orderParam}
+            onChange={(_e: React.MouseEvent<HTMLElement>, val: string) => {
+              // Ensure val is valid before setting
+              if (val) {
+                setOrderParam(val);
+              }
+            }}
+          >
+            <ToggleButton value="desc">
+              <ArrowDownwardSharp />
+            </ToggleButton>
+            <ToggleButton value="asc">
+              <ArrowUpwardSharp />
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <Button
+            disableElevation
+            disabled={disabled}
+            variant="contained"
+            onClick={() => setIsOpen(!isOpen)}
+            startIcon={isOpen ? <ArrowUpwardSharp /> : <SortSharp />}
+          >
+            More Filters
+          </Button>
+          <RefreshButton disabled={disabled} onClick={onRefresh} />
+        </RowFlexBox>
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{
+                opacity: { duration: 0.2, ease: 'easeInOut' },
+                height: { duration: 0.2, ease: 'easeInOut' },
+              }}
+              style={{
+                overflow: 'hidden', // Prevent content overflow during animation
+                width: '100%',
+                display: 'flex', // Keeps consistent styling for the card
+              }}
+            >
+              <StandardCard
                 sx={{
-                  flexShrink: '0 !important',
+                  width: '100%',
+                  display: 'flex',
                 }}
               >
-                {disableRelevance ? null : (
-                  <ToggleButton value="relevance">Relevance</ToggleButton>
-                )}
-                <ToggleButton value="views">Views</ToggleButton>
-                <ToggleButton value="date">Date</ToggleButton>
-                <ToggleButton value="likes">Likes</ToggleButton>
-                <ToggleButton value="dislikes">Dislikes</ToggleButton>
-              </ToggleButtonGroup>
-              <ToggleButtonGroup
-                exclusive
-                value={sortState.direction}
-                onChange={(e: React.MouseEvent<HTMLElement>, val: string) => {
-                  // Ensure val is valid before setting
-                  if (val) {
-                    setSortState((prev) => ({ ...prev, direction: val }));
-                  }
-                }}
-              >
-                <ToggleButton value="desc">
-                  <ArrowDownwardSharp />
-                </ToggleButton>
-                <ToggleButton value="asc">
-                  <ArrowUpwardSharp />
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </Box>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleRefresh}>OK</Button>
-        </DialogActions>
-      </Dialog>
+                <CardContent>
+                  <Typography>Tags</Typography>
+                  <Typography>Custom Tags</Typography>
+                </CardContent>
+              </StandardCard>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </ColFlexBox>
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { HomeCategory, PostCategoryPlain } from '@/app/categories';
+import { HomeCategory, PostCategoryPlain } from '@/app/[locale]/categories';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
@@ -10,7 +10,11 @@ export interface AppState {
   mobileSiderbarOpen: boolean;
   alwaysShowTags: boolean;
   alwaysShowCustomTags: boolean;
+  locale: SupportedLanguages
 }
+
+export type SupportedLanguages = 'en' | 'ja';
+export type LocaleParams = {params: Promise<{locale: SupportedLanguages}>}
 
 const appstateInitialState: AppState = {
   theme: 'auto',
@@ -20,6 +24,7 @@ const appstateInitialState: AppState = {
   mobileSiderbarOpen: false,
   alwaysShowTags: false,
   alwaysShowCustomTags: false,
+  locale: 'en'
 };
 
 const appstateSlice = createSlice({
@@ -56,6 +61,9 @@ const appstateSlice = createSlice({
     setAlwaysShowCustomTags(state, action: PayloadAction<boolean>) {
       state.alwaysShowCustomTags = action.payload;
     },
+    setLocale(state, action: PayloadAction<SupportedLanguages>) {
+      state.locale = action.payload;
+    }
   },
 });
 
@@ -68,7 +76,8 @@ export const {
   setAlwaysShowTags,
   openSnackbarWithMessage,
   openMobileSidebar,
-  closeMobileSidebar
+  closeMobileSidebar,
+  setLocale
 } = appstateSlice.actions;
 export const selectCurrentHomePage = (state: RootState) =>
   state.appstate.currentHomePage;
@@ -82,4 +91,6 @@ export const selectAlwaysShowCustomTags = (state: RootState) =>
   state.appstate.alwaysShowCustomTags;
 export const selectSnackBarMessage = (state: RootState) =>
   state.appstate.snackBarMessage;
+export const selectLocale = (state: RootState) => 
+  state.appstate.locale;
 export default appstateSlice.reducer;

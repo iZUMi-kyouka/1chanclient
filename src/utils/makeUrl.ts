@@ -1,4 +1,5 @@
-import { BASE_API_URL, BASE_URL } from '@/app/layout';
+import { BASE_API_URL, BASE_URL } from '@/app/[locale]/layout';
+import { SupportedLanguages } from '@/store/appState/appStateSlice';
 
 export const makeProfilePictureURL = (filename: string): string => {
   return `${BASE_URL}/files/profile_pictures/${filename}`;
@@ -30,3 +31,11 @@ export const makeQueriedThreadListURL = ({
   const searchQuery = q !== undefined ? `&q=${q}` : '';
   return `${BASE_API_URL}${apiPath}?${sortDirURL}${sortParamURL}${pageIndexURL}${tagURL}${customTagURL}${searchQuery}`;
 };
+
+/**
+ * Outputs a the given URL 'prefixed' with the locale. i.e. if locale is 'ja' and url is '/login' 
+ * then outputs '/ja/login' to improve the routing mechanism
+ */
+export const withLocale = (locale: SupportedLanguages, url: string): string => {
+  return `/${locale}/${url}`;
+}

@@ -1,8 +1,8 @@
 'use client';
 
-import { BASE_API_URL } from '@/app/layout';
+import { BASE_API_URL } from '@/app/[locale]/layout';
 import { UserLikes, WrittenComments, WrittenThreads } from '@/interfaces/user';
-import { openSnackbarWithMessage } from '@/store/appState/appStateSlice';
+import { openSnackbarWithMessage, setLocale, SupportedLanguages } from '@/store/appState/appStateSlice';
 import { updateAccessToken } from '@/store/auth/authSlice';
 import { AppDispatch } from '@/store/store';
 import {
@@ -16,10 +16,12 @@ import { customFetch } from '@/utils/customFetch';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 
-export default function FetchUserData() {
+export default function FetchUserData({ locale }: { locale: SupportedLanguages}) {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
+    dispatch(setLocale(locale));
+
     const fetchFunction = async () => {
       try {
         let response = await fetch(`${BASE_API_URL}/users/refresh_new`, {

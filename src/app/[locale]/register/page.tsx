@@ -1,5 +1,6 @@
 'use client';
-import { selectDeviceID, updateAccessToken } from '@/store/auth/authSlice';
+import { LocaleParams } from '@/store/appState/appStateSlice';
+import { selectDeviceID, updateAccessToken, updateDeviceID } from '@/store/auth/authSlice';
 import { updateUser } from '@/store/user/userSlice';
 import {
   LoginSharp,
@@ -22,8 +23,9 @@ import {
 } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { v4 as uuidv4 } from 'uuid';
 import { BASE_API_URL } from '../layout';
 import theme from '../theme';
 
@@ -39,10 +41,11 @@ import theme from '../theme';
 // 	}
 // }
 
-const Page = () => {
-  const deviceID = useSelector(selectDeviceID);
+const Page = ({ params }: LocaleParams) => {
+  let deviceID = useSelector(selectDeviceID);
   const router = useRouter();
   const dispatch = useDispatch();
+  const locale = use(params).locale;
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -85,6 +88,13 @@ const Page = () => {
     setIsLoading(true);
 
     try {
+      let newDeviceID: string;
+      if (deviceID === '') {
+        newDeviceID = uuidv4();
+        dispatch(updateDeviceID(newDeviceID));
+        deviceID = newDeviceID;
+      }
+      
       const response = await fetch(`${BASE_API_URL}/users/register`, {
         method: 'POST',
         headers: {
@@ -96,8 +106,11 @@ const Page = () => {
       });
 
       if (!response.ok) {
+        const error = await response.json();
         if (response.status === 409) {
           throw new Error('Username already exists.');
+        } else if (response.status === 400 && error.description && error.description === "missing device ID") {
+          throw new Error('Device ID has been reset. Please try again.')
         } else {
           throw new Error('Failed to register. Please try again soon.');
         }
@@ -309,7 +322,7 @@ const Page = () => {
           <Container sx={{ marginTop: theme.spacing(3) }}></Container>
           <Typography variant="body2">
             Already have an account?{' '}
-            <Link style={{ color: 'inherit' }} href="/login">
+            <Link style={{ color: 'inherit' }} href={`/${locale}/login`}>
               Login
             </Link>
           </Typography>

@@ -126,7 +126,7 @@ const TagsPicker = ({
                 <MenuItem key={tag.id} value={tag.id}>
                   <RowFlexBox>
                     {postCategories[idx].icon}
-                    {tag.tag}
+                    {selectedTags.includes(tag) ? <b>{tag.tag}</b> : <>{tag.tag}</>}
                   </RowFlexBox>
                 </MenuItem>
               ))

@@ -21,7 +21,7 @@ const InfiniteScrollLoading = forwardRef<
   } else {
     return (
       <div ref={ref}>
-        <WrappedLoading {...wrappedLoadingProps} />
+        <WrappedLoading disableShrink {...wrappedLoadingProps} />
       </div>
     );
   }

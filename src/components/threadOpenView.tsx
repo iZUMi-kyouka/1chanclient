@@ -1,4 +1,4 @@
-import { BASE_API_URL } from '@/app/layout';
+import { BASE_API_URL } from '@/app/[locale]/layout';
 import { ThreadViewResponse } from '@/interfaces/thread';
 import { selectAccessToken } from '@/store/auth/authSlice';
 import { addToWrittenComments } from '@/store/user/userSlice';
