@@ -82,49 +82,14 @@ export async function customFetch(
 
             const data: { access_token: string } = await refreshResponse.json();
             store.dispatch(updateAccessToken(data.access_token));
-            console.log(`Obtained new access token: ${data.access_token}`);
             return data.access_token;
           });
 
           await refreshAccessTokenPromise;
 
-          // Refresh user metadata (likes, dislikes, owned threads and comments)
-          // let response = await customFetch(`${BASE_API_URL}/users/likes`, {
-          //   method: 'GET',
-          // });
-
-          // if (response.ok) {
-          //   const likes = (await response.json()) as UserLikes;
-          //   store.dispatch(updateThreadLike(likes.threads));
-          //   store.dispatch(updateCommentLike(likes.comments));
-          // } else {
-          //   throw new Error('failed to fetch liked threads');
-          // }
-
-          // response = await customFetch(`${BASE_API_URL}/users/threads`, {
-          //   method: 'GET',
-          // });
-
-          // if (response.ok) {
-          //   const threads = (await response.json()) as WrittenThreads;
-          //   store.dispatch(updateWrittenThreads(threads));
-          // } else {
-          //   throw new Error('failed to fetch written threads.');
-          // }
-
-          // response = await customFetch(`${BASE_API_URL}/users/comments`, {
-          //   method: 'GET',
-          // });
-          // if (response.ok) {
-          //   const comments = (await response.json()) as WrittenComments;
-          //   store.dispatch(updateWrittenComments(comments));
-          // } else {
-          //   throw new Error('failed to fetch written comments.');
-          // }
-        } catch (err) {
-          console.log(
-            `an error occurred in making auth-required request: ${err}`
-          );
+      
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (_err) {
         } finally {
           // Reset flag variables
           store.dispatch(setIsRefreshing(false));
@@ -136,9 +101,6 @@ export async function customFetch(
       await refreshAccessTokenPromise;
 
       // Retry the request that failed with 401
-      console.log(
-        `retrying auth-protected route using new access token: ${store.getState().auth.accessToken}`
-      );
       const newAccessToken = store.getState().auth.accessToken;
       return fetch(url, {
         ...options,

@@ -16,10 +16,10 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import CommentCard from './comment/commentCard';
-import CommentCardEdit from './comment/commentCardEdit';
-import ThreadCard from './thread/threadCard';
-import ColFlexBox from './wrapper/colFlexContainer';
+import CommentCardEdit from '../comment/commentCardEdit';
+import CommentList from '../comment/commentList';
+import ColFlexBox from '../wrapper/colFlexContainer';
+import ThreadCard from './threadCard';
 
 const ThreadOpenView = ({
   threadViewResponse,
@@ -162,30 +162,7 @@ const ThreadOpenView = ({
           <Chip label="Comments"></Chip>
         </Divider>
       </Container>
-      {threadViewResponse.comments && threadViewResponse.comments.response ? (
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems={'center'}
-          gap={theme.spacing(1)}
-          width={'100%'}
-        >
-          {threadViewResponse.comments.response.map((comment) => {
-            return <CommentCard key={comment.id} comment={comment} />;
-          })}
-        </Box>
-      ) : (
-        <Container
-          sx={{
-            flexGrow: 1,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Typography>No comments yet.</Typography>
-        </Container>
-      )}
+      <CommentList threadID={threadViewResponse.thread.id} />
     </Container>
   );
 };

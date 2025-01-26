@@ -1,0 +1,79 @@
+{
+  "HomePage": {
+    "title": "Hello world!",
+    "about": "Go to the about page"
+  },
+  "ThreadListFilter": {
+    "tags": "タグ",
+    "tagsinfo": "選択したタグが少なくとも 1 つ含まれるすべてのスレッドをフィルターします。",
+    "customtagsinfo": "要求されたカスタム タグが少なくとも 1 つ含まれるすべてのスレッドをフィルターします。",
+    "customtags": "カスタムタグ (カンマ区切り)",
+    "sortby": "選別",
+    "sortby_views": "ビュー",
+    "sortby_likes": "ライク",
+    "sortby_dislikes": "嫌い",
+    "sortby_date": "日付",
+    "morefiters": "もっと"
+  },
+  "Settings": {
+    "settings": "設定",
+    "colorscheme": "配色",
+    "alwaysshowtags": "タグを常に表示する",
+    "alwaysshowcustomtags": "タグを常に表示する",
+    "language": "言語",
+    "about": "1chan (ワンチャン) は、iZUMi-kyouka が開発した NextJS ベースのフォーラム アプリです。"
+  },
+  "Sidebar": {
+    "explore": "探検する"
+  },
+  "AppBar": {
+    "newpost": "書く",
+    "searchbar": "1chanで検索",
+    "logout": "ログアウト",
+    "login": "ログイン",
+    "profile": "プロフィール"
+  },
+  "Search": {
+    "searchresult": "検索結果"
+  },
+  "Threads": {
+    "nonefound": "スレッドが見つかりません"
+  },
+  "ThreadOpen": {
+    "addcomment": "コメントを追加",
+    "comment": "コメント",
+    "nocomment": "コメントが見つかりません"
+  },
+  "NewPost": {
+    "postinfo": "メタデータ",
+    "content": "コンテンツ",
+    "post": "ポスト",
+    "title": "表題",
+    "tags": "タグ",
+    "customtags": "カスタムタグ",
+    "cusomtagsinfo": "カスタム タグは大文字と小文字を区別せず、スペースで区切られます。複数の単語はアンダースコアで結合されます (例: 'ice_skating japan')。"
+  },
+  "ThreadCard": {
+    "report": "報告",
+    "edit": "編集",
+    "delete": "消去"
+  },
+  "CommentCard": {
+    "report": "報告",
+    "edit": "編集",
+    "delete": "消去"
+  },
+  "Profile": {
+    "myaccount": "私のアカウント",
+    "someonesacc": "私のアカウント",
+    "biodata": "生体データ",
+    "email": "電子メール",
+    "editaccount": "編集する",
+    "account": "アカウント",
+    "profile": "プロフィール",
+    "currentpass": "現在のパスワード",
+    "newpass": "新しいパスワード",
+    "update": "パスワードを更新する",
+    "invalid": "ユーザー名またはパスワードが無効です"
+  }
+}

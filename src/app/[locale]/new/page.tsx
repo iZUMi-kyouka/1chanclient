@@ -58,7 +58,6 @@ const TagsPicker = ({
       newTags.includes(tag.id)
     );
     setTags(newSelectedTags);
-    // console.log(`Tag changed: ${newTags}`);
   };
 
   if (isLoading) return <CircularProgress />;

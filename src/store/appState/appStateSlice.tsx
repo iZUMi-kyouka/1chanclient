@@ -46,8 +46,8 @@ const appstateSlice = createSlice({
       state.snackBarMessage = action.payload;
       state.copyPasteSnackbarOpen = true;
     },
-    setMobileSidebarOpen(state, action: PayloadAction<boolean>) {
-      state.mobileSiderbarOpen = action.payload;
+    toggleMobileSidebar(state) {
+      state.mobileSiderbarOpen = !state.mobileSiderbarOpen;
     },
     openMobileSidebar(state) {
       state.mobileSiderbarOpen = true;
@@ -71,7 +71,7 @@ export const {
   updateCurrentHomePage,
   openCopyPasteSnackbar,
   closeCopyPasteSnackbar,
-  setMobileSidebarOpen,
+  toggleMobileSidebar,
   setAlwaysShowCustomTags,
   setAlwaysShowTags,
   openSnackbarWithMessage,

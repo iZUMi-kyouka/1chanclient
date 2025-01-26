@@ -1,7 +1,7 @@
 'use client';
 
-import FullPageSpinner from '@/components/loading/fullPageLoading';
 import InfiniteScrollLoading from '@/components/loading/infiniteScrollLoading';
+import WrappedLoading from '@/components/loading/wrappedLoading';
 import ThreadList, { ThreadListResponse } from '@/components/thread/threadList';
 import ThreadListFilterDropdown from '@/components/thread/threadListFilterDialog';
 import RowFlexBox from '@/components/wrapper/rowFlexContainer';
@@ -9,6 +9,7 @@ import PaginatedResponse from '@/interfaces/paginatedResponse';
 import { Thread } from '@/interfaces/thread';
 import { generalFetch } from '@/utils/customFetch';
 import { makeQueriedThreadListURL } from '@/utils/makeUrl';
+import { splitCustomTags, splitTags } from '@/utils/tagsSplitter';
 import { Box, Container, Typography, useTheme } from '@mui/material';
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
@@ -19,10 +20,12 @@ import useSWRInfinite from 'swr/infinite';
 
 export default function Home() {
   const theme = useTheme();
-  const t = useTranslations('HomePage');
+  const localeText = useTranslations('HomePage');
   const listParams = useSearchParams();
   const sortParam = listParams.get('sort_by');
   const sortDir = listParams.get('order');
+  const tags = listParams.get('tags');
+  const customTags = listParams.get('custom_tags');
 
   const getKey = (
     pageIndex: number,
@@ -38,6 +41,8 @@ export default function Home() {
       apiPath: '/threads/search',
       sortDir: sortDir || undefined,
       sortParam: sortParam || undefined,
+      customTags: customTags !==  null ? splitCustomTags(customTags) : undefined,
+      tags: tags !== null ? splitTags(tags) : undefined,
       pageIndex: pageIndex + 1,
     });
   };
@@ -55,6 +60,7 @@ export default function Home() {
 
   useEffect(() => {
     setSize(size + 1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
 
   return (
@@ -93,8 +99,6 @@ export default function Home() {
                     <Box display={'flex'} gap={theme.spacing(1)} flexGrow={1} alignItems={'center'}>
                       <ThreadListFilterDropdown disabled={isLoading} disableRelevance onRefresh={handleRefresh} />
                     </Box>
-                  {/* <Typography>{t('title')}</Typography> */}
-
                   {error && (
                     <RowFlexBox>
                       <Typography>
@@ -112,7 +116,7 @@ export default function Home() {
                       />
                     </>
                   ) : (
-                    isLoading && <FullPageSpinner />
+                    isLoading && <WrappedLoading />
                   )}
                 </Box>
               );

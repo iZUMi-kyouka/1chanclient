@@ -2,8 +2,8 @@
 
 import { BASE_API_URL } from '@/app/[locale]/layout';
 import {
-  openMobileSidebar,
-  SupportedLanguages
+  SupportedLanguages,
+  toggleMobileSidebar
 } from '@/store/appState/appStateSlice';
 import {
   resetAuth,
@@ -17,8 +17,7 @@ import {
   CreateSharp,
   LoginSharp,
   MenuSharp,
-  NotificationsSharp,
-  SearchSharp,
+  SearchSharp
 } from '@mui/icons-material';
 import {
   AppBar,
@@ -116,15 +115,13 @@ export default function PrimaryAppBar() {
       });
 
       if (response.ok) {
-        console.log('Logout success.');
         setLogoutSnackbarState(true);
         dispatch(resetUser());
         dispatch(resetAuth());
       } else {
-        console.log('Logout failed.');
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      console.log(`Error occured: ${err}`);
     } finally {
       router.push('/');
       setAnchorEl(null);
@@ -217,7 +214,6 @@ export default function PrimaryAppBar() {
             size="large"
             edge="start"
             color="inherit"
-            aria-label="open drawer"
             sx={{
               mr: 1,
               [theme.breakpoints.up('md')]: {
@@ -225,7 +221,7 @@ export default function PrimaryAppBar() {
               },
             }}
             onClick={() => {
-              dispatch(openMobileSidebar());
+              dispatch(toggleMobileSidebar());
             }}
           >
             <MenuSharp />
@@ -307,9 +303,6 @@ export default function PrimaryAppBar() {
               <></>
             )}
 
-            <IconButton size="large" color="inherit">
-              <NotificationsSharp />
-            </IconButton>
             <ColorSchemeSwitcher />
           </Box>
           <Box>

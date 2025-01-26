@@ -21,7 +21,6 @@ const HandleDeviceID = () => {
     }
 
     dispatch(updateDeviceID(deviceID));
-    console.log(`deviceID: ${deviceID}`);
   });
 
   return <></>;

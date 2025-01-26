@@ -8,7 +8,7 @@ export function splitTags(tags: string): number[] {
 }
 
 export function splitCustomTags(tags: string): string[] {
-  const tagsArray = tags.split(',');
+  const tagsArray = tags.split(',').map(customTag => customTag.trim().toLowerCase());
   if (tagsArray.length === 1 && tagsArray[0] === '') {
     return [];
   }

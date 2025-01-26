@@ -139,10 +139,8 @@ const Page = ({ params }: LocaleParams) => {
           },
         })
       );
-      console.log('Updated user data!');
       router.push('/');
     } catch (err: unknown) {
-      console.log('error during login: ', (err as Error).message);
       setError((err as Error).message);
     } finally {
       setIsLoading(false);

@@ -105,8 +105,8 @@ const Profile = ({ params }: { params: Promise<Params> }) => {
       } else {
         throw new Error('failed to update profile picture');
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      console.log(err);
     }
   };
 
@@ -153,7 +153,6 @@ const Profile = ({ params }: { params: Promise<Params> }) => {
 
   useEffect(() => {
     if (data) {
-      console.log(data);
       setProfile(data);
     }
   }, [data]);

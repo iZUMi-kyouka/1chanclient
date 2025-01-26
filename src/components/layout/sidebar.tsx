@@ -37,14 +37,17 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
   Switch,
   Toolbar,
   Typography,
-  useTheme,
+  useTheme
 } from '@mui/material';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ComponentProps, forwardRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ColorSchemeSwitcher from '../button/colorSchemeSwitcherButton';
@@ -59,6 +62,8 @@ const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(
     const isAlwaysShowTags = useSelector(selectAlwaysShowTags);
     const isAlwaysShowCustomTags = useSelector(selectAlwaysShowCustomTags);
 
+    const localeText = useTranslations("Sidebar");
+    const currentURL = usePathname();
     const locale = useLocale() as SupportedLanguages;
     const currentHomePage = useSelector(selectCurrentHomePage);
     const mobileOpen = useSelector(selectMobileSidebarOpen);
@@ -280,12 +285,43 @@ const Sidebar = forwardRef<HTMLDivElement, ComponentProps<typeof Box>>(
                   onChange={handleSwitches('alwaysShowCustomTags')}
                 />
               </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Typography>Language</Typography>
+                <Box sx={{ flexGrow: 1 }} />
+                <Select
+                  size="small"
+                  value={locale}
+                  id="lang-selector"
+                  onChange={(e: SelectChangeEvent<string>) => {
+                    if (e.target.value) {
+                      router.replace(
+                        `/${e.target.value}/${currentURL.substring(4)}`
+                      );
+                    }
+                  }}
+                >
+                  <MenuItem value={'en'}>English</MenuItem>
+                  <MenuItem value={'ja'}>日本語</MenuItem>
+                </Select>
+              </Box>
+              <Typography
+                sx={{
+                  mt: 3,
+                }}
+                variant="body2"
+              >
+                1chan (onechan) is a NextJS-powered forum app developed by iZUMi-kyouka
+              </Typography>
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => {
-              setSettingsOpen(false);
-            }}>Close</Button>
+            <Button
+              onClick={() => {
+                setSettingsOpen(false);
+              }}
+            >
+              Close
+            </Button>
           </DialogActions>
         </Dialog>
       </Box>

@@ -2,6 +2,7 @@
 
 import { BASE_API_URL } from '@/app/[locale]/layout';
 import Comment from '@/interfaces/comment';
+import PaginatedResponse from '@/interfaces/paginatedResponse';
 import { SupportedLanguages } from '@/store/appState/appStateSlice';
 import { selectAccessToken } from '@/store/auth/authSlice';
 import {
@@ -32,17 +33,20 @@ import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { SWRInfiniteKeyedMutator } from 'swr/infinite';
 import LikeDislikeButton from '../button/likeDislikeButton';
 import StandardCard from '../StandardCard';
 import UserAvatar from '../user/userAvatar';
 import { CommentDeleteDialog, CommentReportDialog } from './commentDialogs';
 
 const CommentCard = ({
-  width,
   comment,
+  width,
+  mutateHook,
 }: {
-  width?: string;
+  mutateHook?: SWRInfiniteKeyedMutator<PaginatedResponse<Comment>[]>;
   comment: Comment;
+  width?: string;
 }) => {
   const theme = useTheme();
   const dispatch = useDispatch();
@@ -106,7 +110,7 @@ const CommentCard = ({
       if (response.ok) {
         const reportID = (await response.json()).report_id;
         alert(
-          `Thread ${comment.id} successfully reported. Your report ID is ${reportID}`
+          `Comment (ID: ${comment.id}) successfully reported. Your report ID is ${reportID}`
         );
         setReportDialogOpen(false);
         setReportAnchorEl(null);
@@ -126,6 +130,42 @@ const CommentCard = ({
     } else {
       handleLikeDislike(1);
     }
+
+    if (mutateHook) {
+      mutateHook((data) => data, {
+        optimisticData: (data) => {
+          const commentListArr = data as PaginatedResponse<Comment>[];
+          const newCommentList = commentListArr.map((commentList) => {
+            if (commentList.response) {
+              const newResponse = commentList.response.map((curComment) => {
+                if (curComment.id === comment.id) {
+                  const newComment: Comment = {
+                    ...curComment,
+                    like_count:
+                      (!isDisliked && !isLiked) || isDisliked
+                        ? curComment.like_count + 1
+                        : curComment.like_count - 1,
+                    dislike_count: isDisliked
+                      ? curComment.dislike_count - 1
+                      : curComment.dislike_count,
+                  };
+                  return newComment;
+                } else {
+                  return curComment;
+                }
+              });
+
+              return { ...commentList, response: newResponse };
+            } else {
+              return commentList;
+            }
+          });
+          return newCommentList;
+        },
+        revalidate: false,
+        populateCache: false,
+      });
+    }
   };
 
   const handleDislikeClick = () => {
@@ -135,6 +175,42 @@ const CommentCard = ({
       handleLikeDislike(0, true);
     } else {
       handleLikeDislike(0);
+    }
+
+    if (mutateHook) {
+      mutateHook((data) => data, {
+        optimisticData: (data) => {
+          const commentListArr = data as PaginatedResponse<Comment>[];
+          const newCommentList = commentListArr.map((commentList) => {
+            if (commentList.response) {
+              const newResponse = commentList.response.map((curComment) => {
+                if (curComment.id === comment.id) {
+                  const newComment: Comment = {
+                    ...curComment,
+                    dislike_count:
+                      (!isDisliked && !isLiked) || isLiked
+                        ? curComment.dislike_count + 1
+                        : curComment.dislike_count - 1,
+                    like_count: isLiked
+                      ? curComment.like_count - 1
+                      : curComment.like_count,
+                  };
+                  return newComment;
+                } else {
+                  return curComment;
+                }
+              });
+
+              return { ...commentList, response: newResponse };
+            } else {
+              return commentList;
+            }
+          });
+          return newCommentList;
+        },
+        revalidate: false,
+        populateCache: false,
+      });
     }
   };
 
@@ -174,7 +250,6 @@ const CommentCard = ({
       });
 
       if (response.ok) {
-        console.log('response ok');
         if (remove) {
           if (likeDislike === 1) {
             setLikeCount(likeCount - 1);
@@ -198,8 +273,8 @@ const CommentCard = ({
           }
         }
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      console.log(`error: ${err}`);
     }
   };
 

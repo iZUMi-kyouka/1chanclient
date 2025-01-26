@@ -96,7 +96,6 @@ export default function FetchUserData({ locale }: { locale: SupportedLanguages})
           );
         }
 
-        console.log('error during login: ', err);
       }
     };
 

@@ -276,26 +276,12 @@ const ThreadCard = ({
       });
 
       if (response.ok) {
-        console.log('response ok');
         if (remove) {
-          // if (likeDislike === 1) {
-          //   setLikeCount(likeCount - 1);
-          // } else {
-          //   setDislikeCount(dislikeCount - 1);
-          // }
           dispatch(removeFromThreadLikeDislike(thread.id));
         } else {
           if (likeDislike === 1) {
-            // setLikeCount(likeCount + 1);
-            // if (isDisliked) {
-            //   setDislikeCount(dislikeCount - 1);
-            // }
             dispatch(addToThreadLike(thread.id));
           } else {
-            // setDislikeCount(dislikeCount + 1);
-            // if (isLiked) {
-            //   setLikeCount(likeCount - 1);
-            // }
             dispatch(addToThreadDislike(thread.id));
           }
         }

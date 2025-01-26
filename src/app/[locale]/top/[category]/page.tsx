@@ -1,9 +1,8 @@
 'use client';
 
 import { postCategoriesDict } from '@/app/[locale]/categories';
-import RefreshButton from '@/components/button/refreshButton';
-import FullPageSpinner from '@/components/loading/fullPageLoading';
 import InfiniteScrollLoading from '@/components/loading/infiniteScrollLoading';
+import WrappedLoading from '@/components/loading/wrappedLoading';
 import ThreadList, { ThreadListResponse } from '@/components/thread/threadList';
 import ThreadListFilterDropdown from '@/components/thread/threadListFilterDialog';
 import ColFlexBox from '@/components/wrapper/colFlexContainer';
@@ -27,7 +26,6 @@ const Page = ({ params }: { params: Promise<Params> }) => {
 
   let categoryId: number | undefined;
   const categoryIdStr = use(params).category;
-  console.log('category id is ' + categoryIdStr);
 
   if (categoryIdStr !== undefined && typeof categoryIdStr === 'string') {
     categoryId = parseInt(categoryIdStr);
@@ -70,79 +68,92 @@ const Page = ({ params }: { params: Promise<Params> }) => {
     );
   }
 
+  const handleRefresh = () => mutate(undefined);
+  const threads: ThreadListResponse[] = [];
+  data?.forEach((threadViewResponse) => threads.push(threadViewResponse));
+
   return (
     <>
-      {(() => {
-        if (isLoading) {
-          return <FullPageSpinner />;
-        }
+      {error && (
+        <ColFlexBox>
+          <title>{`1chan | Thread`}</title>
+          <Typography>Failed to fetch the list of threads.</Typography>
+          <Typography>Please refresh the page.</Typography>
+        </ColFlexBox>
+      )}
 
-        if (error) {
-          return (
-            <ColFlexBox>
-              <title>{`1chan | Thread`}</title>
-              <Typography>Failed to fetch the list of threads.</Typography>
-              <Typography>Please refresh the page.</Typography>
-            </ColFlexBox>
-          );
-        }
-
-        if (data) {
-          const threads: ThreadListResponse[] = [];
-          data.forEach((threadViewResponse) =>
-            threads.push(threadViewResponse)
-          );
-
-          return (
+      <Box
+        display={'flex'}
+        flexDirection={'column'}
+        alignItems={'center'}
+        gap={theme.spacing(2)}
+        width={'925px'}
+        paddingTop={theme.spacing(2)}
+        
+        sx={{
+          [theme.breakpoints.down('lg')]: {
+            width: '100%',
+          },
+        }}
+      >
+        <Container
+          sx={{
+            margin: '0 !important',
+            padding: '0 !important',
+            width: '100%',
+          }}
+        >
+          <RowFlexBox
+            sx={{
+              pt: theme.spacing(2),
+              pb: theme.spacing(2),
+              gap: theme.spacing(3),
+            }}
+          >
             <Box
-              display="flex"
-              flexDirection="column"
-              gap={theme.spacing(2)}
-              flexGrow={1}
+              sx={{
+                '& .MuiSvgIcon-root': {
+                  width: '75px',
+                  height: '75px',
+                },
+              }}
             >
-              <title>{`1chan | Threads in ${postCategoriesDict[categoryId].displayName}`}</title>
-              <Container
-                sx={{ margin: '0 !important', padding: '0 !important' }}
-              >
-                <RowFlexBox
-                  sx={{
-                    pt: theme.spacing(2),
-                    pb: theme.spacing(2),
-                    gap: theme.spacing(3),
-                  }}
-                >
-                  <Box
-                    sx={{
-                      '& .MuiSvgIcon-root': {
-                        width: '75px',
-                        height: '75px',
-                      },
-                    }}
-                  >
-                    {postCategoriesDict[categoryId || 0].icon}
-                  </Box>
-                  <Typography variant="h3">
-                    {postCategoriesDict[categoryId || 0].displayName}
-                  </Typography>
-                </RowFlexBox>
-                {threads.length > 0 && threads[0].response ? (
-                  <Box display={'flex'} gap={theme.spacing(1)}>
-                    <ThreadListFilterDropdown disableRelevance={true} />
-                    <RefreshButton onClick={() => mutate(undefined)} />
-                  </Box>
-                ) : (
-                  <></>
-                )}
-              </Container>
-              <ThreadList threads={threads} />
-              <InfiniteScrollLoading
-                ref={ref}
-                pagination={data[data.length - 1].pagination}
-              />
+              {postCategoriesDict[categoryId || 0].icon}
             </Box>
-          );
-        }
-      })()}
+            <Typography variant="h3">
+              {postCategoriesDict[categoryId || 0].displayName}
+            </Typography>
+          </RowFlexBox>
+        </Container>
+
+        <Box
+          display={'flex'}
+          gap={theme.spacing(1)}
+          flexGrow={1}
+          alignItems={'center'}
+          width={'100%'}
+        >
+          <ThreadListFilterDropdown
+            disableTagsFilter
+            disabled={isLoading || (threads.length === 0 && threads[0].response === null)}
+            disableRelevance
+            onRefresh={handleRefresh}
+          />
+        </Box>
+
+        {data ? (
+          <>
+            <title>{`1chan | Threads in ${postCategoriesDict[categoryId].displayName}`}</title>
+            <ThreadList mutateHook={mutate} threads={threads} />
+            <InfiniteScrollLoading
+              ref={ref}
+              pagination={data[data.length - 1].pagination}
+            />
+          </>
+        ) : (
+          isLoading && <WrappedLoading />
+        )}
+      </Box>
     </>
   );
 };

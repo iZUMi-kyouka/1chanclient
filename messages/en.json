@@ -1,6 +1,78 @@
 {
   "HomePage": {
-    "title": "Hello world!",
-    "about": "Go to the about page"
+    "title": "Hello world!"
+  },
+  "ThreadListFilter": {
+    "tags": "Tags",
+    "tagsinfo": "Filter all threads that contain at least one selected tag.",
+    "customtagsinfo": "Filter all threads that contain at least one requested custom tag.",
+    "customtags": "Custom Tags (comma-separated)",
+    "sortby": "Sort By",
+    "sortby_views": "Views",
+    "sortby_likes": "Likes",
+    "sortby_dislikes": "Dislikes",
+    "sortby_date": "Date",
+    "morefiters": "More Filters"
+  },
+  "Settings": {
+    "settings": "Settings",
+    "colorscheme": "Color scheme",
+    "alwaysshowtags": "Always show custom tags",
+    "alwaysshowcustomtags": "Alwyas show custom tags",
+    "language": "Language",
+    "about": "                1chan (onechan) is a NextJS-powered forum app developed by iZUMi-kyouka"
+  },
+  "Sidebar": {
+    "explore": "Explore"
+  },
+  "AppBar": {
+    "newpost": "New Post",
+    "searchbar": "Search 1chan...",
+    "logout": "Logout",
+    "login": "Login",
+    "profile": "Profile"
+  },
+  "Search": {
+    "searchresult": "Search Result"
+  },
+  "Threads": {
+    "nonefound": "No threads are found."
+  },
+  "ThreadOpen": {
+    "addcomment": "Add a Comment",
+    "comment": "Comments",
+    "nocomment": "No comments are found."
+  },
+  "NewPost": {
+    "postinfo": "Post Information",
+    "content": "Post Content",
+    "post": "Post",
+    "title": "Title",
+    "tags": "Tags",
+    "customtags": "Custom Tags",
+    "cusomtagsinfo": "カスタム タグは大文字と小文字を区別せず、スペースで区切られます。複数の単語はアンダースコアで結合されます (例: 'ice_skating japan')。"
+  },
+  "ThreadCard": {
+    "report": "報告",
+    "edit": "編集",
+    "delete": "消去"
+  },
+  "CommentCard": {
+    "report": "報告",
+    "edit": "編集",
+    "delete": "消去"
+  },
+  "Profile": {
+    "myaccount": "私のアカウント",
+    "someonesacc": "私のアカウント",
+    "biodata": "生体データ",
+    "email": "電子メール",
+    "editaccount": "編集する",
+    "account": "アカウント",
+    "profile": "プロフィール",
+    "currentpass": "現在のパスワード",
+    "newpass": "新しいパスワード",
+    "update": "パスワードを更新する",
+    "invalid": "ユーザー名またはパスワードが無効です"
   }
 }

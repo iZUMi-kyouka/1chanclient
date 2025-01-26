@@ -15,27 +15,11 @@ import { ReactNode } from 'react';
 import ReduxProvider from './store';
 import theme from './theme';
 
-// export const metadata = metadataZ;
-// export const BASE_API_URL =
-//   process.env.HTTPS_ENABLED === 'true'
-//     ? process.env.NODE_ENV === 'development'
-//       ? 'https://localhost:8080/api/v1'
-//       : 'https://onechan.xyz/api/v1'
-//     : process.env.NODE_ENV === 'development'
-//       ? 'http://localhost:8080/api/v1'
-//       : 'http://54.169.160.55/api/v1';
+// export const BASE_API_URL = `https://onechan.xyz/api/v1`;
+// export const BASE_URL = `https://onechan.xyz`;
 
-// export const BASE_URL =
-//   process.env.HTTPS_ENABLED === 'true'
-//     ? process.env.NODE_ENV === 'development'
-//       ? 'https://localhost:8080'
-//       : 'https://onechan.xyz'
-//     : process.env.NODE_ENV === 'development'
-//       ? 'http://localhost:8080'
-//       : 'http://54.169.160.55';
-
-export const BASE_API_URL = `https://onechan.xyz/api/v1`;
-export const BASE_URL = `https://onechan.xyz`;
+export const BASE_API_URL = 'http://localhost:8080/api/v1';
+export const BASE_URL = 'http://localhost:8080';
 
 export default async function RootLayout({
   children,

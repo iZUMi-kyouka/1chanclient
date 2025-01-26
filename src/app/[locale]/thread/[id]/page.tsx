@@ -2,7 +2,7 @@
 
 import { BASE_API_URL } from '@/app/[locale]/layout';
 import FullPageSpinner from '@/components/loading/fullPageLoading';
-import ThreadOpenView from '@/components/threadOpenView';
+import ThreadOpenView from '@/components/thread/threadOpenView';
 import ColFlexBox from '@/components/wrapper/colFlexContainer';
 import { ThreadViewResponse } from '@/interfaces/thread';
 import { generalFetch } from '@/utils/customFetch';

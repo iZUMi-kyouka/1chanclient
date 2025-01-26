@@ -1,10 +1,9 @@
 'use client';
 
-import RefreshButton from '@/components/button/refreshButton';
 import CustomTagChip from '@/components/chip/customTagChip';
 import TagChip from '@/components/chip/tagChip';
-import FullPageSpinner from '@/components/loading/fullPageLoading';
 import InfiniteScrollLoading from '@/components/loading/infiniteScrollLoading';
+import WrappedLoading from '@/components/loading/wrappedLoading';
 import ThreadList from '@/components/thread/threadList';
 import ThreadListFilterDropdown from '@/components/thread/threadListFilterDialog';
 import ColFlexBox from '@/components/wrapper/colFlexContainer';
@@ -14,7 +13,7 @@ import { Thread } from '@/interfaces/thread';
 import { generalFetch } from '@/utils/customFetch';
 import { makeQueriedThreadListURL } from '@/utils/makeUrl';
 import { splitCustomTags, splitTags } from '@/utils/tagsSplitter';
-import { Box, Container, Typography, useTheme } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
@@ -58,75 +57,87 @@ const Page = () => {
       revalidateFirstPage: false,
     }
   );
-
+  const handleRefresh = () => mutate(undefined);
   useEffect(() => {
     setSize(size + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView]);
 
-  if (error) {
-    return (
-      <ColFlexBox>
-        <title>{`1chan | Search`}</title>
-        <Typography>Failed to fetch search results.</Typography>
-        <Typography>Please refresh the page.</Typography>
-      </ColFlexBox>
-    );
-  }
+  const threads: PaginatedResponse<Thread>[] = [];
+  data?.forEach((threadViewResponse) => threads.push(threadViewResponse));
 
-  if (isLoading) {
-    return <FullPageSpinner />;
-  }
-
-  if (data) {
-    const threads: PaginatedResponse<Thread>[] = [];
-    data.forEach((threadViewResponse) => threads.push(threadViewResponse));
-
-    return (
+  return (
+    <>
       <Box
         display={'flex'}
         flexDirection={'column'}
         alignItems={'center'}
         gap={theme.spacing(2)}
+        width={'925px'}
         paddingTop={theme.spacing(2)}
         sx={{
           [theme.breakpoints.down('lg')]: {
-            width: '100%'
-          }
+            width: '100%',
+          },
         }}
       >
         <title>{`1chan | Search`}</title>
+
+        {/* Header info */}
         <Typography variant="h5">{`${searchQuery ? `Search result for "${searchQuery}"` : 'Search Result'}`}</Typography>
-        <RowFlexBox>
+        <RowFlexBox display={customTags ? 'flex' : 'none'}>
           {customTags
             ? splitCustomTags(customTags).map((t, idx) => (
                 <CustomTagChip key={idx} customTag={t} />
               ))
             : null}
         </RowFlexBox>
-        <RowFlexBox>
+        <RowFlexBox display={customTags ? 'flex' : 'none'}>
           {tags
             ? splitTags(tags).map((t, idx) => <TagChip key={idx} tagID={t} />)
             : null}
         </RowFlexBox>
-        <Container sx={{ margin: '0 !important', padding: '0 !important' }}>
-          {threads.length > 0 && threads[0].response ? (
-            <Box display={'flex'} gap={theme.spacing(1)}>
-              <ThreadListFilterDropdown />
-              <RefreshButton onClick={() => mutate(undefined)} />
-            </Box>
-          ) : (
-            <></>
-          )}
-        </Container>
-        <ThreadList threads={threads} />
-        <InfiniteScrollLoading
-          ref={ref}
-          pagination={data[data.length - 1].pagination}
-        />
+
+        {/* Filters */}
+      
+          <Box
+            display={'flex'}
+            gap={theme.spacing(1)}
+            flexGrow={1}
+            alignItems={'center'}
+            width={'100%'}
+          >
+            <ThreadListFilterDropdown
+              disabled={isLoading || !(threads.length > 0 && threads[0].response)}
+              disableRelevance
+              onRefresh={handleRefresh}
+            />
+          </Box>
+    
+
+        {/* Error page */}
+        {error && (
+          <ColFlexBox>
+            <Typography>Failed to fetch search results.</Typography>
+            <Typography>Please refresh the page.</Typography>
+          </ColFlexBox>
+        )}
+
+        {/* Thread list */}
+        {data ? (
+          <>
+            <ThreadList mutateHook={mutate} threads={threads} />
+            <InfiniteScrollLoading
+              ref={ref}
+              pagination={data[data.length - 1].pagination}
+            />
+          </>
+        ) : (
+          isLoading && <WrappedLoading />
+        )}
       </Box>
-    );
-  }
+    </>
+  );
 };
 
 export default Page;
