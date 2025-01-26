@@ -2,7 +2,10 @@
 
 import { BASE_API_URL } from '@/app/[locale]/layout';
 import { Thread } from '@/interfaces/thread';
-import { openCopyPasteSnackbar, SupportedLanguages } from '@/store/appState/appStateSlice';
+import {
+  openCopyPasteSnackbar,
+  SupportedLanguages,
+} from '@/store/appState/appStateSlice';
 import { selectAccessToken } from '@/store/auth/authSlice';
 import {
   addToThreadDislike,
@@ -33,7 +36,7 @@ import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { KeyedMutator } from 'swr';
+import { SWRInfiniteKeyedMutator } from 'swr/infinite';
 import LikeDislikeButton from '../button/likeDislikeButton';
 import ShareButton from '../button/shareButton';
 import CommentCountChip from '../chip/commentCountChip';
@@ -57,7 +60,7 @@ const ThreadCard = ({
   thread: Thread;
   width?: string;
   disableOnClick?: boolean;
-  mutateHook?: KeyedMutator<ThreadListResponse>;
+  mutateHook?: SWRInfiniteKeyedMutator<ThreadListResponse[]>;
   showTags?: boolean;
   showCustomTags?: boolean;
 }) => {
@@ -73,8 +76,8 @@ const ThreadCard = ({
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const [likeCount, setLikeCount] = useState(thread.like_count);
-  const [dislikeCount, setDislikeCount] = useState(thread.dislike_count);
+  // const [likeCount, setLikeCount] = useState(thread.like_count);
+  // const [dislikeCount, setDislikeCount] = useState(thread.dislike_count);
   const [reportAnchorEl, setReportAnchorEl] = useState<null | HTMLElement>(
     null
   );
@@ -82,8 +85,8 @@ const ThreadCard = ({
   const reportRef = useRef<HTMLInputElement | null>(null);
 
   const likesDisabled = accessToken === '';
-  const isLiked = likes[thread.id] !== undefined && likes[thread.id] === 1;
-  const isDisliked = likes[thread.id] !== undefined && likes[thread.id] === 0;
+  const isLiked = likes[thread.id] === 1;
+  const isDisliked = likes[thread.id] === 0;
   const isOwnedByCurrentUser = writtenThreads[thread.id] === 0 ? true : false;
   const updatedDate = thread.updated_date
     ? format(thread.updated_date, 'MMM d, y')
@@ -93,30 +96,93 @@ const ThreadCard = ({
     : '';
 
   const handleLikeClick = (e: React.MouseEvent<HTMLElement>) => {
-    if (mutateHook) {
-      mutateHook();
-    }
     e.stopPropagation();
-    if (!isDisliked && !isLiked) {
+    if ((!isDisliked && !isLiked) || isDisliked) {
       handleLikeDislike(1);
-    } else if (isLiked) {
-      handleLikeDislike(1, true);
     } else {
-      handleLikeDislike(1);
+      handleLikeDislike(1, true);
+    }
+
+    if (mutateHook) {
+      mutateHook((data) => data, {
+        optimisticData: (data) => {
+          const threadListArr = data as ThreadListResponse[];
+          const newThreadList = threadListArr.map((threadList) => {
+            if (threadList.response) {
+              const newResponse = threadList.response.map((curThread) => {
+                if (curThread.id === thread.id) {
+                  const newThread: Thread = {
+                    ...curThread,
+                    like_count:
+                      (!isDisliked && !isLiked) || isDisliked
+                        ? curThread.like_count + 1
+                        : curThread.like_count - 1,
+                    dislike_count: isDisliked
+                      ? curThread.dislike_count - 1
+                      : curThread.dislike_count,
+                  };
+                  return newThread;
+                } else {
+                  return curThread;
+                }
+              });
+
+              return { ...threadList, response: newResponse };
+            } else {
+              return threadList;
+            }
+          });
+          return newThreadList;
+        },
+        revalidate: false,
+        populateCache: false,
+      });
     }
   };
 
   const handleDislikeClick = (e: React.MouseEvent<HTMLElement>) => {
-    if (mutateHook) {
-      mutateHook();
-    }
     e.stopPropagation();
-    if (!isDisliked && !isLiked) {
+
+    if ((!isDisliked && !isLiked) || isLiked) {
       handleLikeDislike(0);
-    } else if (isDisliked) {
-      handleLikeDislike(0, true);
     } else {
-      handleLikeDislike(0);
+      handleLikeDislike(0, true);
+    }
+
+    if (mutateHook) {
+      mutateHook((data) => data, {
+        optimisticData: (data) => {
+          const threadListArr = data as ThreadListResponse[];
+          const newThreadList = threadListArr.map((threadList) => {
+            if (threadList.response) {
+              const newResponse = threadList.response.map((curThread) => {
+                if (curThread.id === thread.id) {
+                  const newThread: Thread = {
+                    ...curThread,
+                    dislike_count:
+                      (!isDisliked && !isLiked) || isLiked
+                        ? curThread.dislike_count + 1
+                        : curThread.dislike_count - 1,
+                    like_count: isLiked
+                      ? curThread.like_count - 1
+                      : curThread.like_count,
+                  };
+                  return newThread;
+                } else {
+                  return curThread;
+                }
+              });
+
+              return { ...threadList, response: newResponse };
+            } else {
+              return threadList;
+            }
+          });
+          return newThreadList;
+        },
+        revalidate: false,
+        populateCache: false,
+      });
     }
   };
 
@@ -212,30 +278,30 @@ const ThreadCard = ({
       if (response.ok) {
         console.log('response ok');
         if (remove) {
-          if (likeDislike === 1) {
-            setLikeCount(likeCount - 1);
-          } else {
-            setDislikeCount(dislikeCount - 1);
-          }
+          // if (likeDislike === 1) {
+          //   setLikeCount(likeCount - 1);
+          // } else {
+          //   setDislikeCount(dislikeCount - 1);
+          // }
           dispatch(removeFromThreadLikeDislike(thread.id));
         } else {
           if (likeDislike === 1) {
-            setLikeCount(likeCount + 1);
-            if (isDisliked) {
-              setDislikeCount(dislikeCount - 1);
-            }
+            // setLikeCount(likeCount + 1);
+            // if (isDisliked) {
+            //   setDislikeCount(dislikeCount - 1);
+            // }
             dispatch(addToThreadLike(thread.id));
           } else {
-            setDislikeCount(dislikeCount + 1);
-            if (isLiked) {
-              setLikeCount(likeCount - 1);
-            }
+            // setDislikeCount(dislikeCount + 1);
+            // if (isLiked) {
+            //   setLikeCount(likeCount - 1);
+            // }
             dispatch(addToThreadDislike(thread.id));
           }
         }
       }
-    } catch (err) {
-      console.log(`error: ${err}`);
+    } catch (err: unknown) {
+      throw err;
     }
   };
 
@@ -407,8 +473,8 @@ const ThreadCard = ({
         >
           <LikeDislikeButton
             disabled={likesDisabled}
-            likeCount={likeCount}
-            dislikeCount={dislikeCount}
+            likeCount={thread.like_count}
+            dislikeCount={thread.dislike_count}
             status={isLiked ? 'liked' : isDisliked ? 'disliked' : 'undefined'}
             onLikeClick={handleLikeClick}
             onDislikeClick={handleDislikeClick}
@@ -416,15 +482,19 @@ const ThreadCard = ({
           <ShareButton onCopyToClipboard={copyToClipboard} />
 
           <Box sx={{ flexGrow: 1 }} />
-          <RowFlexBox sx={{
-            [theme.breakpoints.down(375)]: {
-              display: 'none'
-            }
-          }}>
+          <RowFlexBox
+            sx={{
+              [theme.breakpoints.down(375)]: {
+                display: 'none',
+              },
+            }}
+          >
             <ViewCountChip viewCount={thread.view_count} />
             <Tooltip
               title={
-                lastCommentDate ? `Last comment was on ${lastCommentDate}` : null
+                lastCommentDate
+                  ? `Last comment was on ${lastCommentDate}`
+                  : null
               }
             >
               <Box>

@@ -16,6 +16,7 @@ const authSlice = createSlice({
       state.accessToken = action.payload;
     },
     updateDeviceID(state, action: PayloadAction<string>) {
+      localStorage.setItem('deviceID', action.payload);
       state.deviceID = action.payload;
     },
     setIsRefreshing(state, action: PayloadAction<boolean>) {

@@ -1,16 +1,11 @@
 import { BASE_API_URL } from '@/app/[locale]/layout';
-import { UserLikes, WrittenComments, WrittenThreads } from '@/interfaces/user';
 import {
-    resetAuth,
-    setIsRefreshing,
-    updateAccessToken,
+  resetAuth,
+  setIsRefreshing,
+  updateAccessToken,
 } from '@/store/auth/authSlice';
 import {
-    resetUser,
-    updateCommentLike,
-    updateThreadLike,
-    updateWrittenComments,
-    updateWrittenThreads,
+  resetUser
 } from '@/store/user/userSlice';
 import { store } from '../store/store';
 
@@ -94,38 +89,38 @@ export async function customFetch(
           await refreshAccessTokenPromise;
 
           // Refresh user metadata (likes, dislikes, owned threads and comments)
-          let response = await customFetch(`${BASE_API_URL}/users/likes`, {
-            method: 'GET',
-          });
+          // let response = await customFetch(`${BASE_API_URL}/users/likes`, {
+          //   method: 'GET',
+          // });
 
-          if (response.ok) {
-            const likes = (await response.json()) as UserLikes;
-            store.dispatch(updateThreadLike(likes.threads));
-            store.dispatch(updateCommentLike(likes.comments));
-          } else {
-            throw new Error('failed to fetch liked threads');
-          }
+          // if (response.ok) {
+          //   const likes = (await response.json()) as UserLikes;
+          //   store.dispatch(updateThreadLike(likes.threads));
+          //   store.dispatch(updateCommentLike(likes.comments));
+          // } else {
+          //   throw new Error('failed to fetch liked threads');
+          // }
 
-          response = await customFetch(`${BASE_API_URL}/users/threads`, {
-            method: 'GET',
-          });
+          // response = await customFetch(`${BASE_API_URL}/users/threads`, {
+          //   method: 'GET',
+          // });
 
-          if (response.ok) {
-            const threads = (await response.json()) as WrittenThreads;
-            store.dispatch(updateWrittenThreads(threads));
-          } else {
-            throw new Error('failed to fetch written threads.');
-          }
+          // if (response.ok) {
+          //   const threads = (await response.json()) as WrittenThreads;
+          //   store.dispatch(updateWrittenThreads(threads));
+          // } else {
+          //   throw new Error('failed to fetch written threads.');
+          // }
 
-          response = await customFetch(`${BASE_API_URL}/users/comments`, {
-            method: 'GET',
-          });
-          if (response.ok) {
-            const comments = (await response.json()) as WrittenComments;
-            store.dispatch(updateWrittenComments(comments));
-          } else {
-            throw new Error('failed to fetch written comments.');
-          }
+          // response = await customFetch(`${BASE_API_URL}/users/comments`, {
+          //   method: 'GET',
+          // });
+          // if (response.ok) {
+          //   const comments = (await response.json()) as WrittenComments;
+          //   store.dispatch(updateWrittenComments(comments));
+          // } else {
+          //   throw new Error('failed to fetch written comments.');
+          // }
         } catch (err) {
           console.log(
             `an error occurred in making auth-required request: ${err}`

@@ -1,9 +1,8 @@
 'use client';
 
-import RefreshButton from '@/components/button/refreshButton';
 import FullPageSpinner from '@/components/loading/fullPageLoading';
 import InfiniteScrollLoading from '@/components/loading/infiniteScrollLoading';
-import ThreadList from '@/components/thread/threadList';
+import ThreadList, { ThreadListResponse } from '@/components/thread/threadList';
 import ThreadListFilterDropdown from '@/components/thread/threadListFilterDialog';
 import RowFlexBox from '@/components/wrapper/rowFlexContainer';
 import PaginatedResponse from '@/interfaces/paginatedResponse';
@@ -15,6 +14,7 @@ import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
+import { Fetcher } from 'swr';
 import useSWRInfinite from 'swr/infinite';
 
 export default function Home() {
@@ -45,11 +45,13 @@ export default function Home() {
   const { ref, inView } = useInView({ threshold: 0.2 });
   const { data, error, isLoading, mutate, size, setSize } = useSWRInfinite(
     getKey,
-    generalFetch(),
+    generalFetch() as Fetcher<ThreadListResponse, string>,
     {
       revalidateFirstPage: false,
     }
   );
+  
+  const handleRefresh = () => mutate(undefined);
 
   useEffect(() => {
     setSize(size + 1);
@@ -89,8 +91,7 @@ export default function Home() {
                   }}
                 >
                     <Box display={'flex'} gap={theme.spacing(1)} flexGrow={1} alignItems={'center'}>
-                      <ThreadListFilterDropdown disabled={isLoading} disableRelevance />
-                      <RefreshButton disabled={isLoading} onClick={() => mutate(undefined)} />
+                      <ThreadListFilterDropdown disabled={isLoading} disableRelevance onRefresh={handleRefresh} />
                     </Box>
                   {/* <Typography>{t('title')}</Typography> */}
 
@@ -104,7 +105,7 @@ export default function Home() {
 
                   {data ? (
                     <>
-                      <ThreadList threads={data} />
+                      <ThreadList mutateHook={mutate} threads={data} />
                       <InfiniteScrollLoading
                         ref={ref}
                         pagination={data[data.length - 1].pagination}

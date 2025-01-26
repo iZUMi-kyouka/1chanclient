@@ -1,7 +1,13 @@
 import {
+  AdsClickSharp,
   ArrowDownwardSharp,
   ArrowUpwardSharp,
+  CalendarMonthSharp,
+  CommentSharp,
+  FilterListSharp,
   SortSharp,
+  ThumbDownSharp,
+  ThumbUpSharp,
 } from '@mui/icons-material';
 import {
   Button,
@@ -18,7 +24,7 @@ import {
 } from '@mui/material';
 import { AnimatePresence, motion } from 'motion/react';
 import { useQueryState } from 'nuqs';
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import RefreshButton from '../button/refreshButton';
 import StandardCard from '../StandardCard';
 import ColFlexBox from '../wrapper/colFlexContainer';
@@ -27,11 +33,11 @@ import RowFlexBox from '../wrapper/rowFlexContainer';
 const ThreadListFilterDropdown = ({
   disabled,
   disableRelevance,
-  onRefresh
+  onRefresh,
 }: {
   disabled?: boolean;
   disableRelevance?: boolean;
-  onRefresh?: () => void
+  onRefresh?: () => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const theme = useTheme();
@@ -43,7 +49,14 @@ const ThreadListFilterDropdown = ({
     defaultValue: 'desc',
   });
 
-  const sortParams = ['relevance', 'views', 'date', 'likes', 'dislikes', 'comments'];
+  const sortParams: [[string, ReactElement]] = [
+    ['relevance', <FilterListSharp />],
+    ['views', <AdsClickSharp />],
+    ['date', <CalendarMonthSharp />],
+    ['likes', <ThumbUpSharp />],
+    ['dislikes', <ThumbDownSharp />],
+    ['comments', <CommentSharp />],
+  ];
   const handleClose = () => {
     setIsOpen(false);
   };
@@ -53,12 +66,12 @@ const ThreadListFilterDropdown = ({
       <ColFlexBox
         sx={{
           alignItems: 'flex-start',
-          gap: 0
+          gap: 0,
         }}
       >
         <RowFlexBox>
           <FormControl
-            sx={{ m: 1, minWidth: 120 }}
+            sx={{ m: 1, minWidth: 160 }}
             size="small"
             disabled={disabled}
           >
@@ -75,8 +88,11 @@ const ThreadListFilterDropdown = ({
               {sortParams.map((p, idx) => {
                 if (disableRelevance && idx === 0) return null;
                 return (
-                  <MenuItem key={idx} value={p}>
-                    {p[0].toUpperCase() + p.slice(1)}
+                  <MenuItem key={idx} value={p[0]}>
+                    <RowFlexBox>
+                      {p[1]}
+                      {p[0][0].toUpperCase() + p[0].slice(1)}
+                    </RowFlexBox>
                   </MenuItem>
                 );
               })}
@@ -102,6 +118,7 @@ const ThreadListFilterDropdown = ({
             </ToggleButton>
           </ToggleButtonGroup>
           <Button
+            disableElevation
             disabled={disabled}
             variant="contained"
             onClick={() => setIsOpen(!isOpen)}
@@ -109,7 +126,7 @@ const ThreadListFilterDropdown = ({
           >
             More Filters
           </Button>
-          <RefreshButton onClick={onRefresh} />
+          <RefreshButton disabled={disabled} onClick={onRefresh} />
         </RowFlexBox>
         <AnimatePresence>
           {isOpen && (

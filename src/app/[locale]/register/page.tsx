@@ -1,6 +1,6 @@
 'use client';
 import { LocaleParams } from '@/store/appState/appStateSlice';
-import { selectDeviceID, updateAccessToken } from '@/store/auth/authSlice';
+import { selectDeviceID, updateAccessToken, updateDeviceID } from '@/store/auth/authSlice';
 import { updateUser } from '@/store/user/userSlice';
 import {
   LoginSharp,
@@ -25,6 +25,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { use, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { v4 as uuidv4 } from 'uuid';
 import { BASE_API_URL } from '../layout';
 import theme from '../theme';
 
@@ -41,7 +42,7 @@ import theme from '../theme';
 // }
 
 const Page = ({ params }: LocaleParams) => {
-  const deviceID = useSelector(selectDeviceID);
+  let deviceID = useSelector(selectDeviceID);
   const router = useRouter();
   const dispatch = useDispatch();
   const locale = use(params).locale;
@@ -87,6 +88,13 @@ const Page = ({ params }: LocaleParams) => {
     setIsLoading(true);
 
     try {
+      let newDeviceID: string;
+      if (deviceID === '') {
+        newDeviceID = uuidv4();
+        dispatch(updateDeviceID(newDeviceID));
+        deviceID = newDeviceID;
+      }
+      
       const response = await fetch(`${BASE_API_URL}/users/register`, {
         method: 'POST',
         headers: {
@@ -98,8 +106,11 @@ const Page = ({ params }: LocaleParams) => {
       });
 
       if (!response.ok) {
+        const error = await response.json();
         if (response.status === 409) {
           throw new Error('Username already exists.');
+        } else if (response.status === 400 && error.description && error.description === "missing device ID") {
+          throw new Error('Device ID has been reset. Please try again.')
         } else {
           throw new Error('Failed to register. Please try again soon.');
         }

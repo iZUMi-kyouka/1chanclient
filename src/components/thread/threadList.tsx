@@ -6,7 +6,7 @@ import {
 } from '@/store/appState/appStateSlice';
 import { Container, Typography, useTheme } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { KeyedMutator } from 'swr/_internal';
+import { SWRInfiniteKeyedMutator } from 'swr/infinite';
 import ColFlexBox from '../wrapper/colFlexContainer';
 import ThreadCard from './threadCard';
 
@@ -17,7 +17,7 @@ const ThreadList = ({
   mutateHook,
 }: {
   threads: ThreadListResponse[];
-  mutateHook?: KeyedMutator<ThreadListResponse>;
+  mutateHook?: SWRInfiniteKeyedMutator<ThreadListResponse[]>;
 }) => {
   const theme = useTheme();
   const showTags = useSelector(selectAlwaysShowTags);
@@ -53,7 +53,7 @@ const ThreadList = ({
               showTags={showTags}
               showCustomTags={showCustomTags}
               mutateHook={mutateHook}
-              key={'_'+Math.random().toString(36).substring(2, 9)}
+              key={'_' + Math.random().toString(36).substring(2, 9)}
               thread={thread}
             />
           ))
